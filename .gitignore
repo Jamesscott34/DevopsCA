@@ -1,7 +1,7 @@
-venv/
+devops_venv/
 __pycache__/
 *.pyc
-*.log
 *.sqlite3
+*.log
 .env
 .DS_Store
