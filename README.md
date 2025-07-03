@@ -52,6 +52,17 @@ This is a Django-based book catalogue system developed as part of a DevOps assig
 
 ---
 
+
+
+## 👨‍💻 Author
+
+**James Scott**  
+Student ID: SBA24070  
+Email: jamesdeanscott19@gmail.com
+GitHub: [github.com/Jamesscott34](https://github.com/Jamesscott34)
+
+---
+
 ## 🧪 Setup Instructions
 
 ```bash
