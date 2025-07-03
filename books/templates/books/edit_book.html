@@ -1,11 +1,40 @@
-<!-- edit_book.html -->
 {% extends 'books/base.html' %}
 {% block content %}
-<h2>Edit Book</h2>
-<form method="post">
+  <h2>Edit Book</h2>
+
+  <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+
+    <div class="mb-3">
+      <label for="id_title" class="form-label">Title</label>
+      {{ form.title }}
+    </div>
+
+    <div class="mb-3">
+      <label for="id_author" class="form-label">Author</label>
+      {{ form.author }}
+    </div>
+
+    <div class="mb-3">
+      <label for="id_published_date" class="form-label">Published Date</label>
+      {{ form.published_date }}
+    </div>
+
+    <div class="mb-3">
+      <label for="id_isbn" class="form-label">ISBN</label>
+      {{ form.isbn }}
+    </div>
+
+    <div class="mb-3">
+      <label for="id_description" class="form-label">Description</label>
+      {{ form.description }}
+    </div>
+
+    <div class="mb-3 form-check">
+      {{ form.is_read }} <label class="form-check-label" for="id_is_read">Mark as Read</label>
+    </div>
+
     <button type="submit" class="btn btn-success">Update</button>
     <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
-</form>
+  </form>
 {% endblock %}

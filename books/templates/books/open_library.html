@@ -1,0 +1,48 @@
+{% extends 'books/base.html' %}
+{% block content %}
+
+<h2>Search Open Library</h2>
+
+<form method="GET" action="{% url 'open_library_search' %}" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="query" class="form-control" placeholder="Search by title, author, or ISBN" required>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
+
+{% if results %}
+    <h4>Results for "{{ query }}"</h4>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for book in results %}
+        <div class="col">
+            <div class="card h-100">
+                {% if book.cover_url %}
+                    <img src="{{ book.cover_url }}" class="card-img-top" alt="Cover">
+                {% else %}
+                    <img src="https://via.placeholder.com/150x220?text=No+Cover" class="card-img-top" alt="No Cover">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ book.title }}</h5>
+                    <p class="card-text">Author: {{ book.author }}</p>
+                    <p class="card-text">Published: {{ book.publish_year }}</p>
+                    <form method="POST" action="{% url 'save_open_library_book' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="title" value="{{ book.title }}">
+                        <input type="hidden" name="author" value="{{ book.author }}">
+                        <input type="hidden" name="published_date" value="{{ book.publish_year }}">
+                        <input type="hidden" name="isbn" value="{{ book.isbn }}">
+                        <button type="submit" class="btn btn-success btn-sm">Save to Library</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% elif query %}
+    <p>No results found for "{{ query }}".</p>
+{% endif %}
+
+<a href="{% url 'home' %}" class="btn btn-secondary mt-4">Back to My Library</a>
+
+{% endblock %}
+

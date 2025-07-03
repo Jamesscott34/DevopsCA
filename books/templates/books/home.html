@@ -2,8 +2,15 @@
 {% extends 'books/base.html' %}
 {% block content %}
 
-<a href="{% url 'add_book' %}" class="btn btn-primary mb-3">Add New Book</a>
+<h2 class="mb-4">Welcome, James Scott (SBA24070)</h2>
 
+<!-- Top action buttons -->
+<div class="mb-3">
+    <a href="{% url 'add_book' %}" class="btn btn-primary">➕ Add Book Manually</a>
+    <a href="{% url 'open_library_search' %}" class="btn btn-info">🌐 Browse Open Library</a>
+</div>
+
+<!-- Table of saved books -->
 <table class="table table-striped">
     <thead>
         <tr>
@@ -11,6 +18,7 @@
             <th>Author</th>
             <th>Published</th>
             <th>ISBN</th>
+            <th>Description</th> <!-- Added column header -->
             <th>Status</th>
             <th>Actions</th>
         </tr>
@@ -22,10 +30,11 @@
             <td>{{ book.author }}</td>
             <td>{{ book.published_date }}</td>
             <td>{{ book.isbn }}</td>
+            <td style="max-width: 250px; word-wrap: break-word;">{{ book.description|default:"—" }}</td> <!-- Correct placement -->
             <td>{% if book.is_read %}Read{% else %}Unread{% endif %}</td>
             <td>
-                <a href="{% url 'edit_book' book.id %}" class="btn btn-warning btn-sm">Edit</a>
-                <a href="{% url 'delete_book' book.id %}" class="btn btn-danger btn-sm">Delete</a>
+                <a href="{% url 'edit_book' book.id %}" class="btn btn-warning btn-sm">✏️ Edit</a>
+                <a href="{% url 'delete_book_by_isbn' book.isbn %}" class="btn btn-danger btn-sm">🗑️ Delete</a>
                 <a href="{% url 'toggle_read' book.id %}" class="btn btn-outline-secondary btn-sm">
                     {% if book.is_read %}Mark Unread{% else %}Mark Read{% endif %}
                 </a>
@@ -35,8 +44,10 @@
     </tbody>
 </table>
 
-<!-- Navigation buttons -->
-<a href="{% url 'read_books' %}" class="btn btn-outline-success">View Read Books</a>
-<a href="{% url 'unread_books' %}" class="btn btn-outline-warning">View Unread Books</a>
+<!-- Filter buttons -->
+<div class="mt-3">
+    <a href="{% url 'read_books' %}" class="btn btn-outline-success">📖 View Read Books</a>
+    <a href="{% url 'unread_books' %}" class="btn btn-outline-warning">📚 View Unread Books</a>
+</div>
 
 {% endblock %}
