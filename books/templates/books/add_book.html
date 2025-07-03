@@ -1,0 +1,11 @@
+<!-- add_book.html -->
+{% extends 'books/base.html' %}
+{% block content %}
+<h2>Add a New Book</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

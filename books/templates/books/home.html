@@ -1,0 +1,42 @@
+<!-- home.html -->
+{% extends 'books/base.html' %}
+{% block content %}
+
+<a href="{% url 'add_book' %}" class="btn btn-primary mb-3">Add New Book</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Published</th>
+            <th>ISBN</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in books %}
+        <tr class="{% if book.is_read %}table-success{% endif %}">
+            <td>{{ book.title }}</td>
+            <td>{{ book.author }}</td>
+            <td>{{ book.published_date }}</td>
+            <td>{{ book.isbn }}</td>
+            <td>{% if book.is_read %}Read{% else %}Unread{% endif %}</td>
+            <td>
+                <a href="{% url 'edit_book' book.id %}" class="btn btn-warning btn-sm">Edit</a>
+                <a href="{% url 'delete_book' book.id %}" class="btn btn-danger btn-sm">Delete</a>
+                <a href="{% url 'toggle_read' book.id %}" class="btn btn-outline-secondary btn-sm">
+                    {% if book.is_read %}Mark Unread{% else %}Mark Read{% endif %}
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Navigation buttons -->
+<a href="{% url 'read_books' %}" class="btn btn-outline-success">View Read Books</a>
+<a href="{% url 'unread_books' %}" class="btn btn-outline-warning">View Unread Books</a>
+
+{% endblock %}
