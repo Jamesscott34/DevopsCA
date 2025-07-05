@@ -1,0 +1,536 @@
+/*
+    Custom CSS for Book Catalog Application - Beautiful Color Scheme
+    
+    This stylesheet provides the visual design and styling for the entire Book Catalog application.
+    It includes a modern color scheme, responsive design, animations, and custom styling for
+    all components including forms, tables, buttons, and navigation elements.
+    
+    Color Palette:
+    - Primary: #2c3e50 (Dark Blue-Gray)
+    - Secondary: #3498db (Bright Blue)
+    - Accent: #e74c3c (Red)
+    - Success: #27ae60 (Green)
+    - Warning: #f39c12 (Orange)
+    - Info: #17a2b8 (Cyan)
+*/
+
+/* CSS Custom Properties (Variables) for consistent color usage throughout the application */
+:root {
+    --primary-color: #2c3e50;      /* Main brand color for headers and primary elements */
+    --secondary-color: #3498db;    /* Secondary color for buttons and links */
+    --accent-color: #e74c3c;       /* Accent color for danger actions and highlights */
+    --success-color: #27ae60;      /* Success color for positive actions and read books */
+    --warning-color: #f39c12;      /* Warning color for pending actions and unread books */
+    --info-color: #17a2b8;         /* Info color for informational elements */
+    --light-bg: #ecf0f1;           /* Light background color for subtle backgrounds */
+    --dark-bg: #2c3e50;            /* Dark background color for headers and footers */
+    --text-light: #ffffff;         /* Light text color for dark backgrounds */
+    --text-dark: #2c3e50;          /* Dark text color for light backgrounds */
+    --border-color: #bdc3c7;       /* Border color for form elements and tables */
+}
+
+/* Global body styling with gradient background and typography */
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Beautiful purple gradient background */
+    min-height: 100vh; /* Ensure full viewport height */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern, readable font stack */
+}
+
+/* Main container styling with glassmorphism effect */
+.container {
+    background: rgba(255, 255, 255, 0.95); /* Semi-transparent white background */
+    border-radius: 15px; /* Rounded corners for modern look */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    backdrop-filter: blur(10px); /* Glassmorphism blur effect */
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 30px;
+}
+
+/* Navigation Bar Styling */
+/* Styles the top navigation bar with gradient background and modern design */
+.navbar {
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); /* Gradient background */
+    border-radius: 15px; /* Rounded corners */
+    margin-bottom: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+}
+
+/* Brand/logo styling in navigation */
+.navbar-brand {
+    font-weight: 700; /* Bold font weight */
+    font-size: 1.5rem; /* Larger font size */
+    color: white !important; /* White text color */
+}
+
+/* User information text in navigation */
+.navbar-text {
+    color: white !important; /* White text color */
+    font-weight: 600; /* Semi-bold font weight */
+}
+
+/* Button styling within navigation */
+.navbar-nav .btn {
+    margin: 0 5px; /* Spacing between buttons */
+    border-radius: 20px; /* Rounded button corners */
+    font-weight: 600; /* Semi-bold font weight */
+    text-transform: uppercase; /* Uppercase text */
+    letter-spacing: 0.5px; /* Letter spacing for readability */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+}
+
+/* Hover effect for navigation buttons */
+.navbar-nav .btn:hover {
+    transform: translateY(-2px); /* Slight upward movement on hover */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+}
+
+/* Badge styling for admin indicator */
+.badge {
+    font-size: 0.7rem; /* Small font size */
+    padding: 0.3em 0.6em; /* Compact padding */
+}
+
+/* Header Styling */
+/* Styles for main page headers and titles */
+h1 {
+    color: var(--primary-color); /* Primary color for main title */
+    text-align: center; /* Center alignment */
+    font-weight: 700; /* Bold font weight */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1); /* Subtle text shadow */
+    margin-bottom: 30px;
+    border-bottom: 3px solid var(--secondary-color); /* Bottom border accent */
+    padding-bottom: 15px;
+}
+
+h2 {
+    color: var(--primary-color); /* Primary color for secondary headers */
+    font-weight: 600; /* Semi-bold font weight */
+    margin-bottom: 25px;
+}
+
+/* Card Styling for Registration Form and other card components */
+/* Provides consistent styling for card-based layouts */
+.card {
+    border: none; /* Remove default border */
+    border-radius: 15px; /* Rounded corners */
+    overflow: hidden; /* Hide overflow content */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Hover effect for cards */
+.card:hover {
+    transform: translateY(-5px); /* Upward movement on hover */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+/* Card header styling with gradient background */
+.card-header {
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); /* Gradient background */
+    border: none; /* Remove default border */
+    padding: 20px;
+    color: white; /* White text color */
+}
+
+/* Card header title styling */
+.card-header h2 {
+    color: white; /* White text color */
+    margin: 0; /* Remove default margin */
+    font-size: 1.5rem; /* Font size */
+}
+
+/* Card header subtitle styling */
+.card-header h5 {
+    color: white; /* White text color */
+    margin: 0; /* Remove default margin */
+    font-weight: 600; /* Semi-bold font weight */
+}
+
+/* Card body styling */
+.card-body {
+    padding: 30px; /* Internal padding */
+    background: white; /* White background */
+}
+
+/* Admin Dashboard Cards */
+/* Special styling for statistics cards in admin dashboard */
+.card.text-white {
+    border-radius: 15px; /* Rounded corners */
+    overflow: hidden; /* Hide overflow */
+    transition: all 0.3s ease; /* Smooth transition */
+}
+
+/* Hover effect for admin dashboard cards */
+.card.text-white:hover {
+    transform: translateY(-3px); /* Upward movement on hover */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
+}
+
+/* Admin dashboard card title styling */
+.card.text-white .card-title {
+    font-size: 2.5rem; /* Large font size for statistics */
+    font-weight: 700; /* Bold font weight */
+    margin-bottom: 10px;
+}
+
+/* Admin dashboard card text styling */
+.card.text-white .card-text {
+    font-size: 1.1rem; /* Font size */
+    font-weight: 600; /* Semi-bold font weight */
+    text-transform: uppercase; /* Uppercase text */
+    letter-spacing: 0.5px; /* Letter spacing */
+}
+
+/* Form Group Styling */
+/* Styling for form field groups and labels */
+.form-group {
+    margin-bottom: 20px; /* Bottom margin for spacing */
+}
+
+/* Form label styling */
+.form-label {
+    font-weight: 600; /* Semi-bold font weight */
+    color: var(--primary-color); /* Primary color */
+    margin-bottom: 8px; /* Bottom margin */
+    display: block; /* Block display */
+}
+
+/* Icon styling within form labels */
+.form-label i {
+    margin-right: 8px; /* Right margin for spacing */
+    color: var(--secondary-color); /* Secondary color for icons */
+}
+
+/* Button Styling */
+/* Comprehensive button styling for all button types */
+.btn {
+    border-radius: 25px; /* Rounded button corners */
+    font-weight: 600; /* Semi-bold font weight */
+    text-transform: uppercase; /* Uppercase text */
+    letter-spacing: 0.5px; /* Letter spacing */
+    transition: all 0.3s ease; /* Smooth transition */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    margin: 5px; /* Margin for spacing */
+}
+
+/* Hover effect for all buttons */
+.btn:hover {
+    transform: translateY(-2px); /* Upward movement on hover */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* Enhanced shadow */
+}
+
+/* Primary button styling (blue gradient) */
+.btn-primary {
+    background: linear-gradient(45deg, var(--secondary-color), #2980b9); /* Blue gradient */
+    border: none; /* Remove border */
+}
+
+/* Primary button hover effect */
+.btn-primary:hover {
+    background: linear-gradient(45deg, #2980b9, var(--secondary-color)); /* Reversed gradient */
+}
+
+/* Info button styling (cyan gradient) */
+.btn-info {
+    background: linear-gradient(45deg, var(--info-color), #138496); /* Cyan gradient */
+    border: none; /* Remove border */
+    color: white; /* White text */
+}
+
+/* Info button hover effect */
+.btn-info:hover {
+    background: linear-gradient(45deg, #138496, var(--info-color)); /* Reversed gradient */
+    color: white; /* Maintain white text */
+}
+
+/* Success button styling (green gradient) */
+.btn-success {
+    background: linear-gradient(45deg, var(--success-color), #229954); /* Green gradient */
+    border: none; /* Remove border */
+}
+
+/* Success button hover effect */
+.btn-success:hover {
+    background: linear-gradient(45deg, #229954, var(--success-color)); /* Reversed gradient */
+}
+
+/* Warning button styling (orange gradient) */
+.btn-warning {
+    background: linear-gradient(45deg, var(--warning-color), #e67e22); /* Orange gradient */
+    border: none; /* Remove border */
+    color: white; /* White text */
+}
+
+/* Warning button hover effect */
+.btn-warning:hover {
+    background: linear-gradient(45deg, #e67e22, var(--warning-color)); /* Reversed gradient */
+    color: white; /* Maintain white text */
+}
+
+/* Danger button styling (red gradient) */
+.btn-danger {
+    background: linear-gradient(45deg, var(--accent-color), #c0392b); /* Red gradient */
+    border: none; /* Remove border */
+}
+
+/* Danger button hover effect */
+.btn-danger:hover {
+    background: linear-gradient(45deg, #c0392b, var(--accent-color)); /* Reversed gradient */
+}
+
+/* Outline button variants for secondary actions */
+.btn-outline-success {
+    color: var(--success-color); /* Green text */
+    border-color: var(--success-color); /* Green border */
+    background: transparent; /* Transparent background */
+}
+
+/* Outline success button hover effect */
+.btn-outline-success:hover {
+    background: var(--success-color); /* Green background on hover */
+    border-color: var(--success-color); /* Green border */
+    color: white; /* White text */
+}
+
+/* Outline warning button styling */
+.btn-outline-warning {
+    color: var(--warning-color); /* Orange text */
+    border-color: var(--warning-color); /* Orange border */
+    background: transparent; /* Transparent background */
+}
+
+/* Outline warning button hover effect */
+.btn-outline-warning:hover {
+    background: var(--warning-color); /* Orange background on hover */
+    border-color: var(--warning-color); /* Orange border */
+    color: white; /* White text */
+}
+
+/* Outline secondary button styling */
+.btn-outline-secondary {
+    color: var(--primary-color); /* Primary color text */
+    border-color: var(--primary-color); /* Primary color border */
+    background: transparent; /* Transparent background */
+}
+
+/* Outline secondary button hover effect */
+.btn-outline-secondary:hover {
+    background: var(--primary-color); /* Primary color background on hover */
+    border-color: var(--primary-color); /* Primary color border */
+    color: white; /* White text */
+}
+
+/* Table Styling */
+/* Comprehensive styling for data tables throughout the application */
+.table {
+    background: white; /* White background */
+    border-radius: 10px; /* Rounded corners */
+    overflow: hidden; /* Hide overflow */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    margin-top: 20px;
+}
+
+/* Table header styling with gradient background */
+.table thead {
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); /* Gradient background */
+    color: white; /* White text */
+}
+
+/* Table header cell styling */
+.table thead th {
+    border: none; /* Remove borders */
+    padding: 15px; /* Internal padding */
+    font-weight: 600; /* Semi-bold font weight */
+    text-transform: uppercase; /* Uppercase text */
+    letter-spacing: 0.5px; /* Letter spacing */
+}
+
+/* Table body row styling */
+.table tbody tr {
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+}
+
+/* Table row hover effect */
+.table tbody tr:hover {
+    background-color: rgba(52, 152, 219, 0.1); /* Light blue background on hover */
+    transform: scale(1.01); /* Slight scale increase */
+}
+
+/* Table body cell styling */
+.table tbody td {
+    padding: 12px 15px; /* Internal padding */
+    border-color: var(--border-color); /* Border color */
+    vertical-align: middle; /* Vertical alignment */
+}
+
+/* Read/Unread Status Styling */
+/* Special styling for books marked as read */
+.table-success {
+    background: linear-gradient(45deg, rgba(39, 174, 96, 0.1), rgba(39, 174, 96, 0.05)) !important; /* Light green background */
+    border-left: 4px solid var(--success-color); /* Green left border */
+}
+
+/* Read book row hover effect */
+.table-success:hover {
+    background: linear-gradient(45deg, rgba(39, 174, 96, 0.2), rgba(39, 174, 96, 0.1)) !important; /* Darker green on hover */
+}
+
+/* Action Buttons Container */
+/* Styling for containers holding action buttons */
+.mb-3 {
+    background: linear-gradient(45deg, rgba(52, 152, 219, 0.1), rgba(52, 152, 219, 0.05)); /* Light blue background */
+    padding: 20px; /* Internal padding */
+    border-radius: 10px; /* Rounded corners */
+    border: 1px solid rgba(52, 152, 219, 0.2); /* Light blue border */
+}
+
+/* Filter Buttons Container */
+/* Styling for containers holding filter buttons */
+.mt-3 {
+    background: linear-gradient(45deg, rgba(247, 76, 60, 0.1), rgba(247, 76, 60, 0.05)); /* Light red background */
+    padding: 20px; /* Internal padding */
+    border-radius: 10px; /* Rounded corners */
+    border: 1px solid rgba(247, 76, 60, 0.2); /* Light red border */
+}
+
+/* Footer Styling */
+/* Styling for the application footer */
+footer {
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); /* Gradient background */
+    color: white; /* White text */
+    padding: 20px; /* Internal padding */
+    border-radius: 10px; /* Rounded corners */
+    margin-top: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Form Styling (for add/edit pages) */
+/* Styling for form input fields */
+.form-control {
+    border-radius: 10px; /* Rounded corners */
+    border: 2px solid var(--border-color); /* Border color */
+    padding: 12px 15px; /* Internal padding */
+    transition: all 0.3s ease; /* Smooth transition */
+}
+
+/* Form control focus state */
+.form-control:focus {
+    border-color: var(--secondary-color); /* Blue border on focus */
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25); /* Blue glow effect */
+}
+
+/* Form label styling */
+.form-label {
+    font-weight: 600; /* Semi-bold font weight */
+    color: var(--primary-color); /* Primary color */
+    margin-bottom: 8px; /* Bottom margin */
+}
+
+/* Alert Styling */
+/* Styling for Django message alerts and notifications */
+.alert {
+    border-radius: 10px; /* Rounded corners */
+    border: none; /* Remove border */
+    padding: 15px 20px; /* Internal padding */
+    margin-bottom: 20px; /* Bottom margin */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Success alert styling (green gradient) */
+.alert-success {
+    background: linear-gradient(45deg, var(--success-color), #229954); /* Green gradient */
+    color: white; /* White text */
+}
+
+/* Danger alert styling (red gradient) */
+.alert-danger {
+    background: linear-gradient(45deg, var(--accent-color), #c0392b); /* Red gradient */
+    color: white; /* White text */
+}
+
+/* Warning alert styling (orange gradient) */
+.alert-warning {
+    background: linear-gradient(45deg, var(--warning-color), #e67e22); /* Orange gradient */
+    color: white; /* White text */
+}
+
+/* Info alert styling (cyan gradient) */
+.alert-info {
+    background: linear-gradient(45deg, var(--info-color), #138496); /* Cyan gradient */
+    color: white; /* White text */
+}
+
+/* Responsive Design */
+/* Mobile-first responsive design for different screen sizes */
+@media (max-width: 768px) {
+    /* Container adjustments for mobile */
+    .container {
+        margin: 10px; /* Reduced margin */
+        padding: 20px; /* Reduced padding */
+    }
+    
+    /* Button adjustments for mobile */
+    .btn {
+        display: block; /* Block display */
+        width: 100%; /* Full width */
+        margin: 5px 0; /* Vertical margin only */
+    }
+    
+    /* Table responsive adjustments */
+    .table-responsive {
+        border-radius: 10px; /* Rounded corners */
+        overflow: hidden; /* Hide overflow */
+    }
+    
+    /* Card body adjustments for mobile */
+    .card-body {
+        padding: 20px; /* Reduced padding */
+    }
+    
+    /* Navigation button adjustments for mobile */
+    .navbar-nav .btn {
+        margin: 5px 0; /* Vertical margin only */
+        width: 100%; /* Full width */
+    }
+}
+
+/* Animation for page load */
+/* Fade-in animation when pages load */
+@keyframes fadeInUp {
+    from {
+        opacity: 0; /* Start invisible */
+        transform: translateY(30px); /* Start below final position */
+    }
+    to {
+        opacity: 1; /* End fully visible */
+        transform: translateY(0); /* End at final position */
+    }
+}
+
+/* Apply fade-in animation to main container */
+.container {
+    animation: fadeInUp 0.6s ease-out; /* 0.6 second animation */
+}
+
+/* Custom scrollbar styling */
+/* Webkit-based browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 8px; /* Scrollbar width */
+}
+
+/* Scrollbar track styling */
+::-webkit-scrollbar-track {
+    background: var(--light-bg); /* Light background */
+}
+
+/* Scrollbar thumb styling */
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, var(--secondary-color), var(--primary-color)); /* Gradient background */
+    border-radius: 4px; /* Rounded corners */
+}
+
+/* Scrollbar thumb hover effect */
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); /* Reversed gradient */
+} 

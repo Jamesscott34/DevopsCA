@@ -1,11 +1,78 @@
 <!-- confirm_delete.html -->
 {% extends 'books/base.html' %}
+
+<!-- 
+    Confirm Delete Template for Book Catalog Application
+    This template provides a confirmation dialog for deleting books from the catalog.
+    It displays book information and asks for user confirmation before proceeding
+    with the deletion. This helps prevent accidental book deletions.
+-->
+
 {% block content %}
-<h2>Confirm Delete</h2>
-<p>Are you sure you want to delete the book: <strong>{{ book.title }}</strong>?</p>
-<form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Yes, Delete</button>
-    <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
-</form>
+    <!-- Confirmation Dialog Card -->
+    <!-- Card-based layout for the delete confirmation dialog -->
+    <div class="card mx-auto" style="max-width: 500px;">
+        
+        <!-- Card Header Section -->
+        <!-- Contains the confirmation dialog title and warning icon -->
+        <div class="card-header bg-danger text-white">
+            <h2><i class="fas fa-exclamation-triangle"></i> Confirm Deletion</h2>
+        </div>
+        
+        <!-- Card Body Section -->
+        <!-- Contains the confirmation message and book details -->
+        <div class="card-body">
+            <!-- Warning Message -->
+            <!-- Clear warning about the deletion action -->
+            <div class="alert alert-warning">
+                <h5><i class="fas fa-exclamation-triangle"></i> Are you sure?</h5>
+                <p class="mb-0">This action cannot be undone. The book will be permanently removed from your catalog.</p>
+            </div>
+            
+            <!-- Book Information Section -->
+            <!-- Displays details of the book to be deleted -->
+            <div class="mb-4">
+                <h5><i class="fas fa-book"></i> Book Details</h5>
+                <ul class="list-unstyled">
+                    <!-- Book Title -->
+                    <li><strong>Title:</strong> {{ book.title }}</li>
+                    
+                    <!-- Book Author -->
+                    <li><strong>Author:</strong> {{ book.author }}</li>
+                    
+                    <!-- Publication Date -->
+                    <li><strong>Published:</strong> {{ book.published_date }}</li>
+                    
+                    <!-- ISBN -->
+                    <li><strong>ISBN:</strong> {{ book.isbn }}</li>
+                    
+                    <!-- Read Status -->
+                    <li><strong>Status:</strong> 
+                        {% if book.is_read %}
+                            <span class="badge bg-success">Read</span>
+                        {% else %}
+                            <span class="badge bg-warning">Unread</span>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Action Buttons Section -->
+            <!-- Buttons for confirming or canceling the deletion -->
+            <div class="d-grid gap-2">
+                <!-- Cancel Button - Returns to previous page without deleting -->
+                <a href="{% url 'home' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+                
+                <!-- Confirm Delete Button - Proceeds with deletion -->
+                <form method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100">
+                        <i class="fas fa-trash"></i> Delete Book
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}

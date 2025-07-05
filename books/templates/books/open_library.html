@@ -1,48 +1,178 @@
 {% extends 'books/base.html' %}
+
+<!-- 
+    Open Library Search Template for Book Catalog Application
+    This template provides an interface for searching and browsing books from the
+    Open Library API. Users can search by title/author or browse popular books,
+    then import selected books into their personal catalog.
+-->
+
 {% block content %}
-
-<h2>Search Open Library</h2>
-
-<form method="GET" action="{% url 'open_library_search' %}" class="mb-4">
-    <div class="input-group">
-        <input type="text" name="query" class="form-control" placeholder="Search by title, author, or ISBN" required>
-        <button type="submit" class="btn btn-primary">Search</button>
+    <!-- Page Header Section -->
+    <!-- Title and description for the Open Library search page -->
+    <div class="text-center mb-4">
+        <h2><i class="fas fa-search"></i> Open Library Search</h2>
+        <p class="text-muted">Search and import books from Open Library's extensive database</p>
     </div>
-</form>
 
-{% if results %}
-    <h4>Results for "{{ query }}"</h4>
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        {% for book in results %}
-        <div class="col">
-            <div class="card h-100">
-                {% if book.cover_url %}
-                    <img src="{{ book.cover_url }}" class="card-img-top" alt="Cover">
-                {% else %}
-                    <img src="https://via.placeholder.com/150x220?text=No+Cover" class="card-img-top" alt="No Cover">
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ book.title }}</h5>
-                    <p class="card-text">Author: {{ book.author }}</p>
-                    <p class="card-text">Published: {{ book.publish_year }}</p>
-                    <form method="POST" action="{% url 'save_open_library_book' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="title" value="{{ book.title }}">
-                        <input type="hidden" name="author" value="{{ book.author }}">
-                        <input type="hidden" name="published_date" value="{{ book.publish_year }}">
-                        <input type="hidden" name="isbn" value="{{ book.isbn }}">
-                        <button type="submit" class="btn btn-success btn-sm">Save to Library</button>
-                    </form>
+    <!-- Search Form Section -->
+    <!-- Form for searching books by title, author, or keywords -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <!-- Search Input Field -->
+                <!-- Text input for search query -->
+                <div class="col-md-8">
+                    <label for="query" class="form-label">
+                        <i class="fas fa-search"></i> Search Books
+                    </label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="query" 
+                           name="query" 
+                           value="{{ query }}" 
+                           placeholder="Enter book title, author, or keywords...">
                 </div>
+                
+                <!-- Search Button -->
+                <!-- Submit button to perform the search -->
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Search Results Section -->
+    <!-- Displays search results or default book list -->
+    {% if results %}
+        <!-- Results Header -->
+        <!-- Shows search query and result count -->
+        <div class="mb-3">
+            {% if query %}
+                <h4><i class="fas fa-list"></i> Search Results for "{{ query }}"</h4>
+            {% else %}
+                <h4><i class="fas fa-book"></i> Popular Books</h4>
+            {% endif %}
+            <p class="text-muted">Found {{ results|length }} books</p>
+        </div>
+
+        <!-- Results Grid -->
+        <!-- Grid layout for displaying book search results -->
+        <div class="row">
+            {% for book in results %}
+                <!-- Individual Book Card -->
+                <!-- Card displaying book information with import option -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <!-- Book Cover Image -->
+                        <!-- Displays book cover if available -->
+                        {% if book.cover_url %}
+                            <img src="{{ book.cover_url }}" 
+                                 class="card-img-top" 
+                                 alt="Cover for {{ book.title }}"
+                                 style="height: 200px; object-fit: cover;">
+                        {% else %}
+                            <!-- Placeholder for missing cover -->
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                 style="height: 200px;">
+                                <i class="fas fa-book fa-3x text-muted"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Card Body -->
+                        <!-- Contains book details and action buttons -->
+                        <div class="card-body">
+                            <!-- Book Title -->
+                            <!-- Displays the book's title -->
+                            <h5 class="card-title">{{ book.title }}</h5>
+                            
+                            <!-- Book Author -->
+                            <!-- Displays the book's author(s) -->
+                            <p class="card-text">
+                                <strong>Author:</strong> {{ book.author }}
+                            </p>
+                            
+                            <!-- Publication Year -->
+                            <!-- Displays when the book was published -->
+                            <p class="card-text">
+                                <strong>Published:</strong> {{ book.publish_year }}
+                            </p>
+                            
+                            <!-- ISBN (if available) -->
+                            <!-- Displays ISBN for books that have one -->
+                            {% if book.isbn %}
+                                <p class="card-text">
+                                    <strong>ISBN:</strong> <code>{{ book.isbn }}</code>
+                                </p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Card Footer -->
+                        <!-- Contains action buttons for importing the book -->
+                        <div class="card-footer">
+                            <!-- Import Book Form -->
+                            <!-- Hidden form for importing book data -->
+                            <form method="post" action="{% url 'save_open_library_book' %}">
+                                {% csrf_token %}
+                                
+                                <!-- Hidden fields with book data -->
+                                <!-- These fields contain the book information to be imported -->
+                                <input type="hidden" name="title" value="{{ book.title }}">
+                                <input type="hidden" name="author" value="{{ book.author }}">
+                                <input type="hidden" name="published_date" value="{{ book.publish_year }}">
+                                <input type="hidden" name="isbn" value="{{ book.isbn }}">
+                                <input type="hidden" name="description" value="Imported from Open Library">
+                                
+                                <!-- Import Button -->
+                                <!-- Button to add this book to the user's catalog -->
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fas fa-plus"></i> Add to Catalog
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+    {% else %}
+        <!-- No Results Section -->
+        <!-- Displayed when search returns no results -->
+        <div class="text-center mt-5">
+            <!-- No Results Icon -->
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            
+            <!-- No Results Message -->
+            <h3 class="text-muted">No books found</h3>
+            <p class="text-muted">
+                {% if query %}
+                    No books found for "{{ query }}". Try different keywords or browse popular books.
+                {% else %}
+                    Unable to load books at the moment. Please try again later.
+                {% endif %}
+            </p>
+            
+            <!-- Action Buttons -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <a href="{% url 'home' %}" class="btn btn-primary">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+                <a href="{% url 'add_book' %}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Add Book Manually
+                </a>
             </div>
         </div>
-        {% endfor %}
+    {% endif %}
+
+    <!-- Navigation Section -->
+    <!-- Links to other parts of the application -->
+    <div class="mt-4 text-center">
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Catalog
+        </a>
     </div>
-{% elif query %}
-    <p>No results found for "{{ query }}".</p>
-{% endif %}
-
-<a href="{% url 'home' %}" class="btn btn-secondary mt-4">Back to My Library</a>
-
 {% endblock %}
 

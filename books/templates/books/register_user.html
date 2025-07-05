@@ -1,0 +1,141 @@
+{% extends 'books/base.html' %}
+
+<!-- 
+    User Registration Template for Book Catalog Application
+    This template provides the user registration interface where new users can create
+    accounts. It includes form validation, password confirmation, and proper security
+    measures. The form uses Bootstrap styling and includes links to login for existing users.
+-->
+
+{% block content %}
+    <!-- Registration Form Card Container -->
+    <!-- Card-based layout for the registration form with gradient header -->
+    <div class="card mx-auto" style="max-width: 600px;">
+        
+        <!-- Card Header Section -->
+        <!-- Contains the registration form title and description -->
+        <div class="card-header">
+            <h2><i class="fas fa-user-plus"></i> Create New Account</h2>
+            <h5>Join the Book Catalog community</h5>
+        </div>
+        
+        <!-- Card Body Section -->
+        <!-- Contains the actual registration form with input fields -->
+        <div class="card-body">
+            <!-- Registration Form -->
+            <!-- Django form for user registration with CSRF protection -->
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Username Input Field -->
+                <!-- Text input for unique username with validation -->
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    {{ form.username }}
+                    <!-- Display username field errors if any -->
+                    {% if form.username.errors %}
+                        <div class="text-danger">
+                            {% for error in form.username.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Email Input Field -->
+                <!-- Email input for account recovery and notifications -->
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}" class="form-label">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    {{ form.email }}
+                    <!-- Display email field errors if any -->
+                    {% if form.email.errors %}
+                        <div class="text-danger">
+                            {% for error in form.email.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Password Input Field -->
+                <!-- Password input with hidden text for security -->
+                <div class="form-group">
+                    <label for="{{ form.password.id_for_label }}" class="form-label">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    {{ form.password }}
+                    <!-- Display password field errors if any -->
+                    {% if form.password.errors %}
+                        <div class="text-danger">
+                            {% for error in form.password.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Confirm Password Input Field -->
+                <!-- Password confirmation to prevent typos -->
+                <div class="form-group">
+                    <label for="{{ form.confirm_password.id_for_label }}" class="form-label">
+                        <i class="fas fa-lock"></i> Confirm Password
+                    </label>
+                    {{ form.confirm_password }}
+                    <!-- Display confirm password field errors if any -->
+                    {% if form.confirm_password.errors %}
+                        <div class="text-danger">
+                            {% for error in form.confirm_password.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Non-Field Errors Display -->
+                <!-- Shows general form errors like password mismatch -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <i class="fas fa-exclamation-triangle"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <!-- Submit Button Section -->
+                <!-- Primary action button to submit the registration form -->
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Login Link Section -->
+            <!-- Link for existing users to log into their accounts -->
+            <div class="text-center mt-3">
+                <p class="text-muted">
+                    Already have an account? 
+                    <a href="{% url 'login_user' %}" class="text-decoration-none">
+                        <i class="fas fa-sign-in-alt"></i> Login here
+                    </a>
+                </p>
+            </div>
+            
+            <!-- Registration Benefits Section -->
+            <!-- Information about what users get when they register -->
+            <div class="alert alert-info mt-3">
+                <h6><i class="fas fa-star"></i> Benefits of Registration</h6>
+                <ul class="mb-0">
+                    <li>Create and manage your personal book catalog</li>
+                    <li>Track your reading progress</li>
+                    <li>Search and import books from Open Library</li>
+                    <li>Access your books from anywhere</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %} 

@@ -1,0 +1,108 @@
+{% extends 'books/base.html' %}
+
+<!-- 
+    Login Page Template for Book Catalog Application
+    This template provides the user authentication interface where users can log into
+    their accounts. It includes form validation, error handling, and links to registration.
+    The form uses Bootstrap styling and includes proper security measures.
+-->
+
+{% block content %}
+    <!-- Login Form Card Container -->
+    <!-- Card-based layout for the login form with gradient header -->
+    <div class="card mx-auto" style="max-width: 500px;">
+        
+        <!-- Card Header Section -->
+        <!-- Contains the login form title and description -->
+        <div class="card-header">
+            <h2><i class="fas fa-sign-in-alt"></i> User Login</h2>
+            <h5>Access your book catalog</h5>
+        </div>
+        
+        <!-- Card Body Section -->
+        <!-- Contains the actual login form with input fields -->
+        <div class="card-body">
+            <!-- Login Form -->
+            <!-- Django form for user authentication with CSRF protection -->
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Username Input Field -->
+                <!-- Text input for user's username with validation -->
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    {{ form.username }}
+                    <!-- Display username field errors if any -->
+                    {% if form.username.errors %}
+                        <div class="text-danger">
+                            {% for error in form.username.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Password Input Field -->
+                <!-- Password input with hidden text for security -->
+                <div class="form-group">
+                    <label for="{{ form.password.id_for_label }}" class="form-label">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    {{ form.password }}
+                    <!-- Display password field errors if any -->
+                    {% if form.password.errors %}
+                        <div class="text-danger">
+                            {% for error in form.password.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Non-Field Errors Display -->
+                <!-- Shows general form errors like invalid credentials -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <i class="fas fa-exclamation-triangle"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <!-- Submit Button Section -->
+                <!-- Primary action button to submit the login form -->
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Registration Link Section -->
+            <!-- Link for new users to create an account -->
+            <div class="text-center mt-3">
+                <p class="text-muted">
+                    Don't have an account? 
+                    <a href="{% url 'register_user' %}" class="text-decoration-none">
+                        <i class="fas fa-user-plus"></i> Register here
+                    </a>
+                </p>
+            </div>
+            
+            <!-- Admin Login Information -->
+            <!-- Special information for admin users -->
+            <div class="alert alert-info mt-3">
+                <h6><i class="fas fa-crown"></i> Admin Access</h6>
+                <p class="mb-1">
+                    <strong>Username:</strong> admin<br>
+                    <strong>Password:</strong> admin
+                </p>
+                <small class="text-muted">
+                    Admin users get access to the admin dashboard with system statistics.
+                </small>
+            </div>
+        </div>
+    </div>
+{% endblock %} 

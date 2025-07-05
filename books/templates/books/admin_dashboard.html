@@ -1,0 +1,246 @@
+{% extends 'books/base.html' %}
+
+<!-- 
+    Admin Dashboard Template for Book Catalog Application
+    This template provides a special interface for admin users with system-wide
+    statistics, user management tools, and administrative functions. It displays
+    key metrics about the application and provides quick access to management tasks.
+    Only users with username 'admin' can access this dashboard.
+-->
+
+{% block content %}
+    <!-- Admin Welcome Section -->
+    <!-- Personalized welcome message for admin users -->
+    <div class="alert alert-warning">
+        <h4><i class="fas fa-crown"></i> Welcome to Admin Dashboard!</h4>
+        <p class="mb-0">
+            You have administrative privileges. Here you can view system statistics 
+            and manage the book catalog application.
+        </p>
+    </div>
+
+    <!-- System Statistics Section -->
+    <!-- Displays key metrics about the application in card format -->
+    <h2 class="mb-4"><i class="fas fa-chart-bar"></i> System Statistics</h2>
+    
+    <!-- Statistics Cards Row -->
+    <!-- Grid layout for displaying various system metrics -->
+    <div class="row mb-4">
+        <!-- Total Books Card -->
+        <!-- Shows the total number of books in the catalog -->
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body text-center">
+                    <div class="card-title">{{ total_books }}</div>
+                    <div class="card-text">
+                        <i class="fas fa-books"></i> Total Books
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Read Books Card -->
+        <!-- Shows the number of books marked as read -->
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body text-center">
+                    <div class="card-title">{{ read_books }}</div>
+                    <div class="card-text">
+                        <i class="fas fa-check-circle"></i> Read Books
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Unread Books Card -->
+        <!-- Shows the number of books marked as unread -->
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body text-center">
+                    <div class="card-title">{{ unread_books }}</div>
+                    <div class="card-text">
+                        <i class="fas fa-bookmark"></i> Unread Books
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Total Users Card -->
+        <!-- Shows the total number of registered users -->
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-info">
+                <div class="card-body text-center">
+                    <div class="card-title">{{ total_users }}</div>
+                    <div class="card-text">
+                        <i class="fas fa-users"></i> Total Users
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Actions Section -->
+    <!-- Quick access buttons for administrative tasks -->
+    <h2 class="mb-4"><i class="fas fa-tools"></i> Admin Actions</h2>
+    
+    <!-- Action Buttons Container -->
+    <!-- Grid of buttons for various admin functions -->
+    <div class="row">
+        <!-- Book Management Actions -->
+        <!-- Buttons for managing the book catalog -->
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-book"></i> Book Management</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Add New Book Button -->
+                    <a href="{% url 'add_book' %}" class="btn btn-success btn-sm mb-2 w-100">
+                        <i class="fas fa-plus"></i> Add New Book
+                    </a>
+                    
+                    <!-- View All Books Button -->
+                    <a href="{% url 'home' %}" class="btn btn-primary btn-sm mb-2 w-100">
+                        <i class="fas fa-list"></i> View All Books
+                    </a>
+                    
+                    <!-- Open Library Search Button -->
+                    <a href="{% url 'open_library_search' %}" class="btn btn-info btn-sm w-100">
+                        <i class="fas fa-search"></i> Search Open Library
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Management Actions -->
+        <!-- Buttons for managing user accounts -->
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-user-cog"></i> User Management</h5>
+                </div>
+                <div class="card-body">
+                    <!-- View User Registration Button -->
+                    <a href="{% url 'register_user' %}" class="btn btn-warning btn-sm mb-2 w-100">
+                        <i class="fas fa-user-plus"></i> Create New User
+                    </a>
+                    
+                    <!-- User Statistics Button -->
+                    <button class="btn btn-secondary btn-sm mb-2 w-100" onclick="showUserStats()">
+                        <i class="fas fa-chart-pie"></i> User Statistics
+                    </button>
+                    
+                    <!-- System Information Button -->
+                    <button class="btn btn-outline-info btn-sm w-100" onclick="showSystemInfo()">
+                        <i class="fas fa-info-circle"></i> System Info
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Statistics Section -->
+    <!-- Additional detailed statistics and insights -->
+    <div class="row mt-4">
+        <!-- Reading Progress Card -->
+        <!-- Shows reading completion percentage -->
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-line"></i> Reading Progress</h5>
+                </div>
+                <div class="card-body">
+                    {% if total_books > 0 %}
+                        <!-- Progress Bar for Read vs Unread Books -->
+                        <div class="progress mb-3">
+                            <div class="progress-bar bg-success" 
+                                 style="width: {{ read_books|floatformat:0 }}%">
+                                {{ read_books|floatformat:0 }}%
+                            </div>
+                        </div>
+                        <p class="mb-1">
+                            <strong>Read:</strong> {{ read_books }} books 
+                            ({{ read_books|floatformat:0 }}%)
+                        </p>
+                        <p class="mb-0">
+                            <strong>Unread:</strong> {{ unread_books }} books 
+                            ({{ unread_books|floatformat:0 }}%)
+                        </p>
+                    {% else %}
+                        <p class="text-muted">No books in the catalog yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Health Card -->
+        <!-- Shows system status and health indicators -->
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-heartbeat"></i> System Health</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Database Status -->
+                    <div class="d-flex justify-content-between mb-2">
+                        <span><i class="fas fa-database"></i> Database:</span>
+                        <span class="badge bg-success">Healthy</span>
+                    </div>
+                    
+                    <!-- User Activity Status -->
+                    <div class="d-flex justify-content-between mb-2">
+                        <span><i class="fas fa-users"></i> Active Users:</span>
+                        <span class="badge bg-info">{{ total_users }}</span>
+                    </div>
+                    
+                    <!-- Book Catalog Status -->
+                    <div class="d-flex justify-content-between mb-2">
+                        <span><i class="fas fa-book"></i> Catalog Size:</span>
+                        <span class="badge bg-primary">{{ total_books }}</span>
+                    </div>
+                    
+                    <!-- Admin Status -->
+                    <div class="d-flex justify-content-between">
+                        <span><i class="fas fa-crown"></i> Admin Status:</span>
+                        <span class="badge bg-warning">Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Information Section -->
+    <!-- Additional information and tips for admin users -->
+    <div class="alert alert-info mt-4">
+        <h6><i class="fas fa-lightbulb"></i> Admin Tips</h6>
+        <ul class="mb-0">
+            <li>Use the "Add New Book" function to manually add books to the catalog</li>
+            <li>Search Open Library to import books from their extensive database</li>
+            <li>Monitor reading progress through the statistics dashboard</li>
+            <li>Regular users can only access their own book catalogs</li>
+        </ul>
+    </div>
+
+    <!-- JavaScript Functions for Admin Dashboard -->
+    <!-- Client-side functions for enhanced admin functionality -->
+    <script>
+        // Function to display user statistics in a modal or alert
+        function showUserStats() {
+            alert('User Statistics:\n' +
+                  'Total Users: {{ total_users }}\n' +
+                  'Admin Users: 1\n' +
+                  'Regular Users: {{ total_users|add:"-1" }}\n' +
+                  'System is running smoothly!');
+        }
+        
+        // Function to display system information
+        function showSystemInfo() {
+            alert('System Information:\n' +
+                  'Application: Book Catalog\n' +
+                  'Framework: Django\n' +
+                  'Database: SQLite\n' +
+                  'Admin User: {{ current_user.username }}\n' +
+                  'Status: Operational');
+        }
+    </script>
+{% endblock %} 

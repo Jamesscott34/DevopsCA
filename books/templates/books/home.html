@@ -1,53 +1,182 @@
 <!-- home.html -->
 {% extends 'books/base.html' %}
+
+<!-- 
+    Home Page Template for Book Catalog Application
+    This template displays the main book catalog with all books in a table format.
+    It includes action buttons for adding books, filtering by read status, and
+    individual book management actions like edit, delete, and toggle read status.
+-->
+
 {% block content %}
+    <!-- Welcome Message Section -->
+    <!-- Displays personalized welcome message for logged-in users -->
+    {% if current_user %}
+        <div class="alert alert-info">
+            <i class="fas fa-user-circle"></i> Welcome back, {{ current_user.username }}! 
+            {% if current_user.username == 'admin' %}
+                <span class="badge bg-warning text-dark">👑 Admin</span>
+            {% endif %}
+        </div>
+    {% else %}
+        <h2 class="mb-4">Welcome to Book Catalog! 📚</h2>
+        <div class="alert alert-info">
+            <strong>New here?</strong> 
+            <a href="{% url 'register_user' %}" class="btn btn-primary btn-sm ms-2">Create Account</a>
+        </div>
+    {% endif %}
 
-<h2 class="mb-4">Welcome, James Scott (SBA24070)</h2>
+    <!-- Action Buttons Section -->
+    <!-- Container for primary action buttons like adding new books -->
+    <div class="mb-3">
+        <!-- Add Book Button - Opens the book addition form -->
+        <a href="{% url 'add_book' %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Add New Book
+        </a>
+        
+        <!-- Open Library Search Button - Opens external book search -->
+        <a href="{% url 'open_library_search' %}" class="btn btn-info">
+            <i class="fas fa-search"></i> Search Open Library
+        </a>
+    </div>
 
-<!-- Top action buttons -->
-<div class="mb-3">
-    <a href="{% url 'add_book' %}" class="btn btn-primary">➕ Add Book Manually</a>
-    <a href="{% url 'open_library_search' %}" class="btn btn-info">🌐 Browse Open Library</a>
-</div>
+    <!-- Book Filtering Section -->
+    <!-- Buttons to filter books by read/unread status -->
+    <div class="mt-3">
+        <!-- Show All Books Button - Displays complete catalog -->
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-list"></i> All Books
+        </a>
+        
+        <!-- Show Read Books Button - Filters to completed reading -->
+        <a href="{% url 'read_books' %}" class="btn btn-outline-success">
+            <i class="fas fa-check-circle"></i> Read Books
+        </a>
+        
+        <!-- Show Unread Books Button - Filters to reading list -->
+        <a href="{% url 'unread_books' %}" class="btn btn-outline-warning">
+            <i class="fas fa-bookmark"></i> Unread Books
+        </a>
+    </div>
 
-<!-- Table of saved books -->
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Published</th>
-            <th>ISBN</th>
-            <th>Description</th> <!-- Added column header -->
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for book in books %}
-        <tr class="{% if book.is_read %}table-success{% endif %}">
-            <td>{{ book.title }}</td>
-            <td>{{ book.author }}</td>
-            <td>{{ book.published_date }}</td>
-            <td>{{ book.isbn }}</td>
-            <td style="max-width: 250px; word-wrap: break-word;">{{ book.description|default:"—" }}</td> <!-- Correct placement -->
-            <td>{% if book.is_read %}Read{% else %}Unread{% endif %}</td>
-            <td>
-                <a href="{% url 'edit_book' book.id %}" class="btn btn-warning btn-sm">✏️ Edit</a>
-                <a href="{% url 'delete_book_by_isbn' book.isbn %}" class="btn btn-danger btn-sm">🗑️ Delete</a>
-                <a href="{% url 'toggle_read' book.id %}" class="btn btn-outline-secondary btn-sm">
-                    {% if book.is_read %}Mark Unread{% else %}Mark Read{% endif %}
-                </a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<!-- Filter buttons -->
-<div class="mt-3">
-    <a href="{% url 'read_books' %}" class="btn btn-outline-success">📖 View Read Books</a>
-    <a href="{% url 'unread_books' %}" class="btn btn-outline-warning">📚 View Unread Books</a>
-</div>
-
+    <!-- Books Table Section -->
+    <!-- Main data table displaying all books in the catalog -->
+    {% if books %}
+        <!-- Responsive table container for mobile compatibility -->
+        <div class="table-responsive">
+            <table class="table">
+                <!-- Table Header Row -->
+                <!-- Column headers defining the data structure -->
+                <thead>
+                    <tr>
+                        <th>Title</th>           <!-- Book title column -->
+                        <th>Author</th>          <!-- Author name column -->
+                        <th>Published Date</th>  <!-- Publication date column -->
+                        <th>ISBN</th>            <!-- ISBN identifier column -->
+                        <th>Status</th>          <!-- Read/unread status column -->
+                        <th>Actions</th>         <!-- Action buttons column -->
+                    </tr>
+                </thead>
+                
+                <!-- Table Body -->
+                <!-- Individual book rows with data and action buttons -->
+                <tbody>
+                    {% for book in books %}
+                        <!-- Individual Book Row -->
+                        <!-- Each row represents one book with conditional styling based on read status -->
+                        <tr {% if book.is_read %}class="table-success"{% endif %}>
+                            <!-- Book Title Cell -->
+                            <!-- Displays the book title with emphasis for read books -->
+                            <td>
+                                <strong>{{ book.title }}</strong>
+                                {% if book.is_read %}
+                                    <i class="fas fa-check-circle text-success ms-2"></i>
+                                {% endif %}
+                            </td>
+                            
+                            <!-- Author Name Cell -->
+                            <!-- Displays the book author -->
+                            <td>{{ book.author }}</td>
+                            
+                            <!-- Publication Date Cell -->
+                            <!-- Displays when the book was published -->
+                            <td>{{ book.published_date }}</td>
+                            
+                            <!-- ISBN Cell -->
+                            <!-- Displays the unique book identifier -->
+                            <td>
+                                <code>{{ book.isbn }}</code>
+                            </td>
+                            
+                            <!-- Read Status Cell -->
+                            <!-- Shows current read status with visual indicators -->
+                            <td>
+                                {% if book.is_read %}
+                                    <!-- Read Status Indicator -->
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check"></i> Read
+                                    </span>
+                                {% else %}
+                                    <!-- Unread Status Indicator -->
+                                    <span class="badge bg-warning">
+                                        <i class="fas fa-bookmark"></i> Unread
+                                    </span>
+                                {% endif %}
+                            </td>
+                            
+                            <!-- Action Buttons Cell -->
+                            <!-- Individual book management actions -->
+                            <td>
+                                <!-- Edit Book Button - Opens edit form for this book -->
+                                <a href="{% url 'edit_book' book.pk %}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                
+                                <!-- Toggle Read Status Button - Changes read/unread status -->
+                                <a href="{% url 'toggle_read_status' book.pk %}" class="btn btn-warning btn-sm">
+                                    {% if book.is_read %}
+                                        <i class="fas fa-times"></i> Mark Unread
+                                    {% else %}
+                                        <i class="fas fa-check"></i> Mark Read
+                                    {% endif %}
+                                </a>
+                                
+                                <!-- Delete Book Button - Removes book from catalog -->
+                                <a href="{% url 'delete_book_by_isbn' book.isbn %}" 
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Are you sure you want to delete this book?')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Book Count Summary -->
+        <!-- Displays total number of books in the catalog -->
+        <div class="mt-3 text-center">
+            <p class="text-muted">
+                <i class="fas fa-books"></i> Total Books: {{ books.count }}
+            </p>
+        </div>
+        
+    {% else %}
+        <!-- Empty State Section -->
+        <!-- Displayed when no books exist in the catalog -->
+        <div class="text-center mt-5">
+            <!-- Empty State Icon -->
+            <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+            
+            <!-- Empty State Message -->
+            <h3 class="text-muted">No books in your catalog yet!</h3>
+            <p class="text-muted">Start building your reading collection by adding your first book.</p>
+            
+            <!-- Call to Action Button -->
+            <a href="{% url 'add_book' %}" class="btn btn-success btn-lg">
+                <i class="fas fa-plus"></i> Add Your First Book
+            </a>
+        </div>
+    {% endif %}
 {% endblock %}

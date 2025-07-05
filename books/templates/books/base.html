@@ -1,23 +1,102 @@
-<!-- base.html -->
+{% load static %}
+<!-- 
+    Base Template for Book Catalog Application
+    This template serves as the foundation for all pages in the application.
+    It includes the navigation bar, common styling, and basic page structure.
+    All other templates extend this base template to maintain consistency.
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Meta tags for proper character encoding and responsive design -->
     <meta charset="UTF-8">
     <title>Book Catalog</title>
-    <!-- Bootstrap CDN -->
+    
+    <!-- Bootstrap CSS framework for responsive design and UI components -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome for icons used throughout the application -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS file with application-specific styling and color scheme -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
 </head>
 <body>
-<div class="container py-4">
-    <h1 class="mb-4">Book Catalog</h1>
+    <!-- Main container with padding and background styling -->
+    <div class="container py-4">
+        
+        <!-- Navigation Bar Section -->
+        <!-- This navbar provides user authentication status and navigation links -->
+        <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+            <div class="container-fluid">
+                <!-- Brand/logo link that takes users to the home page -->
+                <a class="navbar-brand" href="{% url 'home' %}">
+                    <i class="fas fa-book"></i> Book Catalog
+                </a>
+                
+                <!-- Navigation items aligned to the right side -->
+                <div class="navbar-nav ms-auto">
+                    {% if current_user %}
+                        <!-- Display user information when logged in -->
+                        <span class="navbar-text me-3">
+                            <i class="fas fa-user"></i> Welcome, {{ current_user.username }}
+                            {% if current_user.username == 'admin' %}
+                                <!-- Special badge for admin users -->
+                                <span class="badge bg-warning text-dark ms-1">👑 Admin</span>
+                            {% endif %}
+                        </span>
+                        
+                        <!-- Admin dashboard link - only visible to admin users -->
+                        {% if current_user.username == 'admin' %}
+                            <a class="nav-link btn btn-warning btn-sm me-2" href="{% url 'admin_dashboard' %}">
+                                <i class="fas fa-crown"></i> Admin Dashboard
+                            </a>
+                        {% endif %}
+                        
+                        <!-- Logout button for all logged-in users -->
+                        <a class="nav-link btn btn-danger btn-sm" href="{% url 'logout_user' %}">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    {% else %}
+                        <!-- Login and registration buttons for non-authenticated users -->
+                        <a class="nav-link btn btn-primary btn-sm me-2" href="{% url 'login_user' %}">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                        <a class="nav-link btn btn-success btn-sm" href="{% url 'register_user' %}">
+                            <i class="fas fa-user-plus"></i> Register
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
 
-    <!-- Main content block -->
-    {% block content %}{% endblock %}
+        <!-- Main page title -->
+        <h1 class="mb-4">Book Catalog</h1>
 
-    <!-- Footer -->
-    <footer class="mt-5 text-center text-muted">
-        Developed by James Scott - SBA24070
-    </footer>
-</div>
+        <!-- Django Messages Display Section -->
+        <!-- Shows success, error, and info messages from the backend -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Main Content Block -->
+        <!-- This is where child templates will insert their specific content -->
+        {% block content %}{% endblock %}
+
+        <!-- Footer Section -->
+        <!-- Contains developer information and project details -->
+        <footer class="mt-5 text-center text-muted">
+            Developed by James Scott - SBA24070
+        </footer>
+    </div>
+
+    <!-- Bootstrap JavaScript for interactive components like alerts and modals -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
