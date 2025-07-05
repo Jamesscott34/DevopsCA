@@ -571,7 +571,6 @@ The application includes a comprehensive notification system that allows admins 
 ## 📋 Notification System Usage
 
 ### Admin Access
-- **URL**: http://127.0.0.1:8000/login/
 - **Username**: admin
 - **Password**: admin
 
