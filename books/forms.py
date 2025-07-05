@@ -2,13 +2,13 @@
 Django forms for the Book Catalog application.
 
 This module defines the form classes used for data input and validation.
-Forms handle user registration, login, and book management with proper
+Forms handle user registration, login, book management, and notifications with proper
 validation and security measures.
 """
 
 from django import forms
 from django.contrib.auth.hashers import check_password
-from .models import Book, User
+from .models import Book, User, Notification
 
 # forms.py
 
@@ -203,4 +203,199 @@ class ProfileEditForm(forms.ModelForm):
         if email and User.objects.filter(email=email).exclude(id=self.instance.id).exists():
             raise forms.ValidationError("This email is already registered!")
         return email
+
+class AdminEmailChangeForm(forms.Form):
+    """
+    Form for admin to change user email addresses.
+    
+    This form allows admins to update email addresses for any user in the system.
+    It includes validation to ensure the new email is unique and properly formatted.
+    
+    Fields:
+        new_email: New email address for the user
+        confirm_email: Confirmation of the new email address
+    """
+    new_email = forms.EmailField(
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter new email address'}),
+        label='New Email Address'
+    )
+    confirm_email = forms.EmailField(
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Confirm new email address'}),
+        label='Confirm Email Address'
+    )
+    
+    def __init__(self, user, *args, **kwargs):
+        """
+        Initialize form with user instance for validation.
+        
+        Args:
+            user: User instance whose email will be changed
+            *args, **kwargs: Standard form arguments
+        """
+        self.user = user
+        super().__init__(*args, **kwargs)
+    
+    def clean(self):
+        """
+        Custom validation for email change.
+        
+        This method validates that:
+        1. New email and confirmation match
+        2. New email is different from current email
+        3. New email is unique in the system
+        """
+        cleaned_data = super().clean()
+        new_email = cleaned_data.get('new_email')
+        confirm_email = cleaned_data.get('confirm_email')
+        
+        # Check if emails match
+        if new_email and confirm_email and new_email != confirm_email:
+            raise forms.ValidationError("Email addresses do not match!")
+        
+        # Check if new email is different from current
+        if new_email and new_email == self.user.email:
+            raise forms.ValidationError("New email must be different from current email!")
+        
+        # Check if new email is unique
+        if new_email and User.objects.filter(email=new_email).exclude(id=self.user.id).exists():
+            raise forms.ValidationError("This email address is already registered by another user!")
+        
+        return cleaned_data
+
+class NotificationForm(forms.ModelForm):
+    """
+    Form for creating and sending notifications to users.
+    
+    This form allows admins to create notifications that can be sent to users
+    via email or displayed in their profile. It supports both general messages
+    and book recommendations with options to save books to user lists.
+    
+    Fields:
+        title: Notification title/headline
+        message: Detailed notification message
+        notification_type: Type of notification (recommendation, general, system)
+        book_recommendation: Optional book to recommend
+        send_email: Whether to send email notification
+        save_book_to_list: Whether to save the book to user's reading list
+        additional_email_content: Additional content for email notifications
+    """
+    send_email = forms.BooleanField(
+        required=False,
+        initial=True,
+        label='Send Email Notification',
+        help_text='Check this to send the notification via email as well'
+    )
+    save_book_to_list = forms.BooleanField(
+        required=False,
+        initial=False,
+        label='Save Book to User Reading List',
+        help_text='Automatically add the recommended book to user\'s reading list'
+    )
+    additional_email_content = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Additional content for email (optional)'}),
+        label='Additional Email Content',
+        help_text='Extra content to include in email notifications'
+    )
+    
+    class Meta:
+        model = Notification
+        fields = ['title', 'message', 'notification_type', 'book_recommendation']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter notification title'}),
+            'message': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Enter notification message'}),
+            'notification_type': forms.Select(attrs={'class': 'form-control'}),
+            'book_recommendation': forms.Select(attrs={'class': 'form-control'}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        """Initialize form with available books for recommendations."""
+        super().__init__(*args, **kwargs)
+        # Only show books that exist in the catalog for recommendations
+        self.fields['book_recommendation'].queryset = Book.objects.all().order_by('title')
+        self.fields['book_recommendation'].required = False
+        self.fields['book_recommendation'].empty_label = "No book recommendation"
+
+class BulkNotificationForm(forms.Form):
+    """
+    Form for sending notifications to multiple users at once.
+    
+    This form allows admins to send the same notification to multiple users
+    simultaneously, with options for targeting specific user groups and saving books.
+    
+    Fields:
+        title: Notification title/headline
+        message: Detailed notification message
+        notification_type: Type of notification
+        book_recommendation: Optional book to recommend
+        target_users: Which users to send to (all, regular users, specific users)
+        specific_users: List of specific users to target
+        send_email: Whether to send email notifications
+        save_book_to_list: Whether to save the book to user's reading list
+        additional_email_content: Additional content for email notifications
+    """
+    title = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter notification title'})
+    )
+    message = forms.CharField(
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Enter notification message'})
+    )
+    notification_type = forms.ChoiceField(
+        choices=Notification.NOTIFICATION_TYPES,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    book_recommendation = forms.ModelChoiceField(
+        queryset=Book.objects.all().order_by('title'),
+        required=False,
+        empty_label="No book recommendation",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
+    TARGET_CHOICES = [
+        ('all', 'All Users'),
+        ('regular', 'Regular Users Only'),
+        ('specific', 'Specific Users'),
+    ]
+    
+    target_users = forms.ChoiceField(
+        choices=TARGET_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        help_text='Choose which users to send the notification to'
+    )
+    specific_users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.exclude(username='admin').order_by('username'),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+        help_text='Select specific users (admin cannot send notifications to themselves)'
+    )
+    send_email = forms.BooleanField(
+        required=False,
+        initial=True,
+        label='Send Email Notifications',
+        help_text='Check this to send email notifications to all targeted users'
+    )
+    save_book_to_list = forms.BooleanField(
+        required=False,
+        initial=False,
+        label='Save Book to User Reading Lists',
+        help_text='Automatically add the recommended book to all targeted users\' reading lists'
+    )
+    additional_email_content = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Additional content for email (optional)'}),
+        label='Additional Email Content',
+        help_text='Extra content to include in email notifications'
+    )
+    
+    def clean(self):
+        """Validate that specific users are selected when targeting specific users."""
+        cleaned_data = super().clean()
+        target_users = cleaned_data.get('target_users')
+        specific_users = cleaned_data.get('specific_users')
+        
+        if target_users == 'specific' and not specific_users:
+            raise forms.ValidationError("Please select at least one user when targeting specific users.")
+        
+        return cleaned_data
 

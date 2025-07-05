@@ -1,0 +1,227 @@
+{% extends 'books/base.html' %}
+
+<!-- 
+    View Notifications Template for Book Catalog Application
+    This template displays all notifications for the current user, including
+    book recommendations and general messages. Users can mark notifications
+    as read individually or all at once. The template shows notification
+    status, type, and content in an organized list format.
+-->
+
+{% block content %}
+    <!-- Notifications Container -->
+    <!-- Main container for displaying user notifications -->
+    <div class="container">
+        
+        <!-- Page Header Section -->
+        <!-- Contains title, notification count, and action buttons -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h2><i class="fas fa-bell"></i> My Notifications</h2>
+                <p class="text-muted">
+                    {% if unread_count > 0 %}
+                        You have {{ unread_count }} unread notification{{ unread_count|pluralize }}
+                    {% else %}
+                        All notifications have been read
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <!-- Mark All as Read Button -->
+                <!-- Button to mark all unread notifications as read -->
+                {% if unread_count > 0 %}
+                    <a href="{% url 'mark_all_notifications_read' %}" class="btn btn-success">
+                        <i class="fas fa-check-double"></i> Mark All as Read
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Notifications List Section -->
+        <!-- Displays all notifications in a card-based layout -->
+        {% if notifications %}
+            <div class="row">
+                {% for notification in notifications %}
+                    <!-- Individual Notification Card -->
+                    <!-- Each notification is displayed in its own card with status indicators -->
+                    <div class="col-12 mb-3">
+                        <div class="card {% if not notification.is_read %}border-primary{% endif %}">
+                            
+                            <!-- Card Header with Status and Actions -->
+                            <!-- Shows notification type, date, and read status -->
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <!-- Notification Type Badge -->
+                                    <!-- Color-coded badge showing notification type -->
+                                    {% if notification.notification_type == 'recommendation' %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-book"></i> Book Recommendation
+                                        </span>
+                                    {% elif notification.notification_type == 'system' %}
+                                        <span class="badge bg-info">
+                                            <i class="fas fa-cog"></i> System
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-primary">
+                                            <i class="fas fa-bell"></i> General
+                                        </span>
+                                    {% endif %}
+                                    
+                                    <!-- Unread Indicator -->
+                                    <!-- Visual indicator for unread notifications -->
+                                    {% if not notification.is_read %}
+                                        <span class="badge bg-warning ms-2">
+                                            <i class="fas fa-circle"></i> New
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Notification Date and Actions -->
+                                <!-- Shows creation date and action buttons -->
+                                <div class="d-flex align-items-center">
+                                    <small class="text-muted me-3">
+                                        <i class="fas fa-clock"></i> {{ notification.created_at|date:"M d, Y H:i" }}
+                                    </small>
+                                    
+                                    <!-- Mark as Read Button -->
+                                    <!-- Button to mark individual notification as read -->
+                                    {% if not notification.is_read %}
+                                        <a href="{% url 'mark_notification_read' notification.id %}" 
+                                           class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-check"></i> Mark Read
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Card Body with Notification Content -->
+                            <!-- Contains notification title, message, and book recommendation -->
+                            <div class="card-body">
+                                <!-- Notification Title -->
+                                <!-- Main headline of the notification -->
+                                <h5 class="card-title">
+                                    {% if not notification.is_read %}
+                                        <strong>{{ notification.title }}</strong>
+                                    {% else %}
+                                        {{ notification.title }}
+                                    {% endif %}
+                                </h5>
+                                
+                                <!-- Notification Message -->
+                                <!-- Detailed content of the notification -->
+                                <p class="card-text">{{ notification.message }}</p>
+                                
+                                <!-- Book Recommendation Section -->
+                                <!-- Shows recommended book details if applicable -->
+                                {% if notification.book_recommendation %}
+                                    <div class="alert alert-info">
+                                        <h6><i class="fas fa-book-open"></i> Recommended Book:</h6>
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <strong>{{ notification.book_recommendation.title }}</strong><br>
+                                                <em>by {{ notification.book_recommendation.author }}</em><br>
+                                                <small class="text-muted">
+                                                    Published: {{ notification.book_recommendation.published_date|date:"Y" }}
+                                                    {% if notification.book_recommendation.isbn %}
+                                                        | ISBN: {{ notification.book_recommendation.isbn }}
+                                                    {% endif %}
+                                                </small>
+                                            </div>
+                                            <div class="col-md-4 text-end">
+                                                <!-- Add Book to Catalog Button -->
+                                                <!-- Allows users to add recommended book to their catalog -->
+                                                <a href="{% url 'add_book' %}?title={{ notification.book_recommendation.title|urlencode }}&author={{ notification.book_recommendation.author|urlencode }}" 
+                                                   class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-plus"></i> Add to Catalog
+                                                </a>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Book Description -->
+                                        <!-- Shows book description if available -->
+                                        {% if notification.book_recommendation.description %}
+                                            <div class="mt-2">
+                                                <small>{{ notification.book_recommendation.description|truncatewords:30 }}</small>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination Section -->
+            <!-- Navigation for large numbers of notifications -->
+            {% if notifications.has_other_pages %}
+                <nav aria-label="Notifications pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if notifications.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ notifications.previous_page_number }}">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in notifications.paginator.page_range %}
+                            {% if notifications.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > notifications.number|add:'-3' and num < notifications.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if notifications.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ notifications.next_page_number }}">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+            
+        {% else %}
+            <!-- No Notifications Message -->
+            <!-- Displayed when user has no notifications -->
+            <div class="text-center py-5">
+                <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Notifications</h4>
+                <p class="text-muted">You don't have any notifications yet. Check back later for updates!</p>
+                <a href="{% url 'home' %}" class="btn btn-primary">
+                    <i class="fas fa-home"></i> Go to Home
+                </a>
+            </div>
+        {% endif %}
+        
+        <!-- Quick Actions Section -->
+        <!-- Links to other user functions -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h6><i class="fas fa-cog"></i> Quick Actions</h6>
+                        <div class="d-grid gap-2 d-md-flex">
+                            <a href="{% url 'home' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-home"></i> Home
+                            </a>
+                            <a href="{% url 'edit_profile' %}" class="btn btn-outline-info">
+                                <i class="fas fa-user-edit"></i> Edit Profile
+                            </a>
+                            <a href="{% url 'change_password' %}" class="btn btn-outline-warning">
+                                <i class="fas fa-key"></i> Change Password
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %} 

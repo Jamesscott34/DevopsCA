@@ -154,7 +154,8 @@
                         <!-- Progress Bar for Read vs Unread Books -->
                         <div class="progress mb-3">
                             <div class="progress-bar bg-success" 
-                                 style="width: {{ read_books|floatformat:0 }}%">
+                                 data-width="{{ read_books|floatformat:0 }}"
+                                 id="read-progress-bar">
                                 {{ read_books|floatformat:0 }}%
                             </div>
                         </div>
@@ -278,19 +279,43 @@
                                     
                                     <!-- Actions Cell -->
                                     <td>
-                                        {% if user.username != 'admin' %}
-                                            <!-- Delete User Button - Only for non-admin users -->
-                                            <a href="{% url 'delete_user' user.id %}" 
-                                               class="btn btn-danger btn-sm"
-                                               onclick="return confirm('Are you sure you want to delete user \"{{ user.username }}\"? This action cannot be undone.')">
-                                                <i class="fas fa-trash"></i> Delete User
-                                            </a>
-                                        {% else %}
-                                            <!-- Admin users cannot be deleted -->
-                                            <span class="text-muted">
-                                                <i class="fas fa-shield-alt"></i> Protected
-                                            </span>
-                                        {% endif %}
+                                        <div class="btn-group" role="group">
+                                            {% if user.username != 'admin' %}
+                                                <!-- Send Notification Button - For non-admin users only -->
+                                                <a href="{% url 'send_notification_user' user.id %}" 
+                                                   class="btn btn-primary btn-sm"
+                                                   title="Send notification to {{ user.username }}">
+                                                    <i class="fas fa-bell"></i> Notify
+                                                </a>
+                                                
+                                                <!-- Change Email Button - For non-admin users only -->
+                                                <a href="{% url 'change_user_email' user.id %}" 
+                                                   class="btn btn-info btn-sm"
+                                                   title="Change email for {{ user.username }}">
+                                                    <i class="fas fa-envelope"></i> Email
+                                                </a>
+                                                
+                                                <!-- Delete User Button - Only for non-admin users -->
+                                                <a href="{% url 'delete_user' user.id %}" 
+                                                   class="btn btn-danger btn-sm"
+                                                   onclick="return confirm('Are you sure you want to delete user \'{{ user.username }}\'? This action cannot be undone.')"
+                                                   title="Delete user {{ user.username }}">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </a>
+                                            {% else %}
+                                                <!-- Admin user actions - limited functionality -->
+                                                <span class="text-muted me-2">
+                                                    <i class="fas fa-shield-alt"></i> Protected
+                                                </span>
+                                                
+                                                <!-- Admin can only change their own email -->
+                                                <a href="{% url 'change_user_email' user.id %}" 
+                                                   class="btn btn-info btn-sm"
+                                                   title="Change your own email address">
+                                                    <i class="fas fa-envelope"></i> Change Email
+                                                </a>
+                                            {% endif %}
+                                        </div>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -319,9 +344,187 @@
         </div>
     </div>
 
+    <!-- Book Statistics Section -->
+    <!-- Displays most read and most viewed books -->
+    <h2 class="mb-4 mt-5"><i class="fas fa-chart-line"></i> Book Statistics</h2>
+    
+    <div class="row">
+        <!-- Most Read Books Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-book-open"></i> Most Read Books</h5>
+                </div>
+                <div class="card-body">
+                    {% if most_read_books %}
+                        <div class="list-group list-group-flush">
+                            {% for book in most_read_books %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ book.title }}</strong><br>
+                                        <small class="text-muted">by {{ book.author }}</small>
+                                    </div>
+                                    <span class="badge bg-success rounded-pill">{{ book.view_count }} views</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No books have been read yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Most Viewed Books Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-eye"></i> Most Viewed Books</h5>
+                </div>
+                <div class="card-body">
+                    {% if most_viewed_books %}
+                        <div class="list-group list-group-flush">
+                            {% for book in most_viewed_books %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ book.title }}</strong><br>
+                                        <small class="text-muted">by {{ book.author }}</small>
+                                        {% if book.is_read %}
+                                            <span class="badge bg-success ms-2">Read</span>
+                                        {% else %}
+                                            <span class="badge bg-warning ms-2">Unread</span>
+                                        {% endif %}
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">{{ book.view_count }} views</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No books have been viewed yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Management Section -->
+    <!-- Admin tools for sending notifications and managing communication -->
+    <h2 class="mb-4 mt-5"><i class="fas fa-bell"></i> Notification Management</h2>
+    
+    <!-- Notification Management Card -->
+    <div class="card">
+        <div class="card-header">
+            <h5><i class="fas fa-bell"></i> Send Notifications</h5>
+        </div>
+        <div class="card-body">
+            <!-- Notification Actions Row -->
+            <!-- Quick access buttons for different notification types -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body text-center">
+                            <i class="fas fa-user fa-2x mb-2"></i>
+                            <h6>Individual Notifications</h6>
+                            <p class="mb-2">Send personalized notifications to specific users</p>
+                            <a href="{% url 'send_notification' %}" class="btn btn-light btn-sm">
+                                <i class="fas fa-paper-plane"></i> Send Individual
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-warning text-dark">
+                        <div class="card-body text-center">
+                            <i class="fas fa-users fa-2x mb-2"></i>
+                            <h6>Bulk Notifications</h6>
+                            <p class="mb-2">Send the same notification to multiple users at once</p>
+                            <a href="{% url 'send_bulk_notification' %}" class="btn btn-dark btn-sm">
+                                <i class="fas fa-broadcast-tower"></i> Send Bulk
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Notification Tips -->
+            <!-- Best practices and guidelines for sending notifications -->
+            <div class="alert alert-info">
+                <h6><i class="fas fa-lightbulb"></i> Notification Best Practices</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="mb-0">
+                            <li>Use book recommendations to increase engagement</li>
+                            <li>Keep titles concise and attention-grabbing</li>
+                            <li>Target specific users for personalized messages</li>
+                            <li>Admin cannot send notifications to themselves</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="mb-0">
+                            <li>Use bulk notifications sparingly</li>
+                            <li>Include clear calls-to-action</li>
+                            <li>Monitor notification effectiveness</li>
+                            <li>Admin can only change their own email</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Notification Templates -->
+            <!-- Pre-written notification templates for common scenarios -->
+            <div class="mt-4">
+                <h6><i class="fas fa-file-alt"></i> Quick Templates</h6>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>New Book Alert</h6>
+                                <p class="small text-muted">Notify users about new additions to the catalog</p>
+                                <button class="btn btn-outline-primary btn-sm" onclick="useTemplate('new_book')">
+                                    Use Template
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>Reading Challenge</h6>
+                                <p class="small text-muted">Encourage users to read more books</p>
+                                <button class="btn btn-outline-success btn-sm" onclick="useTemplate('reading_challenge')">
+                                    Use Template
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>System Update</h6>
+                                <p class="small text-muted">Inform users about system changes</p>
+                                <button class="btn btn-outline-info btn-sm" onclick="useTemplate('system_update')">
+                                    Use Template
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript Functions for Admin Dashboard -->
     <!-- Client-side functions for enhanced admin functionality -->
     <script>
+        // Set progress bar width on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBar = document.getElementById('read-progress-bar');
+            if (progressBar) {
+                const width = progressBar.getAttribute('data-width');
+                progressBar.style.width = width + '%';
+            }
+        });
+        
         // Function to display user statistics in a modal or alert
         function showUserStats() {
             alert('User Statistics:\n' +
@@ -339,6 +542,39 @@
                   'Database: SQLite\n' +
                   'Admin User: {{ current_user.username }}\n' +
                   'Status: Operational');
+        }
+        
+        // Function to use notification templates
+        function useTemplate(templateType) {
+            let title = '';
+            let message = '';
+            
+            switch(templateType) {
+                case 'new_book':
+                    title = 'New Book Added to Catalog';
+                    message = 'A new book has been added to our catalog that might interest you!';
+                    break;
+                case 'reading_challenge':
+                    title = 'Reading Challenge Update';
+                    message = 'Join our reading challenge and discover new books!';
+                    break;
+                case 'system_update':
+                    title = 'System Update Notification';
+                    message = 'We have updated our system with new features and improvements.';
+                    break;
+                default:
+                    title = 'Notification';
+                    message = 'You have a new notification.';
+            }
+            
+            // Store template data in sessionStorage for the notification form
+            sessionStorage.setItem('notificationTemplate', JSON.stringify({
+                title: title,
+                message: message
+            }));
+            
+            // Redirect to notification form
+            window.location.href = '{% url "send_notification" %}';
         }
     </script>
 {% endblock %} 

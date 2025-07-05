@@ -7,8 +7,8 @@ Each view function processes specific URLs and returns appropriate responses.
 """
 
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Book, User
-from .forms import BookForm, UserRegistrationForm, LoginForm, PasswordChangeForm, ProfileEditForm
+from .models import Book, User, Notification
+from .forms import BookForm, UserRegistrationForm, LoginForm, PasswordChangeForm, ProfileEditForm, NotificationForm, BulkNotificationForm, AdminEmailChangeForm
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from django.http import JsonResponse
@@ -34,11 +34,20 @@ def get_current_user(request):
         User object if logged in, None otherwise
     """
     current_user = None
+    print(f"DEBUG: get_current_user called. Session keys: {list(request.session.keys())}")
+    
     if 'user_id' in request.session:
         try:
-            current_user = User.objects.get(id=request.session['user_id'])
+            user_id = request.session['user_id']
+            print(f"DEBUG: Found user_id in session: {user_id}")
+            current_user = User.objects.get(id=user_id)
+            print(f"DEBUG: Retrieved user: {current_user.username}")
         except User.DoesNotExist:
+            print(f"DEBUG: User with id {user_id} not found in database")
             pass
+    else:
+        print("DEBUG: No user_id found in session")
+    
     return current_user
 
 def home(request):
@@ -48,7 +57,8 @@ def home(request):
     This view shows the primary interface where users can see all their books
     in a table format. It includes action buttons for adding books and filtering
     by read/unread status. The view also displays a personalized welcome message
-    for logged-in users.
+    for logged-in users and tracks book views for statistics.
+    Users must be logged in to access this page.
     
     Args:
         request: Django HttpRequest object
@@ -56,8 +66,18 @@ def home(request):
     Returns:
         Rendered home.html template with books data and user context
     """
-    books = Book.objects.all()
     current_user = get_current_user(request)
+    
+    # Require authentication
+    if not current_user:
+        messages.error(request, 'You must be logged in to access the book catalog.')
+        return redirect('login_user')
+    
+    books = Book.objects.all()
+    
+    # Track book views for statistics (increment view count for each book)
+    for book in books:
+        book.increment_view_count()
     
     return render(request, 'books/home.html', {
         'books': books,
@@ -71,6 +91,7 @@ def add_book(request):
     This view provides a form for users to manually enter book information.
     It handles both GET requests (display form) and POST requests (save book).
     After successful book creation, users are redirected to the home page.
+    The view tracks which user added the book for statistics.
     
     Args:
         request: Django HttpRequest object
@@ -82,7 +103,9 @@ def add_book(request):
     if request.method == 'POST':
         form = BookForm(request.POST)
         if form.is_valid():
-            form.save()
+            book = form.save(commit=False)
+            book.added_by = current_user
+            book.save()
             return redirect('home')
     else:
         form = BookForm()
@@ -360,7 +383,8 @@ def login_user(request):
     
     This view processes login attempts by validating username/password combinations
     against the database. It sets up user sessions and provides different redirects
-    for admin users vs regular users. Admin users go to the admin dashboard.
+    for admin users vs regular users. All users go to the home page after login.
+    If a user is already logged in, they are redirected to the appropriate page.
     
     Args:
         request: Django HttpRequest object
@@ -369,6 +393,16 @@ def login_user(request):
         Rendered login.html template or redirect based on user type
     """
     current_user = get_current_user(request)
+    
+    # If user is already logged in, redirect them to appropriate page
+    if current_user:
+        if current_user.username == 'admin':
+            messages.info(request, 'You are already logged in as admin.')
+            return redirect('admin_dashboard')
+        else:
+            messages.info(request, f'You are already logged in as {current_user.username}.')
+            return redirect('home')
+    
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -420,41 +454,70 @@ def admin_dashboard(request):
     """
     Display the admin dashboard with system statistics and management tools.
     
-    This view provides a special interface for admin users with system-wide
-    statistics, user management tools, and quick access to administrative
-    functions. Only users with username 'admin' can access this dashboard.
+    This view provides admins with an overview of the system including user counts,
+    book statistics, and quick access to administrative functions. It also includes
+    notification statistics for the notification management section.
     
     Args:
         request: Django HttpRequest object
         
     Returns:
-        Rendered admin_dashboard.html template or redirect to login if not admin
+        Rendered admin_dashboard.html template with system statistics
     """
     current_user = get_current_user(request)
-    print(f"DEBUG: admin_dashboard called, current_user: {current_user}")
     if not current_user or current_user.username != 'admin':
-        print(f"DEBUG: Access denied to admin_dashboard")
-        messages.error(request, 'You must be admin to view this page.')
+        messages.error(request, 'You must be admin to access the admin dashboard.')
         return redirect('login_user')
     
-    print(f"DEBUG: Admin access granted, getting statistics")
-    # Get some statistics for admin dashboard
+    # Get system statistics
+    total_users = User.objects.count()
     total_books = Book.objects.count()
     read_books = Book.objects.filter(is_read=True).count()
     unread_books = Book.objects.filter(is_read=False).count()
-    total_users = User.objects.count()
-    
-    # Get all users for management
     all_users = User.objects.all().order_by('created_at')
     
-    return render(request, 'books/admin_dashboard.html', {
+    # Calculate reading progress percentage
+    if total_books > 0:
+        read_percentage = (read_books / total_books) * 100
+        unread_percentage = (unread_books / total_books) * 100
+    else:
+        read_percentage = 0
+        unread_percentage = 0
+    
+    # Get notification statistics
+    total_notifications = Notification.objects.count()
+    read_notifications = Notification.objects.filter(is_read=True).count()
+    unread_notifications = Notification.objects.filter(is_read=False).count()
+    
+    # Get notification type counts
+    recommendation_count = Notification.objects.filter(notification_type='recommendation').count()
+    general_count = Notification.objects.filter(notification_type='general').count()
+    system_count = Notification.objects.filter(notification_type='system').count()
+    
+    # Get most read and most viewed books
+    most_read_books = Book.get_most_read()
+    most_viewed_books = Book.get_most_viewed()
+    
+    context = {
         'current_user': current_user,
+        'total_users': total_users,
         'total_books': total_books,
         'read_books': read_books,
         'unread_books': unread_books,
-        'total_users': total_users,
-        'all_users': all_users
-    })
+        'read_percentage': read_percentage,
+        'unread_percentage': unread_percentage,
+        'all_users': all_users,
+        'total_notifications': total_notifications,
+        'read_notifications': read_notifications,
+        'unread_notifications': unread_notifications,
+        'recommendation_count': recommendation_count,
+        'general_count': general_count,
+        'system_count': system_count,
+        'most_read_books': most_read_books,
+        'most_viewed_books': most_viewed_books,
+    }
+    
+    return render(request, 'books/admin_dashboard.html', context)
 
 def delete_user(request, user_id):
     """
@@ -593,3 +656,308 @@ def delete_profile(request):
         return redirect('login_user')
     
     return render(request, 'books/delete_profile.html', {'current_user': current_user})
+
+def send_notification(request, user_id=None):
+    """
+    Handle sending notifications to users (admin only).
+    
+    This view allows admins to send notifications to specific users or all users.
+    It supports both individual notifications and bulk notifications with email options.
+    Admin cannot send notifications to themselves.
+    
+    Args:
+        request: Django HttpRequest object
+        user_id: Optional user ID to send notification to specific user
+        
+    Returns:
+        Rendered send_notification.html template or redirect to admin dashboard
+    """
+    current_user = get_current_user(request)
+    if not current_user or current_user.username != 'admin':
+        messages.error(request, 'You must be admin to send notifications.')
+        return redirect('login_user')
+    
+    # Get target user if specified
+    target_user = None
+    if user_id:
+        try:
+            target_user = User.objects.get(id=user_id)
+            # Admin cannot send notifications to themselves
+            if target_user.username == 'admin':
+                messages.error(request, 'Admin cannot send notifications to themselves.')
+                return redirect('admin_dashboard')
+        except User.DoesNotExist:
+            messages.error(request, 'Target user not found.')
+            return redirect('admin_dashboard')
+    
+    if request.method == 'POST':
+        form = NotificationForm(request.POST)
+        if form.is_valid():
+            notification_data = form.cleaned_data
+            send_email = notification_data.pop('send_email', False)
+            
+            # Determine target users
+            if target_user:
+                # Send to specific user
+                users_to_notify = [target_user]
+            else:
+                # Send to all regular users (exclude admin)
+                users_to_notify = User.objects.exclude(username='admin')
+            
+            # Create notifications for each user
+            notifications_created = 0
+            for user in users_to_notify:
+                notification = Notification.objects.create(
+                    user=user,
+                    title=notification_data['title'],
+                    message=notification_data['message'],
+                    notification_type=notification_data['notification_type'],
+                    book_recommendation=notification_data.get('book_recommendation')
+                )
+                notifications_created += 1
+                
+                # Save book to user's reading list if requested
+                if notification_data.get('save_book_to_list') and notification_data.get('book_recommendation'):
+                    book = notification_data['book_recommendation']
+                    # Check if user already has this book
+                    if not Book.objects.filter(title=book.title, author=book.author, added_by=user).exists():
+                        # Create a copy of the book for the user
+                        new_book = Book.objects.create(
+                            title=book.title,
+                            author=book.author,
+                            description=book.description,
+                            published_date=book.published_date,
+                            isbn=book.isbn,
+                            is_read=False,  # Start as unread
+                            added_by=user
+                        )
+                
+                # TODO: Send email notification if requested
+                if send_email:
+                    # Email functionality would be implemented here
+                    # Include book details and additional content in email
+                    pass
+            
+            messages.success(request, f'Notification sent to {notifications_created} user(s) successfully.')
+            return redirect('admin_dashboard')
+    else:
+        form = NotificationForm()
+    
+    return render(request, 'books/send_notification.html', {
+        'form': form, 
+        'current_user': current_user,
+        'target_user': target_user
+    })
+
+def send_bulk_notification(request):
+    """
+    Handle sending bulk notifications to multiple users (admin only).
+    
+    This view allows admins to send the same notification to multiple users
+    simultaneously with options for targeting specific user groups.
+    Admin cannot send notifications to themselves.
+    
+    Args:
+        request: Django HttpRequest object
+        
+    Returns:
+        Rendered send_bulk_notification.html template or redirect to admin dashboard
+    """
+    current_user = get_current_user(request)
+    if not current_user or current_user.username != 'admin':
+        messages.error(request, 'You must be admin to send bulk notifications.')
+        return redirect('login_user')
+    
+    if request.method == 'POST':
+        form = BulkNotificationForm(request.POST)
+        if form.is_valid():
+            notification_data = form.cleaned_data
+            send_email = notification_data.pop('send_email', False)
+            
+            # Determine target users based on selection
+            target_users = notification_data['target_users']
+            if target_users == 'all':
+                users_to_notify = User.objects.exclude(username='admin')
+            elif target_users == 'regular':
+                users_to_notify = User.objects.exclude(username='admin')
+            else:  # specific
+                users_to_notify = notification_data['specific_users'].exclude(username='admin')
+            
+            # Create notifications for each user
+            notifications_created = 0
+            for user in users_to_notify:
+                notification = Notification.objects.create(
+                    user=user,
+                    title=notification_data['title'],
+                    message=notification_data['message'],
+                    notification_type=notification_data['notification_type'],
+                    book_recommendation=notification_data.get('book_recommendation')
+                )
+                notifications_created += 1
+                
+                # Save book to user's reading list if requested
+                if notification_data.get('save_book_to_list') and notification_data.get('book_recommendation'):
+                    book = notification_data['book_recommendation']
+                    # Check if user already has this book
+                    if not Book.objects.filter(title=book.title, author=book.author, added_by=user).exists():
+                        # Create a copy of the book for the user
+                        new_book = Book.objects.create(
+                            title=book.title,
+                            author=book.author,
+                            description=book.description,
+                            published_date=book.published_date,
+                            isbn=book.isbn,
+                            is_read=False,  # Start as unread
+                            added_by=user
+                        )
+                
+                # TODO: Send email notification if requested
+                if send_email:
+                    # Email functionality would be implemented here
+                    # Include book details and additional content in email
+                    pass
+            
+            messages.success(request, f'Bulk notification sent to {notifications_created} user(s) successfully.')
+            return redirect('admin_dashboard')
+    else:
+        form = BulkNotificationForm()
+    
+    return render(request, 'books/send_bulk_notification.html', {
+        'form': form, 
+        'current_user': current_user
+    })
+
+def view_notifications(request):
+    """
+    Display notifications for the current user.
+    
+    This view shows all notifications for the logged-in user, including
+    book recommendations and general messages. Users can mark notifications as read.
+    
+    Args:
+        request: Django HttpRequest object
+        
+    Returns:
+        Rendered view_notifications.html template with user's notifications
+    """
+    current_user = get_current_user(request)
+    print(f"DEBUG: view_notifications called. Current user: {current_user}")
+    
+    if not current_user:
+        print("DEBUG: No current user found, redirecting to login")
+        messages.error(request, 'You must be logged in to view notifications.')
+        return redirect('login_user')
+    
+    print(f"DEBUG: User authenticated: {current_user.username}")
+    
+    notifications = Notification.objects.filter(user=current_user).order_by('-created_at')
+    unread_count = notifications.filter(is_read=False).count()
+    
+    print(f"DEBUG: Found {notifications.count()} notifications, {unread_count} unread")
+    
+    return render(request, 'books/view_notifications.html', {
+        'notifications': notifications, 
+        'current_user': current_user,
+        'unread_count': unread_count
+    })
+
+def mark_notification_read(request, notification_id):
+    """
+    Mark a notification as read for the current user.
+    
+    This view allows users to mark individual notifications as read.
+    It validates that the user owns the notification before updating.
+    
+    Args:
+        request: Django HttpRequest object
+        notification_id: ID of the notification to mark as read
+        
+    Returns:
+        Redirect to notifications page with success message
+    """
+    current_user = get_current_user(request)
+    if not current_user:
+        messages.error(request, 'You must be logged in to mark notifications as read.')
+        return redirect('login_user')
+    
+    try:
+        notification = Notification.objects.get(id=notification_id, user=current_user)
+        notification.mark_as_read()
+        messages.success(request, 'Notification marked as read.')
+    except Notification.DoesNotExist:
+        messages.error(request, 'Notification not found.')
+    
+    return redirect('view_notifications')
+
+def mark_all_notifications_read(request):
+    """
+    Mark all notifications as read for the current user.
+    
+    This view allows users to mark all their unread notifications as read
+    in one action for convenience.
+    
+    Args:
+        request: Django HttpRequest object
+        
+    Returns:
+        Redirect to notifications page with success message
+    """
+    current_user = get_current_user(request)
+    if not current_user:
+        messages.error(request, 'You must be logged in to mark notifications as read.')
+        return redirect('login_user')
+    
+    unread_notifications = Notification.objects.filter(user=current_user, is_read=False)
+    count = unread_notifications.count()
+    unread_notifications.update(is_read=True)
+    
+    messages.success(request, f'{count} notification(s) marked as read.')
+    return redirect('view_notifications')
+
+def change_user_email(request, user_id):
+    """
+    Handle changing a user's email address (admin only).
+    
+    This view allows admins to change email addresses for any user in the system.
+    It includes proper validation and confirmation to ensure data integrity.
+    Admin can only change their own email address, not other users'.
+    
+    Args:
+        request: Django HttpRequest object
+        user_id: ID of the user whose email will be changed
+        
+    Returns:
+        Rendered change_user_email.html template or redirect to admin dashboard
+    """
+    current_user = get_current_user(request)
+    if not current_user or current_user.username != 'admin':
+        messages.error(request, 'You must be admin to change user emails.')
+        return redirect('login_user')
+    
+    try:
+        target_user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, 'User not found.')
+        return redirect('admin_dashboard')
+    
+    # Admin can only change their own email address
+    if target_user.username != 'admin':
+        messages.error(request, 'Admin can only change their own email address.')
+        return redirect('admin_dashboard')
+    
+    if request.method == 'POST':
+        form = AdminEmailChangeForm(target_user, request.POST)
+        if form.is_valid():
+            new_email = form.cleaned_data['new_email']
+            target_user.email = new_email
+            target_user.save()
+            messages.success(request, f'Email for user "{target_user.username}" has been updated to {new_email}.')
+            return redirect('admin_dashboard')
+    else:
+        form = AdminEmailChangeForm(target_user)
+    
+    return render(request, 'books/change_user_email.html', {
+        'form': form,
+        'current_user': current_user,
+        'target_user': target_user
+    })

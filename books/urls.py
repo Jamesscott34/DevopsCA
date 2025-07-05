@@ -11,8 +11,8 @@ from . import views
 
 # URL patterns for the Book Catalog application
 urlpatterns = [
-    # Main application pages
-    path('', views.home, name='home'),  # Home page with book catalog
+    # Default redirect to login page
+    path('', views.login_user, name='default'),  # Redirect root to login
     
     # User authentication and registration
     path('register/', views.register_user, name='register_user'),  # User registration
@@ -22,13 +22,23 @@ urlpatterns = [
     # Admin functionality
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),  # Admin dashboard
     path('admin-dashboard/delete-user/<int:user_id>/', views.delete_user, name='delete_user'),  # Delete user (admin only)
+    path('admin-dashboard/change-email/<int:user_id>/', views.change_user_email, name='change_user_email'),  # Change user email (admin only)
     
     # User profile management
     path('profile/edit/', views.edit_profile, name='edit_profile'),  # Edit user profile
     path('profile/change-password/', views.change_password, name='change_password'),  # Change password
     path('profile/delete/', views.delete_profile, name='delete_profile'),  # Delete user profile
     
+    # Notification system (updated URLs to avoid admin conflicts)
+    path('notifications/', views.view_notifications, name='view_notifications'),  # View user notifications
+    path('notifications/mark-read/<int:notification_id>/', views.mark_notification_read, name='mark_notification_read'),  # Mark notification as read
+    path('notifications/mark-all-read/', views.mark_all_notifications_read, name='mark_all_notifications_read'),  # Mark all notifications as read
+    path('send-notification/', views.send_notification, name='send_notification'),  # Send notification (admin)
+    path('send-notification/<int:user_id>/', views.send_notification, name='send_notification_user'),  # Send notification to specific user
+    path('send-bulk-notification/', views.send_bulk_notification, name='send_bulk_notification'),  # Send bulk notification (admin)
+    
     # Book management
+    path('home/', views.home, name='home'),  # Home page with book catalog (moved from root)
     path('add/', views.add_book, name='add_book'),  # Add new book
     path('edit/<int:book_id>/', views.edit_book, name='edit_book'),  # Edit existing book
     path('delete/<str:isbn>/', views.delete_book_by_isbn, name='delete_book_by_isbn'),  # Delete book by ISBN

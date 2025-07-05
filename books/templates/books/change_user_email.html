@@ -1,0 +1,131 @@
+{% extends 'books/base.html' %}
+
+<!-- 
+    Change User Email Template for Book Catalog Application
+    This template provides an interface for admins to change email addresses
+    for any user in the system. It includes proper validation and confirmation
+    to ensure data integrity and prevent errors.
+-->
+
+{% block content %}
+    <!-- Change Email Form Card Container -->
+    <!-- Card-based layout for the email change form -->
+    <div class="card mx-auto" style="max-width: 600px;">
+        
+        <!-- Card Header Section -->
+        <!-- Contains the form title and user information -->
+        <div class="card-header">
+            <h2><i class="fas fa-envelope"></i> Change User Email</h2>
+            <h5>Update email address for {{ target_user.username }}</h5>
+        </div>
+        
+        <!-- Card Body Section -->
+        <!-- Contains the actual email change form -->
+        <div class="card-body">
+            <!-- Current Email Display -->
+            <!-- Shows the user's current email address -->
+            <div class="alert alert-info">
+                <h6><i class="fas fa-info-circle"></i> Current Email</h6>
+                <p class="mb-0"><strong>{{ target_user.email }}</strong></p>
+            </div>
+            
+            <!-- Change Email Form -->
+            <!-- Django form for changing email with CSRF protection -->
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- New Email Field -->
+                <!-- Text input for new email address -->
+                <div class="form-group">
+                    <label for="{{ form.new_email.id_for_label }}" class="form-label">
+                        <i class="fas fa-envelope"></i> {{ form.new_email.label }} *
+                    </label>
+                    {{ form.new_email }}
+                    <!-- Display new_email field errors if any -->
+                    {% if form.new_email.errors %}
+                        <div class="text-danger">
+                            {% for error in form.new_email.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Confirm Email Field -->
+                <!-- Text input for email confirmation -->
+                <div class="form-group">
+                    <label for="{{ form.confirm_email.id_for_label }}" class="form-label">
+                        <i class="fas fa-check-circle"></i> {{ form.confirm_email.label }} *
+                    </label>
+                    {{ form.confirm_email }}
+                    <!-- Display confirm_email field errors if any -->
+                    {% if form.confirm_email.errors %}
+                        <div class="text-danger">
+                            {% for error in form.confirm_email.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Non-Field Errors Display -->
+                <!-- Shows general form errors -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <i class="fas fa-exclamation-triangle"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <!-- Submit Buttons Section -->
+                <!-- Action buttons for form submission and navigation -->
+                <div class="d-grid gap-2">
+                    <!-- Submit Button - Updates the email -->
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Email
+                    </button>
+                    
+                    <!-- Cancel Button - Returns to admin dashboard -->
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+            
+            <!-- Email Change Tips -->
+            <!-- Information about email change best practices -->
+            <div class="alert alert-warning mt-3">
+                <h6><i class="fas fa-lightbulb"></i> Email Change Guidelines</h6>
+                <ul class="mb-0">
+                    <li>Ensure the new email address is valid and accessible</li>
+                    <li>The new email must be unique in the system</li>
+                    <li>Users will need to use the new email for future logins</li>
+                    <li>Consider notifying the user about the email change</li>
+                </ul>
+            </div>
+            
+            <!-- User Information -->
+            <!-- Additional user details for context -->
+            <div class="mt-4">
+                <h6><i class="fas fa-user"></i> User Information</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Username:</strong> {{ target_user.username }}</p>
+                        <p><strong>Current Email:</strong> {{ target_user.email }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Account Created:</strong> {{ target_user.created_at|date:"M d, Y" }}</p>
+                        <p><strong>User Type:</strong> 
+                            {% if target_user.username == 'admin' %}
+                                <span class="badge bg-warning text-dark">Administrator</span>
+                            {% else %}
+                                <span class="badge bg-info">Regular User</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %} 

@@ -1,0 +1,207 @@
+{% extends 'books/base.html' %}
+
+<!-- 
+    Send Notification Template for Book Catalog Application
+    This template provides an interface for admins to send notifications to users.
+    It includes options for book recommendations, email notifications, and targeting
+    specific users or all users. Only admin users can access this functionality.
+-->
+
+{% block content %}
+    <!-- Send Notification Form Card Container -->
+    <!-- Card-based layout for the notification sending form -->
+    <div class="card mx-auto" style="max-width: 800px;">
+        
+        <!-- Card Header Section -->
+        <!-- Contains the form title and description -->
+        <div class="card-header">
+            <h2><i class="fas fa-bell"></i> Send Notification</h2>
+            <h5>
+                {% if target_user %}
+                    Send notification to {{ target_user.username }}
+                {% else %}
+                    Send notification to all users
+                {% endif %}
+            </h5>
+        </div>
+        
+        <!-- Card Body Section -->
+        <!-- Contains the actual notification sending form -->
+        <div class="card-body">
+            <!-- Send Notification Form -->
+            <!-- Django form for sending notifications with CSRF protection -->
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Notification Title Field -->
+                <!-- Text input for notification title/headline -->
+                <div class="form-group">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">
+                        <i class="fas fa-heading"></i> Notification Title *
+                    </label>
+                    {{ form.title }}
+                    <!-- Display title field errors if any -->
+                    {% if form.title.errors %}
+                        <div class="text-danger">
+                            {% for error in form.title.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Notification Message Field -->
+                <!-- Text area for detailed notification message -->
+                <div class="form-group">
+                    <label for="{{ form.message.id_for_label }}" class="form-label">
+                        <i class="fas fa-comment"></i> Message *
+                    </label>
+                    {{ form.message }}
+                    <!-- Display message field errors if any -->
+                    {% if form.message.errors %}
+                        <div class="text-danger">
+                            {% for error in form.message.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Notification Type Field -->
+                <!-- Dropdown for selecting notification type -->
+                <div class="form-group">
+                    <label for="{{ form.notification_type.id_for_label }}" class="form-label">
+                        <i class="fas fa-tag"></i> Notification Type
+                    </label>
+                    {{ form.notification_type }}
+                    <!-- Display notification_type field errors if any -->
+                    {% if form.notification_type.errors %}
+                        <div class="text-danger">
+                            {% for error in form.notification_type.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Book Recommendation Field -->
+                <!-- Optional book selection for recommendations -->
+                <div class="form-group">
+                    <label for="{{ form.book_recommendation.id_for_label }}" class="form-label">
+                        <i class="fas fa-book"></i> Book Recommendation (Optional)
+                    </label>
+                    {{ form.book_recommendation }}
+                    <!-- Display book_recommendation field errors if any -->
+                    {% if form.book_recommendation.errors %}
+                        <div class="text-danger">
+                            {% for error in form.book_recommendation.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Send Email Checkbox -->
+                <!-- Option to send email notification -->
+                <div class="form-group">
+                    <div class="form-check">
+                        {{ form.send_email }}
+                        <label for="{{ form.send_email.id_for_label }}" class="form-check-label">
+                            <i class="fas fa-envelope"></i> {{ form.send_email.label }}
+                        </label>
+                        {% if form.send_email.help_text %}
+                            <small class="form-text text-muted">{{ form.send_email.help_text }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Save Book to List Checkbox -->
+                <!-- Option to automatically save book to user's reading list -->
+                <div class="form-group">
+                    <div class="form-check">
+                        {{ form.save_book_to_list }}
+                        <label for="{{ form.save_book_to_list.id_for_label }}" class="form-check-label">
+                            <i class="fas fa-bookmark"></i> {{ form.save_book_to_list.label }}
+                        </label>
+                        {% if form.save_book_to_list.help_text %}
+                            <small class="form-text text-muted">{{ form.save_book_to_list.help_text }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Additional Email Content Field -->
+                <!-- Text area for extra content in email notifications -->
+                <div class="form-group">
+                    <label for="{{ form.additional_email_content.id_for_label }}" class="form-label">
+                        <i class="fas fa-plus-circle"></i> {{ form.additional_email_content.label }}
+                    </label>
+                    {{ form.additional_email_content }}
+                    {% if form.additional_email_content.help_text %}
+                        <small class="form-text text-muted">{{ form.additional_email_content.help_text }}</small>
+                    {% endif %}
+                    <!-- Display additional_email_content field errors if any -->
+                    {% if form.additional_email_content.errors %}
+                        <div class="text-danger">
+                            {% for error in form.additional_email_content.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Non-Field Errors Display -->
+                <!-- Shows general form errors -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <i class="fas fa-exclamation-triangle"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <!-- Submit Buttons Section -->
+                <!-- Action buttons for form submission and navigation -->
+                <div class="d-grid gap-2">
+                    <!-- Submit Button - Sends the notification -->
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Send Notification
+                    </button>
+                    
+                    <!-- Cancel Button - Returns to admin dashboard -->
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+            
+            <!-- Notification Tips -->
+            <!-- Information about notification best practices -->
+            <div class="alert alert-info mt-3">
+                <h6><i class="fas fa-lightbulb"></i> Notification Tips</h6>
+                <ul class="mb-0">
+                    <li>Keep titles concise and attention-grabbing</li>
+                    <li>Use book recommendations to increase engagement</li>
+                    <li>Email notifications are sent in addition to in-app notifications</li>
+                    <li>Notifications appear in users' notification center</li>
+                </ul>
+            </div>
+            
+            <!-- Quick Actions -->
+            <!-- Links to other notification management functions -->
+            <div class="mt-4">
+                <h6><i class="fas fa-cog"></i> Quick Actions</h6>
+                <div class="d-grid gap-2">
+                    <!-- Send Bulk Notification Link -->
+                    <a href="{% url 'send_bulk_notification' %}" class="btn btn-outline-warning">
+                        <i class="fas fa-users"></i> Send Bulk Notification
+                    </a>
+                    
+                    <!-- View All Users Link -->
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-info">
+                        <i class="fas fa-list"></i> View All Users
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %} 

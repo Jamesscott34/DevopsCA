@@ -2,7 +2,7 @@
 Database models for the Book Catalog application.
 
 This module defines the data structures used to store user accounts and book information
-in the database. It includes models for user authentication and book management.
+in the database. It includes models for user authentication, book management, and notifications.
 """
 
 from django.db import models
@@ -50,7 +50,7 @@ class Book(models.Model):
     
     This model represents a book in the user's personal library. It includes
     basic book metadata like title, author, and publication details, plus
-    tracking for whether the book has been read.
+    tracking for whether the book has been read and how many times it's been viewed.
     
     Attributes:
         title (str): Book title (max 200 characters)
@@ -59,6 +59,8 @@ class Book(models.Model):
         published_date (date): When the book was published
         isbn (str): International Standard Book Number (unique, optional)
         is_read (bool): Whether the user has read this book
+        view_count (int): Number of times the book has been viewed
+        added_by (User): User who added the book to the catalog
     """
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=100)
@@ -66,7 +68,68 @@ class Book(models.Model):
     published_date = models.DateField()
     isbn = models.CharField(max_length=13, unique=True, blank=True, null=True)
     is_read = models.BooleanField(default=False)
+    view_count = models.IntegerField(default=0)
+    added_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='added_books')
 
     def __str__(self):
         """Return the book title as the string representation."""
         return self.title
+    
+    def increment_view_count(self):
+        """Increment the view count for this book."""
+        self.view_count += 1
+        self.save(update_fields=['view_count'])
+    
+    @classmethod
+    def get_most_read(cls):
+        """Get the most read books."""
+        return cls.objects.filter(is_read=True).order_by('-view_count')[:5]
+    
+    @classmethod
+    def get_most_viewed(cls):
+        """Get the most viewed books."""
+        return cls.objects.order_by('-view_count')[:5]
+
+class Notification(models.Model):
+    """
+    Model for storing user notifications and book recommendations.
+    
+    This model handles notifications sent by admins to users, including
+    book recommendations and other important messages. Notifications can
+    be marked as read and are associated with specific users.
+    
+    Attributes:
+        user (User): The user who receives the notification
+        title (str): Notification title/headline
+        message (str): Detailed notification message
+        book_recommendation (Book): Optional book being recommended
+        is_read (bool): Whether the user has read the notification
+        created_at (datetime): When the notification was created
+        notification_type (str): Type of notification (recommendation, general, etc.)
+    """
+    NOTIFICATION_TYPES = [
+        ('recommendation', 'Book Recommendation'),
+        ('general', 'General Message'),
+        ('system', 'System Notification'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    book_recommendation = models.ForeignKey(Book, on_delete=models.SET_NULL, null=True, blank=True, related_name='notifications')
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES, default='general')
+    
+    class Meta:
+        """Meta options for ordering notifications by creation date."""
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        """Return a string representation of the notification."""
+        return f"Notification for {self.user.username}: {self.title}"
+    
+    def mark_as_read(self):
+        """Mark the notification as read."""
+        self.is_read = True
+        self.save()
