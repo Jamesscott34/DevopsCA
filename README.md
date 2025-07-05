@@ -9,21 +9,24 @@ This is a Django-based book catalogue system developed as part of a DevOps assig
 - **Register, log in, and log out as a user**
 - **Admin user with special dashboard and user management**
 - **Beautiful, modern color theme and UI**
-- **Notification system**
+- **Comprehensive notification system**
+- **User profile management and password reset**
+- **Book statistics and reading progress tracking**
 
 ---
 
 ## 🚀 How It Works
 
-- **Home Page** shows all saved books in a table.
+- **Login Page** is the default landing page when you visit the application.
+- **User Registration** allows new users to sign up with a username, email, and password.
+- **Home Page** (after login) shows all saved books in a table with reading progress.
 - **Manual Add** lets you enter title, author, published date, description, and an auto-generated ISBN (starting with `JS`).
 - **Open Library Search** lets you search external books, view results, and import selected ones into your library with auto-generated ISBNs.
-- **User Registration** allows new users to sign up with a username, email, and password.
-- **Login/Logout** for all users.
-- **Admin Dashboard**: If you log in as `admin`, you get a special admin dashboard page with user management capabilities.
-- **Books are saved in a PostgreSQL/SQLite DB** using Django's ORM.
+- **Admin Dashboard**: If you log in as `admin`, you get a special admin dashboard page with comprehensive user management capabilities.
+- **Books are saved in SQLite DB** using Django's ORM.
 - **Books can be edited, deleted, and marked read/unread**.
 - **Modern, colorful UI** with custom CSS and Bootstrap.
+- **Notification System** allows admins to send personalized messages and book recommendations to users.
 
 ---
 
@@ -32,52 +35,63 @@ This is a Django-based book catalogue system developed as part of a DevOps assig
 - [ ] Add search and filter options to local book list  
 - [ ] Improve validation and error handling  
 - [ ] Implement cover image upload for manually added books  
-- [ ] Deploy to cloud with Docker + Kubernetes (DevOps stage)  
 - [ ] Add REST API endpoints for integration with JavaScript frontends  
+- [ ] Implement email notification functionality
+- [ ] Add book categories and tags
 
 ---
 
 ## ✅ Features So Far
 
+- [x] **Login Page as Default Landing Page**
 - [x] Manual Book Entry Form with Description and JS-ISBN
 - [x] Editable Book Entries
 - [x] Delete and Toggle Status
 - [x] Open Library Integration with Search + Import
 - [x] Book Table with Description Column
-- [x] Bootstrap Styling
-- [x] Beautiful Custom Color Theme
+- [x] Bootstrap Styling with Custom Color Theme
 - [x] User Registration (Sign Up)
-- [x] User Login/Logout
+- [x] User Login/Logout with Session Management
 - [x] Personalized Welcome Message
 - [x] Admin User and Dashboard
 - [x] Admin User Management Script
 - [x] User Deletion from Admin Dashboard
 - [x] User Profile Editing and Password Reset
 - [x] Profile Deletion with Confirmation
-- [x] Branching + Merging with Git (open-library-integration → master → api-js-bridge)
-- [x] Notification System
+- [x] Comprehensive Notification System
+- [x] Book Statistics and Reading Progress Tracking
+- [x] Admin Restrictions (can only change own email, cannot notify self)
+- [x] Book View Tracking and Attribution
+- [x] Automatic Book Saving from Notifications
 
 ---
 
 ## 📦 Tech Stack
 
-- **Backend**: Django (Python 3.13)  
+- **Backend**: Django (Python 3.8+)  
 - **Database**: SQLite (default), PostgreSQL ready  
 - **Frontend**: HTML + Bootstrap + Custom CSS  
 - **External API**: [Open Library](https://openlibrary.org/developers/api)  
 - **Version Control**: Git + GitHub  
-- **Deployment**: Docker & Kubernetes (coming soon)
+- **Authentication**: Custom user model with password hashing
+
+---
+
+## 🎯 Default Landing Page
+
+**Login Page is the Default**: When you start the server and visit `http://127.0.0.1:8000/`, the login page appears automatically. This ensures users must authenticate before accessing the book catalog.
 
 ---
 
 ## 👤 User Management
 
-- **Register**: Go to `/register/` to create a new user account.
-- **Login**: Go to `/login/` to log in with your username and password.
-- **Logout**: Click the logout button in the navigation or go to `/logout/`.
-- **Admin User**: If you log in as `admin`, you will be redirected to a special admin dashboard at `/admin-dashboard/`.
-- **Personalized Welcome**: After login, the homepage will greet you by your username.
-- **User Management**: Admin users can delete other users from the admin dashboard.
+- **Default Landing**: Visit `http://127.0.0.1:8000/` to see the login page
+- **Register**: Go to `/register/` to create a new user account
+- **Login**: Go to `/login/` to log in with your username and password
+- **Logout**: Click the logout button in the navigation or go to `/logout/`
+- **Admin User**: If you log in as `admin`, you will be redirected to a special admin dashboard at `/admin-dashboard/`
+- **Personalized Welcome**: After login, the homepage will greet you by your username
+- **User Management**: Admin users can manage other users from the admin dashboard
 
 ### Profile Management Features
 
@@ -86,21 +100,17 @@ This is a Django-based book catalogue system developed as part of a DevOps assig
 - **Security**: Requires current password verification
 - **Validation**: New password must be entered twice for confirmation
 - **Requirements**: New password must be different from current password
-- **Security Tips**: Includes password strength recommendations
 
 #### **Profile Editing**
 - **Location**: Profile dropdown → "Edit Profile" or `/profile/edit/`
 - **Fields**: Username and email address
 - **Validation**: Ensures uniqueness and prevents conflicts
 - **Session Updates**: Automatically updates user session after changes
-- **Real-time**: Changes take effect immediately
 
 #### **Profile Deletion**
 - **Location**: Profile dropdown → "Delete Profile" or `/profile/delete/`
 - **Protection**: Admin users cannot delete themselves
 - **Confirmation**: Multiple confirmation dialogs with clear warnings
-- **Information**: Shows exactly what data will be deleted
-- **Alternatives**: Suggests other options before deletion
 - **Cleanup**: Completely removes user and all associated data
 
 ### Admin User Setup
@@ -112,11 +122,14 @@ The application includes an automated admin user setup script that creates the a
 - **System Statistics**: Total books, users, read/unread counts
 - **Reading Progress**: Visual progress tracking
 - **System Health**: Database and application status monitoring
+- **Book Statistics**: Most read and most viewed books
+- **Notification Management**: Send individual or bulk notifications
+- **Email Management**: Change user email addresses (admin can only change their own)
 
 ### Admin Features
-- **User Management**: View all users, delete users, and change email addresses
-- **Book Statistics**: View most read and most viewed books
-- **Notification Management**: Send individual or bulk notifications to users
+- **User Management**: View all users, delete users, and manage permissions
+- **Book Statistics**: View most read and most viewed books with view counts
+- **Notification System**: Send individual or bulk notifications to users
 - **Book Recommendations**: Recommend books to users with automatic saving to reading lists
 - **Email Management**: Change user email addresses with validation
 - **System Statistics**: Monitor user activity and book engagement
@@ -203,14 +216,16 @@ python admin_manager.py reset     # Reset admin password to 'admin'
 ## 🌈 UI & Styling
 - The app uses a beautiful, modern color theme with gradients, custom buttons, and responsive design.
 - All pages are styled with Bootstrap and custom CSS for a professional look.
+- Admin dashboard features comprehensive statistics and management tools.
 
 ---
 
 ## 🗝️ Default URLs
-- `/` — Home (book list)
+- `/` — Login page (default landing page)
 - `/register/` — Register new user
 - `/login/` — User login
 - `/logout/` — User logout
+- `/home/` — Home page with book catalog (requires login)
 - `/admin-dashboard/` — Admin dashboard (for admin user)
 - `/admin-dashboard/delete-user/<id>/` — Delete user (admin only)
 - `/profile/edit/` — Edit user profile
@@ -218,6 +233,9 @@ python admin_manager.py reset     # Reset admin password to 'admin'
 - `/profile/delete/` — Delete user profile
 - `/add/` — Add book manually
 - `/open-library/` — Browse Open Library
+- `/notifications/` — View user notifications
+- `/send-notification/` — Send individual notification (admin)
+- `/send-bulk-notification/` — Send bulk notification (admin)
 
 ---
 
@@ -225,19 +243,24 @@ python admin_manager.py reset     # Reset admin password to 'admin'
 
 The admin dashboard provides:
 - System statistics (total books, users, read/unread counts)
-- User management (view all users, delete users)
+- User management (view all users, delete users, change emails)
 - Quick access to book management functions
 - Reading progress tracking
 - System health monitoring
+- Book statistics (most read and most viewed)
+- Notification management system
+- Email management tools
 
 ---
 
 ## 🚨 Important Notes
 
 1. **Always run `python admin_manager.py` after setup** to create the admin user
-2. The admin user has special privileges including user deletion
-3. Regular users can only manage their own book catalogs
-4. The application uses SQLite by default for development
+2. **Login page is the default landing page** - users must authenticate first
+3. The admin user has special privileges including user deletion and notification management
+4. Regular users can only manage their own book catalogs
+5. The application uses SQLite by default for development
+6. Admin cannot send notifications to themselves or change other users' emails
 
 ---
 
@@ -318,7 +341,7 @@ The application includes a comprehensive notification system that allows admins 
 
 ### Prerequisites
 - Python 3.8 or higher
-- PostgreSQL database (recommended) or SQLite
+- SQLite database (default) or PostgreSQL
 - Virtual environment (recommended)
 
 ### Quick Setup
@@ -407,6 +430,7 @@ The application includes a comprehensive notification system that allows admins 
 ## 📋 Notification System URL Structure
 
 ### Authentication & User Management
+- `/` - Login page (default landing)
 - `/register/` - User registration
 - `/login/` - User login
 - `/logout/` - User logout
@@ -422,6 +446,7 @@ The application includes a comprehensive notification system that allows admins 
 - `/send-bulk-notification/` - Send bulk notification
 
 ### Book Management
+- `/home/` - Home page with book catalog (requires login)
 - `/add/` - Add new book
 - `/edit/<id>/` - Edit book
 - `/delete/<isbn>/` - Delete book
@@ -451,6 +476,8 @@ The application includes a comprehensive notification system that allows admins 
 - `published_date`: Publication date
 - `isbn`: International Standard Book Number (unique, optional)
 - `is_read`: Reading status boolean
+- `view_count`: Number of times book has been viewed
+- `added_by`: User who added the book
 
 ### Notification Model
 - `user`: Foreign key to User (recipient)
@@ -480,7 +507,7 @@ python admin_manager.py
 ## 📋 Notification System Configuration
 
 ### Database Settings
-The application is configured for PostgreSQL by default. Update `settings.py` for your database:
+The application is configured for SQLite by default. Update `settings.py` for PostgreSQL:
 
 ```python
 DATABASES = {
@@ -544,7 +571,7 @@ Devops/
 ## 📋 Notification System Troubleshooting
 
 ### Common Issues
-1. **Database Connection**: Ensure PostgreSQL is running and credentials are correct
+1. **Database Connection**: Ensure SQLite file exists and is writable
 2. **Migration Errors**: Run `python manage.py makemigrations` and `python manage.py migrate`
 3. **Admin Access**: Use `python admin_manager.py` to create/reset admin user
 4. **Static Files**: Ensure `STATICFILES_DIRS` is configured in settings
