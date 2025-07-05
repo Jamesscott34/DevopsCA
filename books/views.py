@@ -8,7 +8,7 @@ Each view function processes specific URLs and returns appropriate responses.
 
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Book, User
-from .forms import BookForm, UserRegistrationForm, LoginForm
+from .forms import BookForm, UserRegistrationForm, LoginForm, PasswordChangeForm, ProfileEditForm
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from django.http import JsonResponse
@@ -18,7 +18,7 @@ from .forms import BookForm
 from datetime import datetime
 import random
 from django.contrib import messages
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import check_password, make_password
 
 def get_current_user(request):
     """
@@ -444,10 +444,152 @@ def admin_dashboard(request):
     unread_books = Book.objects.filter(is_read=False).count()
     total_users = User.objects.count()
     
+    # Get all users for management
+    all_users = User.objects.all().order_by('created_at')
+    
     return render(request, 'books/admin_dashboard.html', {
         'current_user': current_user,
         'total_books': total_books,
         'read_books': read_books,
         'unread_books': unread_books,
-        'total_users': total_users
+        'total_users': total_users,
+        'all_users': all_users
     })
+
+def delete_user(request, user_id):
+    """
+    Delete a user from the system (admin only).
+    
+    This view allows admin users to delete other user accounts from the system.
+    It prevents the admin from deleting themselves and provides confirmation
+    messages for successful or failed deletions.
+    
+    Args:
+        request: Django HttpRequest object
+        user_id: ID of the user to delete
+        
+    Returns:
+        Redirect to admin dashboard with success/error message
+    """
+    current_user = get_current_user(request)
+    
+    # Check if current user is admin
+    if not current_user or current_user.username != 'admin':
+        messages.error(request, 'You must be admin to perform this action.')
+        return redirect('login_user')
+    
+    try:
+        user_to_delete = User.objects.get(id=user_id)
+        
+        # Prevent admin from deleting themselves
+        if user_to_delete.username == 'admin':
+            messages.error(request, 'You cannot delete the admin user.')
+            return redirect('admin_dashboard')
+        
+        # Delete the user
+        username = user_to_delete.username
+        user_to_delete.delete()
+        messages.success(request, f'User "{username}" has been deleted successfully.')
+        
+    except User.DoesNotExist:
+        messages.error(request, 'User not found.')
+    except Exception as e:
+        messages.error(request, f'Error deleting user: {str(e)}')
+    
+    return redirect('admin_dashboard')
+
+def change_password(request):
+    """
+    Handle password change for a user.
+    
+    This view allows users to change their password. It processes the form data,
+    validates the current password, and updates the user's password in the database.
+    
+    Args:
+        request: Django HttpRequest object
+        
+    Returns:
+        Rendered change_password.html template or redirect to home page
+    """
+    current_user = get_current_user(request)
+    if not current_user:
+        messages.error(request, 'You must be logged in to change your password.')
+        return redirect('login_user')
+    
+    if request.method == 'POST':
+        form = PasswordChangeForm(current_user, request.POST)
+        if form.is_valid():
+            user = User.objects.get(id=current_user.id)
+            user.password = make_password(form.cleaned_data['new_password'])
+            user.save()
+            messages.success(request, 'Your password has been changed successfully.')
+            return redirect('home')
+    else:
+        form = PasswordChangeForm(current_user)
+    
+    return render(request, 'books/change_password.html', {'form': form, 'current_user': current_user})
+
+def edit_profile(request):
+    """
+    Handle profile editing for a user.
+    
+    This view allows users to modify their profile information. It processes the form data,
+    updates the user's profile in the database, and provides a confirmation message.
+    
+    Args:
+        request: Django HttpRequest object
+        
+    Returns:
+        Rendered edit_profile.html template or redirect to home page
+    """
+    current_user = get_current_user(request)
+    if not current_user:
+        messages.error(request, 'You must be logged in to edit your profile.')
+        return redirect('login_user')
+    
+    if request.method == 'POST':
+        form = ProfileEditForm(request.POST, instance=current_user)
+        if form.is_valid():
+            form.save()
+            # Update session with new username if changed
+            if 'user_id' in request.session:
+                updated_user = User.objects.get(id=current_user.id)
+                request.session['user_id'] = updated_user.id
+            messages.success(request, 'Your profile has been updated successfully.')
+            return redirect('home')
+    else:
+        form = ProfileEditForm(instance=current_user)
+    
+    return render(request, 'books/edit_profile.html', {'form': form, 'current_user': current_user})
+
+def delete_profile(request):
+    """
+    Handle profile deletion for a user.
+    
+    This view allows users to delete their profile from the system. It provides a confirmation
+    message and redirects to the login page after the profile is deleted.
+    
+    Args:
+        request: Django HttpRequest object
+        
+    Returns:
+        Redirect to login page with logout message
+    """
+    current_user = get_current_user(request)
+    if not current_user:
+        messages.error(request, 'You must be logged in to delete your profile.')
+        return redirect('login_user')
+    
+    # Prevent admin from deleting themselves
+    if current_user.username == 'admin':
+        messages.error(request, 'Admin users cannot delete their profile.')
+        return redirect('home')
+    
+    if request.method == 'POST':
+        username = current_user.username
+        current_user.delete()
+        request.session.flush()
+        messages.success(request, f'Profile for user "{username}" has been deleted successfully.')
+        return redirect('login_user')
+    
+    return render(request, 'books/delete_profile.html', {'current_user': current_user})

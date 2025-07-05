@@ -7,6 +7,7 @@ validation and security measures.
 """
 
 from django import forms
+from django.contrib.auth.hashers import check_password
 from .models import Book, User
 
 # forms.py
@@ -95,4 +96,111 @@ class LoginForm(forms.Form):
     """
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+
+class PasswordChangeForm(forms.Form):
+    """
+    Form for changing user passwords.
+    
+    This form allows users to update their passwords with proper validation.
+    It requires the current password for security and confirmation of the new password.
+    
+    Fields:
+        current_password: Current password for verification
+        new_password: New password to set
+        confirm_new_password: Confirmation of new password
+    """
+    current_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        label='Current Password'
+    )
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        label='New Password'
+    )
+    confirm_new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        label='Confirm New Password'
+    )
+    
+    def __init__(self, user, *args, **kwargs):
+        """
+        Initialize form with user instance for password validation.
+        
+        Args:
+            user: User instance to validate current password against
+            *args, **kwargs: Standard form arguments
+        """
+        self.user = user
+        super().__init__(*args, **kwargs)
+    
+    def clean(self):
+        """
+        Custom validation for password change.
+        
+        This method validates that:
+        1. Current password is correct
+        2. New password and confirmation match
+        3. New password is different from current password
+        """
+        cleaned_data = super().clean()
+        current_password = cleaned_data.get('current_password')
+        new_password = cleaned_data.get('new_password')
+        confirm_new_password = cleaned_data.get('confirm_new_password')
+        
+        # Check if current password is correct
+        if current_password and not check_password(current_password, self.user.password):
+            raise forms.ValidationError("Current password is incorrect!")
+        
+        # Check if new passwords match
+        if new_password and confirm_new_password and new_password != confirm_new_password:
+            raise forms.ValidationError("New passwords do not match!")
+        
+        # Check if new password is different from current
+        if current_password and new_password and current_password == new_password:
+            raise forms.ValidationError("New password must be different from current password!")
+        
+        return cleaned_data
+
+class ProfileEditForm(forms.ModelForm):
+    """
+    Form for editing user profile information.
+    
+    This form allows users to update their username and email address.
+    It excludes the password field as password changes are handled separately.
+    
+    Fields:
+        username: Username for login (can be updated)
+        email: Email address for account recovery (can be updated)
+    """
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+        }
+    
+    def clean_username(self):
+        """
+        Validate username uniqueness excluding current user.
+        
+        This method ensures the username is unique while allowing users
+        to keep their current username unchanged.
+        """
+        username = self.cleaned_data.get('username')
+        if username and User.objects.filter(username=username).exclude(id=self.instance.id).exists():
+            raise forms.ValidationError("This username is already taken!")
+        return username
+    
+    def clean_email(self):
+        """
+        Validate email uniqueness excluding current user.
+        
+        This method ensures the email is unique while allowing users
+        to keep their current email unchanged.
+        """
+        email = self.cleaned_data.get('email')
+        if email and User.objects.filter(email=email).exclude(id=self.instance.id).exists():
+            raise forms.ValidationError("This email is already registered!")
+        return email
 

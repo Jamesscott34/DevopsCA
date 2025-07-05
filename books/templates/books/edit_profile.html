@@ -1,0 +1,119 @@
+{% extends 'books/base.html' %}
+
+<!-- 
+    Edit Profile Template for Book Catalog Application
+    This template provides a form for users to edit their profile information.
+    It allows users to update their username and email address with proper
+    validation and error handling.
+-->
+
+{% block content %}
+    <!-- Edit Profile Form Card Container -->
+    <!-- Card-based layout for the profile editing form -->
+    <div class="card mx-auto" style="max-width: 600px;">
+        
+        <!-- Card Header Section -->
+        <!-- Contains the form title and description -->
+        <div class="card-header">
+            <h2><i class="fas fa-user-edit"></i> Edit Profile</h2>
+            <h5>Update your account information</h5>
+        </div>
+        
+        <!-- Card Body Section -->
+        <!-- Contains the actual profile editing form -->
+        <div class="card-body">
+            <!-- Edit Profile Form -->
+            <!-- Django form for profile editing with CSRF protection -->
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Username Input Field -->
+                <!-- Text input for updating username -->
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    {{ form.username }}
+                    <!-- Display username field errors if any -->
+                    {% if form.username.errors %}
+                        <div class="text-danger">
+                            {% for error in form.username.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Email Input Field -->
+                <!-- Email input for updating email address -->
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}" class="form-label">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    {{ form.email }}
+                    <!-- Display email field errors if any -->
+                    {% if form.email.errors %}
+                        <div class="text-danger">
+                            {% for error in form.email.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Non-Field Errors Display -->
+                <!-- Shows general form errors -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <i class="fas fa-exclamation-triangle"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <!-- Submit Buttons Section -->
+                <!-- Action buttons for form submission and navigation -->
+                <div class="d-grid gap-2">
+                    <!-- Submit Button - Updates the profile -->
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Profile
+                    </button>
+                    
+                    <!-- Cancel Button - Returns to home page -->
+                    <a href="{% url 'home' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+            
+            <!-- Profile Management Links -->
+            <!-- Links to other profile management functions -->
+            <div class="mt-4">
+                <h6><i class="fas fa-cog"></i> Profile Management</h6>
+                <div class="d-grid gap-2">
+                    <!-- Change Password Link -->
+                    <a href="{% url 'change_password' %}" class="btn btn-outline-warning">
+                        <i class="fas fa-key"></i> Change Password
+                    </a>
+                    
+                    <!-- Delete Profile Link -->
+                    <a href="{% url 'delete_profile' %}" class="btn btn-outline-danger">
+                        <i class="fas fa-trash"></i> Delete Profile
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Profile Information -->
+            <!-- Information about profile management -->
+            <div class="alert alert-info mt-3">
+                <h6><i class="fas fa-info-circle"></i> Profile Information</h6>
+                <ul class="mb-0">
+                    <li>Your username is used for logging into your account</li>
+                    <li>Your email is used for account recovery and notifications</li>
+                    <li>Profile changes take effect immediately</li>
+                    <li>You can change your password separately</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %} 

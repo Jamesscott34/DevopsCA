@@ -54,6 +54,25 @@
                             </a>
                         {% endif %}
                         
+                        <!-- Profile Management Dropdown -->
+                        <div class="dropdown me-2">
+                            <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-cog"></i> Profile
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                                <li><a class="dropdown-item" href="{% url 'edit_profile' %}">
+                                    <i class="fas fa-user-edit"></i> Edit Profile
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'change_password' %}">
+                                    <i class="fas fa-key"></i> Change Password
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'delete_profile' %}">
+                                    <i class="fas fa-trash"></i> Delete Profile
+                                </a></li>
+                            </ul>
+                        </div>
+                        
                         <!-- Logout button for all logged-in users -->
                         <a class="nav-link btn btn-danger btn-sm" href="{% url 'logout_user' %}">
                             <i class="fas fa-sign-out-alt"></i> Logout

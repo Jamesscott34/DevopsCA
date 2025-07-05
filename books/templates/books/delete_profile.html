@@ -1,0 +1,103 @@
+{% extends 'books/base.html' %}
+
+<!-- 
+    Delete Profile Template for Book Catalog Application
+    This template provides a confirmation dialog for deleting user profiles.
+    It displays clear warnings about the permanent nature of the action
+    and requires explicit confirmation before proceeding.
+-->
+
+{% block content %}
+    <!-- Delete Profile Confirmation Card -->
+    <!-- Card-based layout for the profile deletion confirmation -->
+    <div class="card mx-auto" style="max-width: 500px;">
+        
+        <!-- Card Header Section -->
+        <!-- Contains the confirmation dialog title and warning icon -->
+        <div class="card-header bg-danger text-white">
+            <h2><i class="fas fa-exclamation-triangle"></i> Delete Profile</h2>
+        </div>
+        
+        <!-- Card Body Section -->
+        <!-- Contains the confirmation message and user details -->
+        <div class="card-body">
+            <!-- Warning Message -->
+            <!-- Clear warning about the deletion action -->
+            <div class="alert alert-danger">
+                <h5><i class="fas fa-exclamation-triangle"></i> Are you absolutely sure?</h5>
+                <p class="mb-0">
+                    This action <strong>cannot be undone</strong>. Your profile and all associated data 
+                    will be permanently deleted from the system.
+                </p>
+            </div>
+            
+            <!-- User Information Section -->
+            <!-- Displays details of the user profile to be deleted -->
+            <div class="mb-4">
+                <h5><i class="fas fa-user"></i> Profile to be Deleted</h5>
+                <ul class="list-unstyled">
+                    <!-- Username -->
+                    <li><strong>Username:</strong> {{ current_user.username }}</li>
+                    
+                    <!-- Email -->
+                    <li><strong>Email:</strong> {{ current_user.email }}</li>
+                    
+                    <!-- Account Created Date -->
+                    <li><strong>Account Created:</strong> {{ current_user.created_at|date:"M d, Y" }}</li>
+                </ul>
+            </div>
+            
+            <!-- What Will Be Deleted Section -->
+            <!-- Information about what data will be lost -->
+            <div class="alert alert-warning">
+                <h6><i class="fas fa-trash"></i> What will be deleted:</h6>
+                <ul class="mb-0">
+                    <li>Your user account and profile</li>
+                    <li>All your book catalog data</li>
+                    <li>Your reading progress and preferences</li>
+                    <li>All associated session data</li>
+                </ul>
+            </div>
+            
+            <!-- Action Buttons Section -->
+            <!-- Buttons for confirming or canceling the deletion -->
+            <div class="d-grid gap-2">
+                <!-- Cancel Button - Returns to home page without deleting -->
+                <a href="{% url 'home' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel - Keep My Profile
+                </a>
+                
+                <!-- Confirm Delete Button - Proceeds with deletion -->
+                <form method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100" 
+                            onclick="return confirm('FINAL WARNING: Are you absolutely sure you want to delete your profile? This action cannot be undone!')">
+                        <i class="fas fa-trash"></i> Yes, Delete My Profile Permanently
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Alternative Actions -->
+            <!-- Suggestions for alternatives to deletion -->
+            <div class="mt-4">
+                <h6><i class="fas fa-lightbulb"></i> Consider These Alternatives:</h6>
+                <div class="d-grid gap-2">
+                    <!-- Edit Profile Link -->
+                    <a href="{% url 'edit_profile' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-user-edit"></i> Edit Profile Instead
+                    </a>
+                    
+                    <!-- Change Password Link -->
+                    <a href="{% url 'change_password' %}" class="btn btn-outline-warning">
+                        <i class="fas fa-key"></i> Change Password Instead
+                    </a>
+                    
+                    <!-- Contact Support Link -->
+                    <a href="{% url 'home' %}" class="btn btn-outline-info">
+                        <i class="fas fa-question-circle"></i> Contact Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %} 

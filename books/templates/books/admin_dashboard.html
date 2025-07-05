@@ -221,6 +221,104 @@
         </ul>
     </div>
 
+    <!-- User Management Section -->
+    <!-- Displays all users and allows admin to delete them -->
+    <h2 class="mb-4 mt-5"><i class="fas fa-users"></i> User Management</h2>
+    
+    <!-- User Management Card -->
+    <div class="card">
+        <div class="card-header">
+            <h5><i class="fas fa-user-cog"></i> All Users</h5>
+        </div>
+        <div class="card-body">
+            {% if all_users %}
+                <!-- Users Table -->
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Created</th>
+                                <th>Type</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in all_users %}
+                                <tr {% if user.username == 'admin' %}class="table-warning"{% endif %}>
+                                    <!-- Username Cell -->
+                                    <td>
+                                        <strong>{{ user.username }}</strong>
+                                        {% if user.username == 'admin' %}
+                                            <span class="badge bg-warning text-dark ms-2">Admin</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- Email Cell -->
+                                    <td>
+                                        <i class="fas fa-envelope text-muted me-1"></i>
+                                        {{ user.email }}
+                                    </td>
+                                    
+                                    <!-- Created Date Cell -->
+                                    <td>
+                                        <i class="fas fa-calendar text-muted me-1"></i>
+                                        {{ user.created_at|date:"M d, Y" }}
+                                    </td>
+                                    
+                                    <!-- User Type Cell -->
+                                    <td>
+                                        {% if user.username == 'admin' %}
+                                            <span class="badge bg-warning text-dark">Administrator</span>
+                                        {% else %}
+                                            <span class="badge bg-info">Regular User</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- Actions Cell -->
+                                    <td>
+                                        {% if user.username != 'admin' %}
+                                            <!-- Delete User Button - Only for non-admin users -->
+                                            <a href="{% url 'delete_user' user.id %}" 
+                                               class="btn btn-danger btn-sm"
+                                               onclick="return confirm('Are you sure you want to delete user \"{{ user.username }}\"? This action cannot be undone.')">
+                                                <i class="fas fa-trash"></i> Delete User
+                                            </a>
+                                        {% else %}
+                                            <!-- Admin users cannot be deleted -->
+                                            <span class="text-muted">
+                                                <i class="fas fa-shield-alt"></i> Protected
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- User Management Summary -->
+                <div class="mt-3">
+                    <p class="text-muted">
+                        <i class="fas fa-info-circle"></i> 
+                        Total Users: {{ total_users }} | 
+                        Admin Users: 1 | 
+                        Regular Users: {{ total_users|add:"-1" }}
+                    </p>
+                </div>
+                
+            {% else %}
+                <!-- No Users State -->
+                <div class="text-center py-4">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No users found</h5>
+                    <p class="text-muted">No users have registered yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
     <!-- JavaScript Functions for Admin Dashboard -->
     <!-- Client-side functions for enhanced admin functionality -->
     <script>
