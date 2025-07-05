@@ -32,10 +32,10 @@ This is a Django-based book catalogue system developed as part of a DevOps assig
 
 ## 🛠️ What To Do Next
 
+- [x] **REST API endpoints for integration with JavaScript frontends** ✅
 - [ ] Add search and filter options to local book list  
 - [ ] Improve validation and error handling  
 - [ ] Implement cover image upload for manually added books  
-- [ ] Add REST API endpoints for integration with JavaScript frontends  
 - [ ] Implement email notification functionality
 - [ ] Add book categories and tags
 
@@ -63,6 +63,180 @@ This is a Django-based book catalogue system developed as part of a DevOps assig
 - [x] Admin Restrictions (can only change own email, cannot notify self)
 - [x] Book View Tracking and Attribution
 - [x] Automatic Book Saving from Notifications
+- [x] **Complete REST API with Authentication, CRUD Operations, and Statistics**
+
+---
+
+## 🚀 REST API
+
+The Book Catalog application now includes a complete REST API that allows integration with JavaScript frontends, mobile applications, and other services.
+
+### 🔗 API Base URL
+```
+http://127.0.0.1:8000/api/
+```
+
+### 📋 Available Endpoints
+
+#### 🔑 Authentication Endpoints
+- `POST /api/auth/register/` - Register new user
+- `POST /api/auth/login/` - User login
+- `POST /api/auth/logout/` - User logout
+- `POST /api/auth/change_password/` - Change password
+
+#### 📚 Book Endpoints
+- `GET /api/books/` - Get all books (with filtering and search)
+- `GET /api/books/{id}/` - Get single book
+- `POST /api/books/` - Create new book
+- `PUT /api/books/{id}/` - Update book
+- `DELETE /api/books/{id}/` - Delete book
+- `POST /api/books/{id}/toggle_read/` - Toggle read status
+- `GET /api/books/read_books/` - Get read books only
+- `GET /api/books/unread_books/` - Get unread books only
+- `GET /api/books/statistics/` - Get book statistics
+
+#### 👥 User Endpoints (Admin Only)
+- `GET /api/users/` - Get all users
+- `GET /api/users/{id}/` - Get single user
+- `POST /api/users/` - Create new user
+- `PUT /api/users/{id}/` - Update user
+- `DELETE /api/users/{id}/` - Delete user
+- `GET /api/users/statistics/` - Get user statistics
+
+#### 🔔 Notification Endpoints
+- `GET /api/notifications/` - Get all notifications
+- `GET /api/notifications/{id}/` - Get single notification
+- `POST /api/notifications/` - Create notification
+- `PUT /api/notifications/{id}/` - Update notification
+- `DELETE /api/notifications/{id}/` - Delete notification
+- `POST /api/notifications/{id}/mark_read/` - Mark as read
+- `POST /api/notifications/mark_all_read/` - Mark all as read
+- `GET /api/notifications/unread_count/` - Get unread count
+
+#### 📊 System Statistics (Admin Only)
+- `GET /api/statistics/` - Get comprehensive system statistics
+
+### 🔧 API Features
+
+#### Authentication & Security
+- **Session-based authentication** for secure user sessions
+- **Role-based access control** (admin vs regular users)
+- **Password hashing** and validation
+- **CSRF protection** and secure headers
+
+#### Data Operations
+- **Full CRUD operations** for all models
+- **Filtering and searching** capabilities
+- **Pagination** for large datasets
+- **Data validation** and error handling
+
+#### Advanced Features
+- **Book statistics** and reading progress tracking
+- **User management** for admin users
+- **Notification system** with read/unread tracking
+- **System-wide statistics** for monitoring
+
+### 📖 Usage Examples
+
+#### JavaScript/Fetch API
+```javascript
+// Login
+const loginResponse = await fetch('http://127.0.0.1:8000/api/auth/login/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: 'admin', password: 'admin' }),
+    credentials: 'include'
+});
+
+// Get books
+const booksResponse = await fetch('http://127.0.0.1:8000/api/books/', {
+    credentials: 'include'
+});
+
+// Create book
+const newBook = await fetch('http://127.0.0.1:8000/api/books/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        title: 'The Hobbit',
+        author: 'J.R.R. Tolkien',
+        description: 'A fantasy novel about a hobbit\'s journey.',
+        published_date: '1937-09-21',
+        isbn: '978-0547928241',
+        is_read: false
+    }),
+    credentials: 'include'
+});
+```
+
+#### Python/Requests
+```python
+import requests
+
+session = requests.Session()
+
+# Login
+login_data = {'username': 'admin', 'password': 'admin'}
+login_response = session.post('http://127.0.0.1:8000/api/auth/login/', json=login_data)
+
+# Get books
+books_response = session.get('http://127.0.0.1:8000/api/books/')
+books_data = books_response.json()
+```
+
+### 🛠️ API Testing
+
+#### Browsable API Interface
+Visit any API endpoint in your browser to access the interactive Django REST Framework interface:
+- `http://127.0.0.1:8000/api/` - API root
+- `http://127.0.0.1:8000/api/books/` - Books endpoint
+- `http://127.0.0.1:8000/api/auth/login/` - Login endpoint
+
+#### JavaScript Example File
+A complete JavaScript example is available at `static/js/api-example.js` that demonstrates all API operations.
+
+#### API Documentation
+Comprehensive API documentation is available in `API_DOCUMENTATION.md` with detailed examples and usage instructions.
+
+### 🔍 Filtering & Searching
+
+#### Book Filtering
+- `GET /api/books/?is_read=true` - Get only read books
+- `GET /api/books/?is_read=false` - Get only unread books
+- `GET /api/books/?search=fantasy` - Search in title, author, or description
+
+#### Pagination
+- `GET /api/books/?page=2` - Get second page
+- `GET /api/books/?page_size=10` - 10 items per page
+
+### 📊 Response Format
+
+All API responses follow a consistent JSON format with proper HTTP status codes and error handling.
+
+### 🚀 Getting Started with API
+
+1. **Start the server:**
+   ```bash
+   python manage.py runserver
+   ```
+
+2. **Access the API:**
+   ```
+   http://127.0.0.1:8000/api/
+   ```
+
+3. **Test authentication:**
+   ```bash
+   curl -X POST http://127.0.0.1:8000/api/auth/login/ \
+        -H "Content-Type: application/json" \
+        -d '{"username":"admin","password":"admin"}' \
+        -c cookies.txt
+   ```
+
+4. **Get books:**
+   ```bash
+   curl http://127.0.0.1:8000/api/books/ -b cookies.txt
+   ```
 
 ---
 
