@@ -107,12 +107,20 @@ python manage.py migrate
 echo "Database setup completed successfully!"
 
 # =============================================================================
+# Static Files Collection
+# =============================================================================
+
+echo "Collecting static files..."
+python manage.py collectstatic --noinput
+echo "Static files collected successfully!"
+
+# =============================================================================
 # Admin User Setup
 # =============================================================================
 
-# Set up admin user using the admin management script
+# Set up admin user using the custom management command
 echo "Setting up admin user..."
-python admin_manager.py
+python manage.py create_admin
 echo "Admin user setup completed!"
 
 # =============================================================================

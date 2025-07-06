@@ -319,70 +319,54 @@ GitHub: [github.com/Jamesscott34](https://github.com/Jamesscott34)
 
 ---
 
-## 🧪 Setup Instructions
+## 🚀 Quickstart
 
-### Quick Setup (Recommended)
-```bash
-# 1. Clone the repo
-git clone https://github.com/Jamesscott34/DevopsCA.git
-cd DevopsCA
+See [docs/QUICKSTART.md](docs/QUICKSTART.md) for a step-by-step guide.
 
-# 2. Run the automated setup script
+## 🛠️ Setup Instructions
+
+### Using setup.sh (Recommended)
+
+```sh
 ./setup.sh
 ```
-
-The setup script will:
-- Prompt you for a virtual environment name (default: `devops`)
-- Create and activate the virtual environment
-- Install Django and requirements
-- Create Django project and books app (if needed)
-- Run database migrations
-- Set up admin user automatically
-- Start the Django development server
+- This will install dependencies, run migrations, collect static files, create the admin user, and start the server.
+- Visit: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+- Log in as admin: Username: `admin`, Password: `admin`
 
 ### Manual Setup
-```bash
-# 1. Clone the repo
-git clone https://github.com/Jamesscott34/DevopsCA.git
-cd DevopsCA
 
-# 2. Create virtual environment
-python3 -m venv devops
-source devops/bin/activate
+1. Install dependencies:
+   ```sh
+   pip install -r requirements.txt
+   ```
+2. Run migrations:
+   ```sh
+   python manage.py makemigrations
+   python manage.py migrate
+   ```
+3. Collect static files:
+   ```sh
+   python manage.py collectstatic --noinput
+   ```
+4. Create the admin user:
+   ```sh
+   python manage.py create_admin
+   ```
+5. Start the server:
+   ```sh
+   python manage.py runserver
+   ```
+6. Visit: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
-# 3. Install requirements
-pip install -r requirements.txt
+### Docker
 
-# 4. Run migrations
-python manage.py makemigrations
-python manage.py migrate
+- See [docs/QUICKSTART.md](docs/QUICKSTART.md) for Docker instructions.
 
-# 5. Create admin user (IMPORTANT: Run this script!)
-python admin_manager.py
+## 🔑 Admin Login
 
-# 6. Start the dev server
-python manage.py runserver
-```
-
-### Admin User Management Script
-
-The `admin_manager.py` script automatically creates and configures the admin user:
-
-```bash
-# Run the full setup (creates admin user, verifies, tests authentication)
-python admin_manager.py
-
-# Or run specific commands:
-python admin_manager.py create    # Create admin user only
-python admin_manager.py verify    # Verify admin user exists
-python admin_manager.py test      # Test password authentication
-python admin_manager.py stats     # Show user statistics
-python admin_manager.py reset     # Reset admin password to 'admin'
-```
-
-**Default Admin Credentials:**
-- Username: `admin`
-- Password: `admin`
+- The admin user (`admin`/`admin`) can log in via the main login page at `/login/`.
+- The admin dashboard is accessible after login.
 
 ---
 
