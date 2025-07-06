@@ -95,6 +95,14 @@ GitHub: [github.com/Jamesscott34](https://github.com/Jamesscott34)
 - [ ] Add Kubernetes manifests for deployment, service, ingress, and config
 - [ ] Create a Helm chart for easy deployment and configuration
 - [ ] Set up CI/CD pipeline for automated testing, building, and deployment to Kubernetes
+- [ ] Daily or Weekly Email Digest (Celery Scheduled Job): Send users a digest of their reading progress or unread books (celery, django-celery-beat)
+- [ ] Reading Streak Tracker: Track consecutive days a user marks a book as read, display visually (progress bar/flame icon)
+- [ ] Smart Book Recommendations: Recommend books based on keywords in previously read books (NLTK, spaCy, or keyword matching)
+- [ ] Book Stats Graph: Generate graphs like "Books Read Over Time" or "Genre Distribution" (matplotlib, plotly, or Chart.js)
+- [ ] Calendar View for Reading Log: Show which days users read which books (DateRead field, JS calendar or Django template)
+- [ ] Advanced Book Categories/Tags: Let users tag books and filter by tag (ManyToMany, tag filtering)
+- [ ] Advanced Filtering and Sorting: Filter by read status, author, date, etc. (Django ORM + template filtering)
+- [ ] Automated API Tests: Run tests on API endpoints, registration, book creation, etc. (pytest, unittest, or django.test.TestCase)
 
 ---
 
