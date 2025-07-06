@@ -24,7 +24,7 @@
         <div class="card-body">
             <!-- Add Book Form -->
             <!-- Django form for adding books with CSRF protection -->
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 
                 <!-- Form Fields Container -->
@@ -143,6 +143,21 @@
                     {% if form.is_read.errors %}
                         <div class="text-danger">
                             {% for error in form.is_read.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Cover Image Upload Field -->
+                <div class="form-group mt-3">
+                    <label for="{{ form.cover_image.id_for_label }}" class="form-label">
+                        <i class="fas fa-image"></i> Cover Image (Optional)
+                    </label>
+                    {{ form.cover_image }}
+                    {% if form.cover_image.errors %}
+                        <div class="text-danger">
+                            {% for error in form.cover_image.errors %}
                                 <small>{{ error }}</small>
                             {% endfor %}
                         </div>
