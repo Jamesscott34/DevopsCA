@@ -48,10 +48,13 @@ GitHub: [github.com/Jamesscott34](https://github.com/Jamesscott34)
 - **Home Page** (after login) shows all saved books in a table with reading progress.
 - **Manual Add** lets you enter title, author, published date, description, and an auto-generated ISBN (starting with `JS`).
 - **Open Library Search** lets you search external books, view results, and import selected ones into your library.
-- **Admin Dashboard**: If you log in as `admin`, you get a special admin dashboard page with user management and statistics.
+- **Admin Dashboard**: If you log in as `admin`, you get a special admin dashboard page with user management and statistics. Admin can view any user's books and set a referral book for any user.
 - **Books are saved in SQLite DB** using Django's ORM by default.
 - **Books can be edited, deleted, and marked read/unread**.
 - **Notification System** allows admins to send personalized messages and book recommendations to users.
+- **User/Admin Book Separation**: Users and admin see only their own books on `/home/`. Admin can view any user's books from the dashboard.
+- **Admin Referral Feature**: Admin can set a referral book for any user; users can add the referral to their collection from their profile.
+- **User Notes**: Users can add/edit personal notes in their profile.
 
 ---
 
@@ -82,12 +85,24 @@ GitHub: [github.com/Jamesscott34](https://github.com/Jamesscott34)
 - [x] Improve validation and error handling
 - [x] Implement cover image upload for manually added books
 - [x] Add book categories and tags
+- [x] User/admin book separation (users and admin see only their own books on `/home/`)
+- [x] Admin can view any user's books from the admin dashboard
+- [x] Admin referral feature: admin can set a referral book for any user, and users can add it to their collection
+- [x] User notes: users can add/edit personal notes in their profile
 
 ---
 
 ## ️ What To Do Next
 
 - [ ] Implement email notification functionality
+- [ ] Add book import/export (CSV, JSON)
+- [ ] Add analytics/dashboard for users (reading stats, most read authors, etc.)
+- [ ] Enhance book cover image support (drag-and-drop, cropping)
+- [ ] Add user profile picture/avatar
+- [ ] Improve mobile responsiveness and accessibility
+- [ ] Add Kubernetes manifests for deployment, service, ingress, and config
+- [ ] Create a Helm chart for easy deployment and configuration
+- [ ] Set up CI/CD pipeline for automated testing, building, and deployment to Kubernetes
 
 ---
 
