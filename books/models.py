@@ -44,6 +44,18 @@ class User(models.Model):
         """Return the username as the string representation of the user."""
         return self.username
 
+class Tag(models.Model):
+    """
+    Model for book tags/categories.
+    Allows users to assign multiple tags to books for better organization and filtering.
+    Attributes:
+        name (str): Name of the tag/category (unique)
+    """
+    name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name
+
 class Book(models.Model):
     """
     Model for storing book information in the catalog.
@@ -62,6 +74,7 @@ class Book(models.Model):
         view_count (int): Number of times the book has been viewed
         added_by (User): User who added the book to the catalog
         cover_image (ImageField): Optional cover image for the book
+        tags (ManyToManyField): Tags/categories for this book
     """
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=100)
@@ -77,6 +90,7 @@ class Book(models.Model):
         null=True,
         help_text='Optional cover image for the book.'
     )
+    tags = models.ManyToManyField(Tag, blank=True, related_name='books', help_text='Tags/categories for this book.')
 
     def __str__(self):
         """Return the book title as the string representation."""
