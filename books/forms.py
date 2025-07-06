@@ -8,13 +8,14 @@ validation and security measures.
 
 from django import forms
 from django.contrib.auth.hashers import check_password
-from .models import Book, User, Notification
+from .models import Book, User, Notification, Tag
 
 # forms.py
 
 class BookForm(forms.ModelForm):
     """
-    Form for adding and editing books in the catalog.
+    Form for adding and editing books in the catalog, now with tag selection.
+    Users can assign multiple tags/categories to a book for better organization and filtering.
     
     This form provides a user-friendly interface for entering book information.
     It includes proper field validation and Bootstrap styling for the UI.
@@ -28,10 +29,18 @@ class BookForm(forms.ModelForm):
         description: Multi-line text area for book summary
         is_read: Checkbox to mark book as read/unread
         cover_image: Optional image upload for book cover
+        tags: Multiple tags/categories for the book
     """
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        help_text='Select one or more tags/categories for this book.'
+    )
+
     class Meta:
         model = Book
-        fields = ['title', 'author', 'published_date', 'isbn', 'description', 'is_read', 'cover_image']
+        fields = ['title', 'author', 'published_date', 'isbn', 'description', 'is_read', 'cover_image', 'tags']
         widgets = {
             'published_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
