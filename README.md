@@ -30,12 +30,9 @@ This is a Django-based book catalogue system developed as part of a DevOps assig
 
 ---
 
-## 🛠️ What To Do Next
+## ��️ What To Do Next
 
-- [x] **REST API endpoints for integration with JavaScript frontends** ✅
-- [ ] Add search and filter options to local book list  
-- [ ] Improve validation and error handling  
-- [ ] Implement cover image upload for manually added books  
+- [ ] Implement cover image upload for manually added books
 - [ ] Implement email notification functionality
 - [ ] Add book categories and tags
 
@@ -43,7 +40,7 @@ This is a Django-based book catalogue system developed as part of a DevOps assig
 
 ## ✅ Features So Far
 
-- [x] **Login Page as Default Landing Page**
+- [x] Login Page as Default Landing Page
 - [x] Manual Book Entry Form with Description and JS-ISBN
 - [x] Editable Book Entries
 - [x] Delete and Toggle Status
@@ -63,7 +60,9 @@ This is a Django-based book catalogue system developed as part of a DevOps assig
 - [x] Admin Restrictions (can only change own email, cannot notify self)
 - [x] Book View Tracking and Attribution
 - [x] Automatic Book Saving from Notifications
-- [x] **Complete REST API with Authentication, CRUD Operations, and Statistics**
+- [x] Complete REST API with Authentication, CRUD Operations, and Statistics
+- [x] Add search and filter options to local book list
+- [x] Improve validation and error handling
 
 ---
 
