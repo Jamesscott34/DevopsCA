@@ -283,18 +283,16 @@
                                             {% if user.username != 'admin' %}
                                                 <!-- Send Notification Button - For non-admin users only -->
                                                 <a href="{% url 'send_notification_user' user.id %}" 
+                                                   class="btn btn-info btn-sm"
+                                                   title="Send email to {{ user.username }}">
+                                                    <i class="fas fa-envelope"></i> Send Email
+                                                </a>
+                                                <!-- Notify Button - For non-admin users only -->
+                                                <a href="{% url 'send_notification_user' user.id %}" 
                                                    class="btn btn-primary btn-sm"
                                                    title="Send notification to {{ user.username }}">
                                                     <i class="fas fa-bell"></i> Notify
                                                 </a>
-                                                
-                                                <!-- Change Email Button - For non-admin users only -->
-                                                <a href="{% url 'change_user_email' user.id %}" 
-                                                   class="btn btn-info btn-sm"
-                                                   title="Change email for {{ user.username }}">
-                                                    <i class="fas fa-envelope"></i> Email
-                                                </a>
-                                                
                                                 <!-- Delete User Button - Only for non-admin users -->
                                                 <a href="{% url 'delete_user' user.id %}" 
                                                    class="btn btn-danger btn-sm"
