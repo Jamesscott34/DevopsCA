@@ -22,11 +22,13 @@ class User(models.Model):
         email (str): Unique email address for account recovery
         password (str): Hashed password (max 128 characters)
         created_at (datetime): Timestamp when account was created
+        admin_referral (str): Admin referral or notes for this user (max 255 characters)
     """
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)  # Will store hashed password
     created_at = models.DateTimeField(auto_now_add=True)
+    admin_referral = models.CharField(max_length=255, blank=True, null=True, help_text='Admin referral or notes for this user.')
     
     def save(self, *args, **kwargs):
         """
