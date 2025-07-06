@@ -32,7 +32,6 @@ This is a Django-based book catalogue system developed as part of a DevOps assig
 
 ## ��️ What To Do Next
 
-- [ ] Implement cover image upload for manually added books
 - [ ] Implement email notification functionality
 - [ ] Add book categories and tags
 
@@ -63,6 +62,7 @@ This is a Django-based book catalogue system developed as part of a DevOps assig
 - [x] Complete REST API with Authentication, CRUD Operations, and Statistics
 - [x] Add search and filter options to local book list
 - [x] Improve validation and error handling
+- [x] Implement cover image upload for manually added books
 
 ---
 
