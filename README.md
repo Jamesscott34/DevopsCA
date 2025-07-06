@@ -116,3 +116,14 @@ Email: jamesdeanscott19@gmail.com
 GitHub: [github.com/Jamesscott34](https://github.com/Jamesscott34)
 
 This project is part of the SBA24070 coursework and is for educational purposes.
+
+=======
+
+## 📋 Notification System Support
+
+For issues and questions:
+1. Check the troubleshooting section
+2. Review the admin management script documentation
+3. Check Django documentation for framework-specific issues
+
+---
