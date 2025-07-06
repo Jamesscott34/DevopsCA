@@ -111,7 +111,7 @@ def add_book(request):
     It handles both GET requests (display form) and POST requests (save book).
     After successful book creation, users are redirected to the home page.
     The view tracks which user added the book for statistics.
-    Now handlesvalidation and user-friendly error messages.
+    Now handles validation and user-friendly error messages.
 
     Args:
         request: Django HttpRequest object
@@ -142,16 +142,16 @@ def add_book(request):
 
 def edit_book(request, pk):
     """
-    Handle editing existing books in the catalog.
-    
+    Handle editing existing books in the catalog with improved validation and error handling.
+
     This view allows users to modify book information. It pre-populates the
     form with existing book data and saves changes when submitted. The view
     uses the book's primary key to identify which book to edit.
-    
+    Now includes robust validation and user-friendly error messages.
+
     Args:
         request: Django HttpRequest object
         pk: Primary key of the book to edit
-        
     Returns:
         Rendered edit_book.html template or redirect to home page
     """
@@ -160,8 +160,19 @@ def edit_book(request, pk):
     if request.method == 'POST':
         form = BookForm(request.POST, instance=book)
         if form.is_valid():
-            form.save()
-            return redirect('home')
+            try:
+                updated_book = form.save(commit=False)
+                # Check for duplicate ISBN if changed
+                if updated_book.isbn and Book.objects.filter(isbn=updated_book.isbn).exclude(pk=book.pk).exists():
+                    form.add_error('isbn', 'A book with this ISBN already exists.')
+                else:
+                    updated_book.save()
+                    messages.success(request, 'Book updated successfully!')
+                    return redirect('home')
+            except Exception as e:
+                form.add_error(None, f'An unexpected error occurred: {str(e)}')
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = BookForm(instance=book)
     return render(request, 'books/edit_book.html', {'form': form, 'current_user': current_user})
