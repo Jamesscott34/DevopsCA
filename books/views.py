@@ -105,16 +105,16 @@ def home(request):
 
 def add_book(request):
     """
-    Handle adding new books to the catalog.
-    
+    Handle adding new books to the catalog with improved validation and error handling.
+
     This view provides a form for users to manually enter book information.
     It handles both GET requests (display form) and POST requests (save book).
     After successful book creation, users are redirected to the home page.
     The view tracks which user added the book for statistics.
-    
+    Now handlesvalidation and user-friendly error messages.
+
     Args:
         request: Django HttpRequest object
-        
     Returns:
         Rendered add_book.html template or redirect to home page
     """
@@ -122,10 +122,20 @@ def add_book(request):
     if request.method == 'POST':
         form = BookForm(request.POST)
         if form.is_valid():
-            book = form.save(commit=False)
-            book.added_by = current_user
-            book.save()
-            return redirect('home')
+            try:
+                book = form.save(commit=False)
+                book.added_by = current_user
+                # Check for duplicate ISBN if provided
+                if book.isbn and Book.objects.filter(isbn=book.isbn).exists():
+                    form.add_error('isbn', 'A book with this ISBN already exists.')
+                else:
+                    book.save()
+                    messages.success(request, 'Book added successfully!')
+                    return redirect('home')
+            except Exception as e:
+                form.add_error(None, f'An unexpected error occurred: {str(e)}')
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = BookForm()
     return render(request, 'books/add_book.html', {'form': form, 'current_user': current_user})
