@@ -1,5 +1,11 @@
 # SBA24070 Book Catalogue App – Quickstart
 
+**Database Flexibility Note:**
+- You do **not** have to use the database provided by default.
+- By default, the app uses SQLite, which requires no setup—just clone and run.
+- You can switch to PostgreSQL (or another supported DB) by updating `settings.py` (or your `.env` for Docker) and running migrations.
+- See below for setup instructions for both local and Docker environments.
+
 ## Setup (Recommended)
 
 1. Clone the repository and enter the project directory.
