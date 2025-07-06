@@ -27,10 +27,11 @@ class BookForm(forms.ModelForm):
         isbn: Text input for ISBN (optional)
         description: Multi-line text area for book summary
         is_read: Checkbox to mark book as read/unread
+        cover_image: Optional image upload for book cover
     """
     class Meta:
         model = Book
-        fields = ['title', 'author', 'published_date', 'isbn', 'description', 'is_read']
+        fields = ['title', 'author', 'published_date', 'isbn', 'description', 'is_read', 'cover_image']
         widgets = {
             'published_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
