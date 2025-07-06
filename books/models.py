@@ -61,6 +61,7 @@ class Book(models.Model):
         is_read (bool): Whether the user has read this book
         view_count (int): Number of times the book has been viewed
         added_by (User): User who added the book to the catalog
+        cover_image (ImageField): Optional cover image for the book
     """
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=100)
@@ -70,6 +71,12 @@ class Book(models.Model):
     is_read = models.BooleanField(default=False)
     view_count = models.IntegerField(default=0)
     added_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='added_books')
+    cover_image = models.ImageField(
+        upload_to='book_covers/',
+        blank=True,
+        null=True,
+        help_text='Optional cover image for the book.'
+    )
 
     def __str__(self):
         """Return the book title as the string representation."""
