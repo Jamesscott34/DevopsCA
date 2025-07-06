@@ -72,6 +72,14 @@
             </select>
         </div>
         <div class="col-auto">
+            <select name="tag" class="form-select">
+                <option value="">All Tags</option>
+                {% for tag in tags %}
+                    <option value="{{ tag.id }}" {% if selected_tag == tag.id|stringformat:"s" %}selected{% endif %}>{{ tag.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto">
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-search"></i> Filter
             </button>
@@ -93,6 +101,7 @@
                         <th>Author</th>          <!-- Author name column -->
                         <th>Published Date</th>  <!-- Publication date column -->
                         <th>ISBN</th>            <!-- ISBN identifier column -->
+                        <th>Tags</th>           <!-- Tags column -->
                         <th>Status</th>          <!-- Read/unread status column -->
                         <th>Actions</th>         <!-- Action buttons column -->
                     </tr>
@@ -134,6 +143,16 @@
                             <!-- Displays the unique book identifier -->
                             <td>
                                 <code>{{ book.isbn }}</code>
+                            </td>
+                            
+                            <!-- Tags Cell -->
+                            <!-- Displays tags for the book -->
+                            <td>
+                                {% for tag in book.tags.all %}
+                                    <span class="badge bg-info text-dark">{{ tag.name }}</span>
+                                {% empty %}
+                                    <span class="text-muted">No tags</span>
+                                {% endfor %}
                             </td>
                             
                             <!-- Read Status Cell -->
