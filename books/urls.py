@@ -43,9 +43,9 @@ urlpatterns = [
     # Book management
     path('home/', views.home, name='home'),  # Home page with book catalog (moved from root)
     path('add/', views.add_book, name='add_book'),  # Add new book
-    path('edit/<int:book_id>/', views.edit_book, name='edit_book'),  # Edit existing book
+    path('edit/<int:pk>/', views.edit_book, name='edit_book'),  # Edit existing book
     path('delete/<str:isbn>/', views.delete_book_by_isbn, name='delete_book_by_isbn'),  # Delete book by ISBN
-    path('toggle/<int:book_id>/', views.toggle_read, name='toggle_read'),  # Toggle read status
+    path('toggle/<int:pk>/', views.toggle_read, name='toggle_read'),  # Toggle read status
     
     # Book filtering and views
     path('read/', views.read_books, name='read_books'),  # Show only read books
