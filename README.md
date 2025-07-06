@@ -110,7 +110,7 @@ GitHub: [github.com/Jamesscott34](https://github.com/Jamesscott34)
 
 A complete REST API is available for integration with JavaScript frontends, mobile apps, and other services. See [API Documentation](API_DOCUMENTATION.md) for all endpoints, authentication, and usage examples.
 
-<<<<<<< HEAD
+
 ---
 =======
 ---
@@ -636,4 +636,3 @@ For issues and questions:
 3. Check Django documentation for framework-specific issues
 
 ---
->>>>>>> a10a6879dc2198bd3a1c39ca8f0d8e1d2f18f7c8
