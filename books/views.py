@@ -8,7 +8,7 @@ Each view function processes specific URLs and returns appropriate responses.
 
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Book, User, Notification, Tag
-from .forms import BookForm, UserRegistrationForm, LoginForm, PasswordChangeForm, ProfileEditForm, NotificationForm, BulkNotificationForm, AdminEmailChangeForm
+from .forms import BookForm, UserRegistrationForm, LoginForm, PasswordChangeForm, ProfileEditForm, NotificationForm, BulkNotificationForm, AdminEmailChangeForm, AdminReferralForm
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from django.http import JsonResponse
@@ -1005,4 +1005,28 @@ def change_user_email(request, user_id):
         'form': form,
         'current_user': current_user,
         'target_user': target_user
+    })
+
+def edit_admin_referral(request, user_id):
+    """
+    Allow admin to edit the admin_referral field for a user.
+    """
+    current_user = get_current_user(request)
+    if not current_user or current_user.username != 'admin':
+        messages.error(request, 'You must be admin to edit admin referral info.')
+        return redirect('login_user')
+
+    user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        form = AdminReferralForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Admin referral info updated for user '{user.username}'.")
+            return redirect('admin_dashboard')
+    else:
+        form = AdminReferralForm(instance=user)
+    return render(request, 'books/edit_admin_referral.html', {
+        'form': form,
+        'target_user': user,
+        'current_user': current_user,
     })

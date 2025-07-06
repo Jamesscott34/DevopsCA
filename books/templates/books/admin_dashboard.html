@@ -293,6 +293,12 @@
                                                    title="Send notification to {{ user.username }}">
                                                     <i class="fas fa-bell"></i> Notify
                                                 </a>
+                                                <!-- Edit Referral Button - For non-admin users only -->
+                                                <a href="{% url 'edit_admin_referral' user.id %}"
+                                                   class="btn btn-warning btn-sm"
+                                                   title="Edit admin referral for {{ user.username }}">
+                                                    <i class="fas fa-user-edit"></i> Edit Referral
+                                                </a>
                                                 <!-- Delete User Button - Only for non-admin users -->
                                                 <a href="{% url 'delete_user' user.id %}" 
                                                    class="btn btn-danger btn-sm"
