@@ -22,11 +22,15 @@ class User(models.Model):
         email (str): Unique email address for account recovery
         password (str): Hashed password (max 128 characters)
         created_at (datetime): Timestamp when account was created
+        admin_referral (ForeignKey): Admin referral or notes for this user
+        user_notes (str): User personal notes or referral info (max 255 characters)
     """
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)  # Will store hashed password
     created_at = models.DateTimeField(auto_now_add=True)
+    admin_referral = models.ForeignKey('Book', on_delete=models.SET_NULL, null=True, blank=True, related_name='referred_users', help_text='Book selected by admin as a referral for this user.')
+    user_notes = models.TextField(blank=True, null=True, help_text='User personal notes or referral info.')
     
     def save(self, *args, **kwargs):
         """
@@ -43,6 +47,18 @@ class User(models.Model):
     def __str__(self):
         """Return the username as the string representation of the user."""
         return self.username
+
+class Tag(models.Model):
+    """
+    Model for book tags/categories.
+    Allows users to assign multiple tags to books for better organization and filtering.
+    Attributes:
+        name (str): Name of the tag/category (unique)
+    """
+    name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name
 
 class Book(models.Model):
     """
@@ -61,6 +77,8 @@ class Book(models.Model):
         is_read (bool): Whether the user has read this book
         view_count (int): Number of times the book has been viewed
         added_by (User): User who added the book to the catalog
+        cover_image (ImageField): Optional cover image for the book
+        tags (ManyToManyField): Tags/categories for this book
     """
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=100)
@@ -70,6 +88,13 @@ class Book(models.Model):
     is_read = models.BooleanField(default=False)
     view_count = models.IntegerField(default=0)
     added_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='added_books')
+    cover_image = models.ImageField(
+        upload_to='book_covers/',
+        blank=True,
+        null=True,
+        help_text='Optional cover image for the book.'
+    )
+    tags = models.ManyToManyField(Tag, blank=True, related_name='books', help_text='Tags/categories for this book.')
 
     def __str__(self):
         """Return the book title as the string representation."""

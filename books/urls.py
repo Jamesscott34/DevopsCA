@@ -23,6 +23,9 @@ urlpatterns = [
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),  # Admin dashboard
     path('admin-dashboard/delete-user/<int:user_id>/', views.delete_user, name='delete_user'),  # Delete user (admin only)
     path('admin-dashboard/change-email/<int:user_id>/', views.change_user_email, name='change_user_email'),  # Change user email (admin only)
+    path('admin-dashboard/edit-referral/<int:user_id>/', views.edit_admin_referral, name='edit_admin_referral'),  # Edit admin referral for user
+    path('admin-dashboard/view-books/<int:user_id>/', views.admin_view_user_books, name='admin_view_user_books'),  # Admin view: books for user
+    path('admin-dashboard/set-referral/<int:user_id>/', views.admin_set_referral, name='admin_set_referral'),  # Admin set referral book for user
     
     # User profile management
     path('profile/edit/', views.edit_profile, name='edit_profile'),  # Edit user profile
@@ -40,9 +43,9 @@ urlpatterns = [
     # Book management
     path('home/', views.home, name='home'),  # Home page with book catalog (moved from root)
     path('add/', views.add_book, name='add_book'),  # Add new book
-    path('edit/<int:book_id>/', views.edit_book, name='edit_book'),  # Edit existing book
+    path('edit/<int:pk>/', views.edit_book, name='edit_book'),  # Edit existing book
     path('delete/<str:isbn>/', views.delete_book_by_isbn, name='delete_book_by_isbn'),  # Delete book by ISBN
-    path('toggle/<int:book_id>/', views.toggle_read, name='toggle_read'),  # Toggle read status
+    path('toggle/<int:pk>/', views.toggle_read, name='toggle_read'),  # Toggle read status
     
     # Book filtering and views
     path('read/', views.read_books, name='read_books'),  # Show only read books

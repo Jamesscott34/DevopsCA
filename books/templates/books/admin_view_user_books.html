@@ -1,0 +1,32 @@
+{% extends 'books/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2><i class="fas fa-book"></i> Books for {{ target_user.username }}</h2>
+    <p><strong>Email:</strong> {{ target_user.email }}</p>
+    <p><strong>Admin Referral:</strong> {% if target_user.admin_referral %}{{ target_user.admin_referral.title }}{% else %}-{% endif %}</p>
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary mb-3">&larr; Back to Admin Dashboard</a>
+    {% if books %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>ISBN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in books %}
+                        <tr>
+                            <td>{{ book.title }}</td>
+                            <td>{{ book.isbn }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">This user has no books in their catalog.</div>
+    {% endif %}
+</div>
+{% endblock %} 

@@ -8,13 +8,14 @@ validation and security measures.
 
 from django import forms
 from django.contrib.auth.hashers import check_password
-from .models import Book, User, Notification
+from .models import Book, User, Notification, Tag
 
 # forms.py
 
 class BookForm(forms.ModelForm):
     """
-    Form for adding and editing books in the catalog.
+    Form for adding and editing books in the catalog, now with tag selection.
+    Users can assign multiple tags/categories to a book for better organization and filtering.
     
     This form provides a user-friendly interface for entering book information.
     It includes proper field validation and Bootstrap styling for the UI.
@@ -27,10 +28,19 @@ class BookForm(forms.ModelForm):
         isbn: Text input for ISBN (optional)
         description: Multi-line text area for book summary
         is_read: Checkbox to mark book as read/unread
+        cover_image: Optional image upload for book cover
+        tags: Multiple tags/categories for the book
     """
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        help_text='Select one or more tags/categories for this book.'
+    )
+
     class Meta:
         model = Book
-        fields = ['title', 'author', 'published_date', 'isbn', 'description', 'is_read']
+        fields = ['title', 'author', 'published_date', 'isbn', 'description', 'is_read', 'cover_image', 'tags']
         widgets = {
             'published_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
@@ -398,4 +408,30 @@ class BulkNotificationForm(forms.Form):
             raise forms.ValidationError("Please select at least one user when targeting specific users.")
         
         return cleaned_data
+
+class AdminReferralForm(forms.ModelForm):
+    """
+    Form for editing the admin_referral field for a user (admin only).
+    """
+    class Meta:
+        model = User
+        fields = ['admin_referral']
+        widgets = {
+            'admin_referral': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter admin referral or notes (optional)'}),
+        }
+
+class AdminSetReferralForm(forms.ModelForm):
+    """
+    Form for admin to set a referral book for a user.
+    """
+    admin_referral = forms.ModelChoiceField(
+        queryset=Book.objects.all().order_by('title'),
+        required=False,
+        label='Referral Book',
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        help_text='Select a book to refer to this user.'
+    )
+    class Meta:
+        model = User
+        fields = ['admin_referral']
 

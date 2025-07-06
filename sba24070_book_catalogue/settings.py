@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -78,14 +79,16 @@ WSGI_APPLICATION = 'sba24070_book_catalogue.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'sba24070',
-        'USER': 'sba24070_user',
-        'PASSWORD': 'your_secure_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.environ.get('POSTGRES_DB', 'sba24070'),
+        'USER': os.environ.get('POSTGRES_USER', 'sba24070_user'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'your_secure_password'),
+        'HOST': os.environ.get('POSTGRES_HOST', 'db'), 
+        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }
 
@@ -125,7 +128,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]

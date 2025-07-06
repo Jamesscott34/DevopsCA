@@ -7,8 +7,8 @@ Each view function processes specific URLs and returns appropriate responses.
 """
 
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Book, User, Notification
-from .forms import BookForm, UserRegistrationForm, LoginForm, PasswordChangeForm, ProfileEditForm, NotificationForm, BulkNotificationForm, AdminEmailChangeForm
+from .models import Book, User, Notification, Tag
+from .forms import BookForm, UserRegistrationForm, LoginForm, PasswordChangeForm, ProfileEditForm, NotificationForm, BulkNotificationForm, AdminEmailChangeForm, AdminReferralForm, AdminSetReferralForm
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from django.http import JsonResponse
@@ -52,7 +52,8 @@ def get_current_user(request):
 
 def home(request):
     """
-    Display the main homepage with all books in the catalog.
+    Display the main homepage with all books in the catalog, with search, filter, and tag filter options.
+    Now supports filtering by search query (title, author, ISBN), read status, and tag.
     
     This view shows the primary interface where users can see all their books
     in a table format. It includes action buttons for adding books and filtering
@@ -73,66 +74,110 @@ def home(request):
         messages.error(request, 'You must be logged in to access the book catalog.')
         return redirect('login_user')
     
+    # Get search, filter, and tag parameters
+    search_query = request.GET.get('search', '').strip()
+    read_status = request.GET.get('read_status', '')
+    tag_id = request.GET.get('tag', '')
+
     books = Book.objects.all()
+    if search_query:
+        books = books.filter(
+            title__icontains=search_query
+        ) | books.filter(
+            author__icontains=search_query
+        ) | books.filter(
+            isbn__icontains=search_query
+        )
+    if read_status == 'read':
+        books = books.filter(is_read=True)
+    elif read_status == 'unread':
+        books = books.filter(is_read=False)
+    if tag_id:
+        books = books.filter(tags__id=tag_id)
     
     # Track book views for statistics (increment view count for each book)
     for book in books:
         book.increment_view_count()
     
+    tags = Tag.objects.all()
     return render(request, 'books/home.html', {
         'books': books,
-        'current_user': current_user
+        'current_user': current_user,
+        'search_query': search_query,
+        'read_status': read_status,
+        'tags': tags,
+        'selected_tag': tag_id,
     })
 
 def add_book(request):
     """
-    Handle adding new books to the catalog.
-    
-    This view provides a form for users to manually enter book information.
+    Handle adding new books to the catalog with improved validation, error handling, and cover image upload support.
+
+    This view provides a form for users to manually enter book information, including an optional cover image.
     It handles both GET requests (display form) and POST requests (save book).
     After successful book creation, users are redirected to the home page.
     The view tracks which user added the book for statistics.
-    
+    Now handles validation, user-friendly error messages, and file uploads.
+
     Args:
         request: Django HttpRequest object
-        
     Returns:
         Rendered add_book.html template or redirect to home page
     """
     current_user = get_current_user(request)
     if request.method == 'POST':
-        form = BookForm(request.POST)
+        form = BookForm(request.POST, request.FILES)
         if form.is_valid():
-            book = form.save(commit=False)
-            book.added_by = current_user
-            book.save()
-            return redirect('home')
+            try:
+                book = form.save(commit=False)
+                book.added_by = current_user
+                # Check for duplicate ISBN if provided
+                if book.isbn and Book.objects.filter(isbn=book.isbn).exists():
+                    form.add_error('isbn', 'A book with this ISBN already exists.')
+                else:
+                    book.save()
+                    messages.success(request, 'Book added successfully!')
+                    return redirect('home')
+            except Exception as e:
+                form.add_error(None, f'An unexpected error occurred: {str(e)}')
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = BookForm()
     return render(request, 'books/add_book.html', {'form': form, 'current_user': current_user})
 
 def edit_book(request, pk):
     """
-    Handle editing existing books in the catalog.
-    
-    This view allows users to modify book information. It pre-populates the
-    form with existing book data and saves changes when submitted. The view
-    uses the book's primary key to identify which book to edit.
-    
+    Handle editing existing books in the catalog with improved validation, error handling, and cover image upload support.
+
+    This view allows users to modify book information, including updating the cover image. It pre-populates the
+    form with existing book data and saves changes when submitted. The view uses the book's primary key to identify
+    which book to edit. Now includes robust validation, user-friendly error messages, and file uploads.
+
     Args:
         request: Django HttpRequest object
         pk: Primary key of the book to edit
-        
     Returns:
         Rendered edit_book.html template or redirect to home page
     """
     current_user = get_current_user(request)
     book = get_object_or_404(Book, pk=pk)
     if request.method == 'POST':
-        form = BookForm(request.POST, instance=book)
+        form = BookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
-            form.save()
-            return redirect('home')
+            try:
+                updated_book = form.save(commit=False)
+                # Check for duplicate ISBN if changed
+                if updated_book.isbn and Book.objects.filter(isbn=updated_book.isbn).exclude(pk=book.pk).exists():
+                    form.add_error('isbn', 'A book with this ISBN already exists.')
+                else:
+                    updated_book.save()
+                    messages.success(request, 'Book updated successfully!')
+                    return redirect('home')
+            except Exception as e:
+                form.add_error(None, f'An unexpected error occurred: {str(e)}')
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = BookForm(instance=book)
     return render(request, 'books/edit_book.html', {'form': form, 'current_user': current_user})
@@ -960,4 +1005,70 @@ def change_user_email(request, user_id):
         'form': form,
         'current_user': current_user,
         'target_user': target_user
+    })
+
+def edit_admin_referral(request, user_id):
+    """
+    Allow admin to edit the admin_referral field for a user.
+    """
+    current_user = get_current_user(request)
+    if not current_user or current_user.username != 'admin':
+        messages.error(request, 'You must be admin to edit admin referral info.')
+        return redirect('login_user')
+
+    user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        form = AdminReferralForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Admin referral info updated for user '{user.username}'.")
+            return redirect('admin_dashboard')
+    else:
+        form = AdminReferralForm(instance=user)
+    return render(request, 'books/edit_admin_referral.html', {
+        'form': form,
+        'target_user': user,
+        'current_user': current_user,
+    })
+
+def admin_view_user_books(request, user_id):
+    """
+    Admin-only view to display all books for a specific user.
+    """
+    current_user = get_current_user(request)
+    if not current_user or current_user.username != 'admin':
+        messages.error(request, 'You must be admin to view user books.')
+        return redirect('login_user')
+
+    user = get_object_or_404(User, id=user_id)
+    # Only show books for the current user (including admin)
+    books = Book.objects.filter(added_by=current_user)
+    return render(request, 'books/admin_view_user_books.html', {
+        'target_user': user,
+        'books': books,
+        'current_user': current_user,
+    })
+
+def admin_set_referral(request, user_id):
+    """
+    Admin-only view to set a referral book for a user.
+    """
+    current_user = get_current_user(request)
+    if not current_user or current_user.username != 'admin':
+        messages.error(request, 'You must be admin to set a referral book.')
+        return redirect('login_user')
+
+    user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        form = AdminSetReferralForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Referral book set for user '{user.username}'.")
+            return redirect('admin_dashboard')
+    else:
+        form = AdminSetReferralForm(instance=user)
+    return render(request, 'books/admin_set_referral.html', {
+        'form': form,
+        'target_user': user,
+        'current_user': current_user,
     })
