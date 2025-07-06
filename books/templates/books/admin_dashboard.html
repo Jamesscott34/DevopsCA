@@ -305,6 +305,12 @@
                                                    title="View all books for {{ user.username }}">
                                                     <i class="fas fa-book"></i> View Books
                                                 </a>
+                                                <!-- Set Referral Button - For non-admin users only -->
+                                                <a href="{% url 'admin_set_referral' user.id %}"
+                                                   class="btn btn-success btn-sm"
+                                                   title="Set referral book for {{ user.username }}">
+                                                    <i class="fas fa-bookmark"></i> Set Referral
+                                                </a>
                                                 <!-- Delete User Button - Only for non-admin users -->
                                                 <a href="{% url 'delete_user' user.id %}" 
                                                    class="btn btn-danger btn-sm"

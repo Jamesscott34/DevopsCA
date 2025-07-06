@@ -1,0 +1,19 @@
+{% extends 'books/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2><i class="fas fa-user-shield"></i> Set Referral Book for {{ target_user.username }}</h2>
+    <form method="post" class="mt-3">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="id_admin_referral" class="form-label">Referral Book</label>
+            {{ form.admin_referral }}
+            {% if form.admin_referral.errors %}
+                <div class="text-danger small">{{ form.admin_referral.errors }}</div>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>
+{% endblock %} 

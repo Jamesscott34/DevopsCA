@@ -77,7 +77,20 @@
                         <i class="fas fa-user-shield"></i> Admin Referral
                     </label>
                     {% if current_user.admin_referral %}
-                        <input type="text" class="form-control" value="{{ current_user.admin_referral.title }} by {{ current_user.admin_referral.author }}" disabled>
+                        <input type="text" class="form-control mb-2" value="{{ current_user.admin_referral.title }} by {{ current_user.admin_referral.author }}" disabled>
+                        {% if not books.filter(title=current_user.admin_referral.title, author=current_user.admin_referral.author, added_by=current_user).exists %}
+                            <form method="post" action="{% url 'add_book' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="title" value="{{ current_user.admin_referral.title }}">
+                                <input type="hidden" name="author" value="{{ current_user.admin_referral.author }}">
+                                <input type="hidden" name="published_date" value="{{ current_user.admin_referral.published_date }}">
+                                <input type="hidden" name="isbn" value="{{ current_user.admin_referral.isbn }}">
+                                <input type="hidden" name="description" value="{{ current_user.admin_referral.description }}">
+                                <button type="submit" class="btn btn-outline-primary btn-sm mt-1">
+                                    <i class="fas fa-plus"></i> Add to My Books
+                                </button>
+                            </form>
+                        {% endif %}
                     {% else %}
                         <input type="text" class="form-control" value="No referral set." disabled>
                     {% endif %}

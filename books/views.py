@@ -8,7 +8,7 @@ Each view function processes specific URLs and returns appropriate responses.
 
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Book, User, Notification, Tag
-from .forms import BookForm, UserRegistrationForm, LoginForm, PasswordChangeForm, ProfileEditForm, NotificationForm, BulkNotificationForm, AdminEmailChangeForm, AdminReferralForm
+from .forms import BookForm, UserRegistrationForm, LoginForm, PasswordChangeForm, ProfileEditForm, NotificationForm, BulkNotificationForm, AdminEmailChangeForm, AdminReferralForm, AdminSetReferralForm
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from django.http import JsonResponse
@@ -1041,9 +1041,34 @@ def admin_view_user_books(request, user_id):
         return redirect('login_user')
 
     user = get_object_or_404(User, id=user_id)
-    books = Book.objects.filter(added_by=user)
+    # Only show books for the current user (including admin)
+    books = Book.objects.filter(added_by=current_user)
     return render(request, 'books/admin_view_user_books.html', {
         'target_user': user,
         'books': books,
+        'current_user': current_user,
+    })
+
+def admin_set_referral(request, user_id):
+    """
+    Admin-only view to set a referral book for a user.
+    """
+    current_user = get_current_user(request)
+    if not current_user or current_user.username != 'admin':
+        messages.error(request, 'You must be admin to set a referral book.')
+        return redirect('login_user')
+
+    user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        form = AdminSetReferralForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Referral book set for user '{user.username}'.")
+            return redirect('admin_dashboard')
+    else:
+        form = AdminSetReferralForm(instance=user)
+    return render(request, 'books/admin_set_referral.html', {
+        'form': form,
+        'target_user': user,
         'current_user': current_user,
     })
