@@ -163,6 +163,17 @@
                         </div>
                     {% endif %}
                 </div>
+                <!-- Tags Field -->
+                <div class="form-group mt-3">
+                    <label for="id_tags" class="form-label"><i class="fas fa-tags"></i> Tags/Categories</label>
+                    {{ form.tags }}
+                    {% if form.tags.help_text %}
+                        <div class="form-text">{{ form.tags.help_text }}</div>
+                    {% endif %}
+                    {% for error in form.tags.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
                 
                 <!-- Submit Buttons Section -->
                 <!-- Action buttons for form submission and navigation -->
