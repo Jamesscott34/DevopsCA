@@ -161,7 +161,7 @@
                                 </a>
                                 
                                 <!-- Toggle Read Status Button - Changes read/unread status -->
-                                <a href="{% url 'toggle_read_status' book.pk %}" class="btn btn-warning btn-sm">
+                                <a href="{% url 'toggle_read' book.pk %}" class="btn btn-warning btn-sm">
                                     {% if book.is_read %}
                                         <i class="fas fa-times"></i> Mark Unread
                                     {% else %}
