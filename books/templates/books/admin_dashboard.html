@@ -299,6 +299,12 @@
                                                    title="Edit admin referral for {{ user.username }}">
                                                     <i class="fas fa-user-edit"></i> Edit Referral
                                                 </a>
+                                                <!-- View Books Button - For non-admin users only -->
+                                                <a href="{% url 'admin_view_user_books' user.id %}"
+                                                   class="btn btn-secondary btn-sm"
+                                                   title="View all books for {{ user.username }}">
+                                                    <i class="fas fa-book"></i> View Books
+                                                </a>
                                                 <!-- Delete User Button - Only for non-admin users -->
                                                 <a href="{% url 'delete_user' user.id %}" 
                                                    class="btn btn-danger btn-sm"

@@ -1030,3 +1030,20 @@ def edit_admin_referral(request, user_id):
         'target_user': user,
         'current_user': current_user,
     })
+
+def admin_view_user_books(request, user_id):
+    """
+    Admin-only view to display all books for a specific user.
+    """
+    current_user = get_current_user(request)
+    if not current_user or current_user.username != 'admin':
+        messages.error(request, 'You must be admin to view user books.')
+        return redirect('login_user')
+
+    user = get_object_or_404(User, id=user_id)
+    books = Book.objects.filter(added_by=user)
+    return render(request, 'books/admin_view_user_books.html', {
+        'target_user': user,
+        'books': books,
+        'current_user': current_user,
+    })

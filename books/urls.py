@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin-dashboard/delete-user/<int:user_id>/', views.delete_user, name='delete_user'),  # Delete user (admin only)
     path('admin-dashboard/change-email/<int:user_id>/', views.change_user_email, name='change_user_email'),  # Change user email (admin only)
     path('admin-dashboard/edit-referral/<int:user_id>/', views.edit_admin_referral, name='edit_admin_referral'),  # Edit admin referral for user
+    path('admin-dashboard/view-books/<int:user_id>/', views.admin_view_user_books, name='admin_view_user_books'),  # Admin view: books for user
     
     # User profile management
     path('profile/edit/', views.edit_profile, name='edit_profile'),  # Edit user profile
