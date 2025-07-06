@@ -361,7 +361,25 @@ See [docs/QUICKSTART.md](docs/QUICKSTART.md) for a step-by-step guide.
 
 ### Docker
 
-- See [docs/QUICKSTART.md](docs/QUICKSTART.md) for Docker instructions.
+1. **Add your database credentials to a `.env` file** in your project root (see Docker Compose for required variables).
+2. **Build and start the containers:**
+   ```sh
+   docker compose up --build
+   ```
+3. **Run migrations and collect static files:**
+   ```sh
+   docker compose exec web python manage.py migrate
+   docker compose exec web python manage.py collectstatic --noinput
+   docker compose exec web python manage.py create_admin
+   ```
+4. **Visit the app:**
+   - [http://localhost:8000](http://localhost:8000)
+   - Log in as admin: `admin` / `admin`
+
+**Note:**
+- The `web` service runs Django with Gunicorn for production-like serving.
+- The `db` service uses PostgreSQL and persists data in a Docker volume.
+- The `.env` file is required for environment variables and should not be committed to version control.
 
 ## 🔑 Admin Login
 
@@ -754,5 +772,27 @@ For issues and questions:
 1. Check the troubleshooting section
 2. Review the admin management script documentation
 3. Check Django documentation for framework-specific issues
+
+---
+
+## 🏁 Quick Start Options
+
+You can run the app in two ways:
+
+### 1. Local Python/Django (no Docker)
+- Run:
+  ```sh
+  ./run_django.sh
+  ```
+- This will set up a virtual environment, install dependencies, run migrations, collect static files, create the admin user, and start the Django server at [http://127.0.0.1:8000](http://127.0.0.1:8000).
+
+### 2. Docker
+- Run:
+  ```sh
+  ./run_docker.sh
+  ```
+- This will build and start Docker containers, run all setup commands in the container, and start the app at [http://localhost:8000](http://localhost:8000).
+
+See the rest of this README for more details on each method.
 
 ---
