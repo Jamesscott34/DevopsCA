@@ -45,6 +45,7 @@
                 <!-- Column headers defining the data structure -->
                 <thead>
                     <tr>
+                        <th>Cover</th>         <!-- Book cover image column -->
                         <th>Title</th>           <!-- Book title column -->
                         <th>Author</th>          <!-- Author name column -->
                         <th>Published Date</th>  <!-- Publication date column -->
@@ -60,6 +61,14 @@
                         <!-- Individual Unread Book Row -->
                         <!-- Each row represents one unread book with default styling -->
                         <tr>
+                            <!-- Book Cover Cell -->
+                            <td style="width: 60px;">
+                                {% if book.cover_image %}
+                                    <img src="{{ book.cover_image.url }}" alt="Cover" style="max-width: 48px; max-height: 64px; border-radius: 4px;">
+                                {% else %}
+                                    <span class="text-muted"><i class="fas fa-book fa-2x"></i></span>
+                                {% endif %}
+                            </td>
                             <!-- Book Title Cell -->
                             <!-- Displays the book title with unread indicator -->
                             <td>
