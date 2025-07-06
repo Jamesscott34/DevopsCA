@@ -105,13 +105,13 @@ def home(request):
 
 def add_book(request):
     """
-    Handle adding new books to the catalog with improved validation and error handling.
+    Handle adding new books to the catalog with improved validation, error handling, and cover image upload support.
 
-    This view provides a form for users to manually enter book information.
+    This view provides a form for users to manually enter book information, including an optional cover image.
     It handles both GET requests (display form) and POST requests (save book).
     After successful book creation, users are redirected to the home page.
     The view tracks which user added the book for statistics.
-    Now handles validation and user-friendly error messages.
+    Now handles validation, user-friendly error messages, and file uploads.
 
     Args:
         request: Django HttpRequest object
@@ -120,7 +120,7 @@ def add_book(request):
     """
     current_user = get_current_user(request)
     if request.method == 'POST':
-        form = BookForm(request.POST)
+        form = BookForm(request.POST, request.FILES)
         if form.is_valid():
             try:
                 book = form.save(commit=False)
@@ -142,12 +142,11 @@ def add_book(request):
 
 def edit_book(request, pk):
     """
-    Handle editing existing books in the catalog with improved validation and error handling.
+    Handle editing existing books in the catalog with improved validation, error handling, and cover image upload support.
 
-    This view allows users to modify book information. It pre-populates the
-    form with existing book data and saves changes when submitted. The view
-    uses the book's primary key to identify which book to edit.
-    Now includes robust validation and user-friendly error messages.
+    This view allows users to modify book information, including updating the cover image. It pre-populates the
+    form with existing book data and saves changes when submitted. The view uses the book's primary key to identify
+    which book to edit. Now includes robust validation, user-friendly error messages, and file uploads.
 
     Args:
         request: Django HttpRequest object
@@ -158,7 +157,7 @@ def edit_book(request, pk):
     current_user = get_current_user(request)
     book = get_object_or_404(Book, pk=pk)
     if request.method == 'POST':
-        form = BookForm(request.POST, instance=book)
+        form = BookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
             try:
                 updated_book = form.save(commit=False)
