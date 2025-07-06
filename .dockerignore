@@ -11,4 +11,5 @@ venv/
 .gitignore
 *.db
 media/
-staticfiles/ 
+staticfiles/
+.env 

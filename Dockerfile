@@ -18,5 +18,5 @@ COPY . .
 # Expose port
 EXPOSE 8000
 
-# Run Django dev server (you can change to gunicorn in production)
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"] 
+# Run Gunicorn for production
+CMD ["gunicorn", "sba24070_book_catalogue.wsgi:application", "--bind", "0.0.0.0:8000"] 
