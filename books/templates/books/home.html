@@ -59,6 +59,25 @@
         </a>
     </div>
 
+    <!-- Search and Filter Form Section -->
+    <form method="get" class="row g-3 align-items-center mb-4">
+        <div class="col-auto">
+            <input type="text" name="search" class="form-control" placeholder="Search by title, author, or ISBN" value="{{ search_query }}">
+        </div>
+        <div class="col-auto">
+            <select name="read_status" class="form-select">
+                <option value="" {% if not read_status %}selected{% endif %}>All Statuses</option>
+                <option value="read" {% if read_status == 'read' %}selected{% endif %}>Read</option>
+                <option value="unread" {% if read_status == 'unread' %}selected{% endif %}>Unread</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Filter
+            </button>
+        </div>
+    </form>
+
     <!-- Books Table Section -->
     <!-- Main data table displaying all books in the catalog -->
     {% if books %}
