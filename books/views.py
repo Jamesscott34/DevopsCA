@@ -52,13 +52,14 @@ def get_current_user(request):
 
 def home(request):
     """
-    Display the main homepage with all books in the catalog.
+    Display the main homepage with all books in the catalog, with search and filter options.
     
     This view shows the primary interface where users can see all their books
     in a table format. It includes action buttons for adding books and filtering
     by read/unread status. The view also displays a personalized welcome message
     for logged-in users and tracks book views for statistics.
     Users must be logged in to access this page.
+    Now supports filtering by search query (title, author, ISBN) and read status.
     
     Args:
         request: Django HttpRequest object
@@ -73,7 +74,23 @@ def home(request):
         messages.error(request, 'You must be logged in to access the book catalog.')
         return redirect('login_user')
     
+    # Get search and filter parameters
+    search_query = request.GET.get('search', '').strip()
+    read_status = request.GET.get('read_status', '')
+
     books = Book.objects.all()
+    if search_query:
+        books = books.filter(
+            title__icontains=search_query
+        ) | books.filter(
+            author__icontains=search_query
+        ) | books.filter(
+            isbn__icontains=search_query
+        )
+    if read_status == 'read':
+        books = books.filter(is_read=True)
+    elif read_status == 'unread':
+        books = books.filter(is_read=False)
     
     # Track book views for statistics (increment view count for each book)
     for book in books:
@@ -81,7 +98,9 @@ def home(request):
     
     return render(request, 'books/home.html', {
         'books': books,
-        'current_user': current_user
+        'current_user': current_user,
+        'search_query': search_query,
+        'read_status': read_status,
     })
 
 def add_book(request):
