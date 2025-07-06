@@ -23,12 +23,14 @@ class User(models.Model):
         password (str): Hashed password (max 128 characters)
         created_at (datetime): Timestamp when account was created
         admin_referral (str): Admin referral or notes for this user (max 255 characters)
+        user_notes (str): User personal notes or referral info (max 255 characters)
     """
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)  # Will store hashed password
     created_at = models.DateTimeField(auto_now_add=True)
     admin_referral = models.CharField(max_length=255, blank=True, null=True, help_text='Admin referral or notes for this user.')
+    user_notes = models.TextField(blank=True, null=True, help_text='User personal notes or referral info.')
     
     def save(self, *args, **kwargs):
         """
