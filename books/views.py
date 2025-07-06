@@ -7,7 +7,7 @@ Each view function processes specific URLs and returns appropriate responses.
 """
 
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Book, User, Notification
+from .models import Book, User, Notification, Tag
 from .forms import BookForm, UserRegistrationForm, LoginForm, PasswordChangeForm, ProfileEditForm, NotificationForm, BulkNotificationForm, AdminEmailChangeForm
 from django.views.decorators.csrf import csrf_exempt
 import requests
@@ -52,14 +52,14 @@ def get_current_user(request):
 
 def home(request):
     """
-    Display the main homepage with all books in the catalog, with search and filter options.
+    Display the main homepage with all books in the catalog, with search, filter, and tag filter options.
+    Now supports filtering by search query (title, author, ISBN), read status, and tag.
     
     This view shows the primary interface where users can see all their books
     in a table format. It includes action buttons for adding books and filtering
     by read/unread status. The view also displays a personalized welcome message
     for logged-in users and tracks book views for statistics.
     Users must be logged in to access this page.
-    Now supports filtering by search query (title, author, ISBN) and read status.
     
     Args:
         request: Django HttpRequest object
@@ -74,9 +74,10 @@ def home(request):
         messages.error(request, 'You must be logged in to access the book catalog.')
         return redirect('login_user')
     
-    # Get search and filter parameters
+    # Get search, filter, and tag parameters
     search_query = request.GET.get('search', '').strip()
     read_status = request.GET.get('read_status', '')
+    tag_id = request.GET.get('tag', '')
 
     books = Book.objects.all()
     if search_query:
@@ -91,16 +92,21 @@ def home(request):
         books = books.filter(is_read=True)
     elif read_status == 'unread':
         books = books.filter(is_read=False)
+    if tag_id:
+        books = books.filter(tags__id=tag_id)
     
     # Track book views for statistics (increment view count for each book)
     for book in books:
         book.increment_view_count()
     
+    tags = Tag.objects.all()
     return render(request, 'books/home.html', {
         'books': books,
         'current_user': current_user,
         'search_query': search_query,
         'read_status': read_status,
+        'tags': tags,
+        'selected_tag': tag_id,
     })
 
 def add_book(request):
