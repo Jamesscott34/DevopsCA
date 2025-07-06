@@ -409,3 +409,14 @@ class BulkNotificationForm(forms.Form):
         
         return cleaned_data
 
+class AdminReferralForm(forms.ModelForm):
+    """
+    Form for editing the admin_referral field for a user (admin only).
+    """
+    class Meta:
+        model = User
+        fields = ['admin_referral']
+        widgets = {
+            'admin_referral': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter admin referral or notes (optional)'}),
+        }
+
