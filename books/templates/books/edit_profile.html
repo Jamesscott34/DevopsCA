@@ -71,6 +71,27 @@
                     </div>
                 {% endif %}
                 
+                <!-- Admin Referral Display (read-only) -->
+                <div class="form-group mt-3">
+                    <label class="form-label">
+                        <i class="fas fa-user-shield"></i> Admin Referral
+                    </label>
+                    {% if current_user.admin_referral %}
+                        <input type="text" class="form-control" value="{{ current_user.admin_referral.title }} by {{ current_user.admin_referral.author }}" disabled>
+                    {% else %}
+                        <input type="text" class="form-control" value="No referral set." disabled>
+                    {% endif %}
+                </div>
+
+                <!-- User's Own Selection/Notes -->
+                <div class="form-group mt-3">
+                    <label for="user_notes" class="form-label">
+                        <i class="fas fa-sticky-note"></i> My Notes / Selection
+                    </label>
+                    <textarea id="user_notes" name="user_notes" class="form-control" rows="2" placeholder="Add your own notes or selection here..." disabled>{{ current_user.user_notes|default:'' }}</textarea>
+                    <small class="form-text text-muted">(Feature: User notes are not editable here yet.)</small>
+                </div>
+                
                 <!-- Submit Buttons Section -->
                 <!-- Action buttons for form submission and navigation -->
                 <div class="d-grid gap-2">
