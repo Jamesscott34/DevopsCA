@@ -1,3 +1,18 @@
+'''
+README for SBA24070 Book Catalogue App
+
+IMPORTANT DATABASE HOST NOTE:
+- If running locally (not in Docker), set DATABASES['default']['HOST'] = 'localhost' in sba24070_book_catalogue/settings.py
+- If running with Docker, set DATABASES['default']['HOST'] = 'db' in sba24070_book_catalogue/settings.py
+
+You can use the provided scripts for setup:
+- ./run_django.sh: Sets HOST to 'localhost', installs requirements, runs migrations, and starts the Django server.
+- ./run_docker.sh: Sets HOST to 'db', builds and starts Docker containers, runs migrations, and starts the app.
+- ./setup.sh: Interactive setup for both modes, ensures correct HOST is set and all requirements are met.
+
+See below for detailed instructions.
+'''
+
 # 📚 SBA24070 Book Catalogue App
 
 This is a Django-based book catalogue system developed as part of a DevOps assignment. It allows users to manage personal book collections with the ability to:
@@ -30,7 +45,7 @@ This is a Django-based book catalogue system developed as part of a DevOps assig
 
 ---
 
-## ��️ What To Do Next
+## ️ What To Do Next
 
 - [ ] Implement email notification functionality
 - [ ] Add book categories and tags
@@ -777,22 +792,8 @@ For issues and questions:
 
 ## 🏁 Quick Start Options
 
-You can run the app in two ways:
-
-### 1. Local Python/Django (no Docker)
-- Run:
-  ```sh
-  ./run_django.sh
-  ```
-- This will set up a virtual environment, install dependencies, run migrations, collect static files, create the admin user, and start the Django server at [http://127.0.0.1:8000](http://127.0.0.1:8000).
-
-### 2. Docker
-- Run:
-  ```sh
-  ./run_docker.sh
-  ```
-- This will build and start Docker containers, run all setup commands in the container, and start the app at [http://localhost:8000](http://localhost:8000).
-
-See the rest of this README for more details on each method.
-
----
+'''
+- For local Django: use ./run_django.sh (HOST will be set to 'localhost')
+- For Docker: use ./run_docker.sh (HOST will be set to 'db')
+- You can also use ./setup.sh for a guided setup.
+'''
