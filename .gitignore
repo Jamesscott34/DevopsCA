@@ -10,3 +10,14 @@ k8s/secret.yaml
 # Ignore Kubernetes generated files (optional)
 k8s/*.bak
 k8s/*.tmp
+*.bak
+*.tmp
+*.log
+*.sqlite3
+__pycache__/
+staticfiles/
+.env
+k8s/secret.yaml
+# Ignore Kubernetes generated files (optional)
+k8s/*.bak
+k8s/*.tmp
