@@ -1,0 +1,63 @@
+# deployment.yaml
+# This Kubernetes Deployment runs the Django application using the specified Docker image.
+# It pulls environment variables from the Secret and ConfigMap, and exposes port 8000.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-deployment
+  labels:
+    app: django
+    managed-by: user
+spec:
+  replicas: 1  # Adjust for scaling
+  selector:
+    matchLabels:
+      app: django
+  template:
+    metadata:
+      labels:
+        app: django
+    spec:
+      containers:
+      - name: django
+        image: jamesdean89/devops-book-app:latest  # Update if you use a different image
+        ports:
+        - containerPort: 8000  # Django default
+        env:
+        # --- Secret values ---
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: django-secret
+              key: SECRET_KEY
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: django-secret
+              key: POSTGRES_DB
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: django-secret
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: django-secret
+              key: POSTGRES_PASSWORD
+        # --- ConfigMap values ---
+        - name: DEBUG
+          valueFrom:
+            configMapKeyRef:
+              name: django-config
+              key: DEBUG
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: django-config
+              key: POSTGRES_HOST
+        - name: POSTGRES_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: django-config
+              key: POSTGRES_PORT 
