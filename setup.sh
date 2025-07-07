@@ -159,6 +159,31 @@ elif [ "$mode" = "3" ]; then
         kubectl apply -f k8s/deployment.yaml
         kubectl apply -f k8s/service.yaml
         echo "[INFO] Kubernetes resources applied."
+        echo "[INFO] Waiting for Django pod to be ready..."
+        # Wait for the Django pod to be running
+        while true; do
+          DJANGO_POD=$(kubectl get pods -l app=django -o jsonpath='{.items[0].metadata.name}')
+          STATUS=$(kubectl get pod "$DJANGO_POD" -o jsonpath='{.status.phase}')
+          if [ "$STATUS" = "Running" ]; then
+            break
+          fi
+          echo "[INFO] Waiting for pod $DJANGO_POD to be Running..."
+          sleep 3
+        done
+        echo "[INFO] Django pod is running: $DJANGO_POD"
+        echo "[INFO] Running migrations in the Django pod..."
+        kubectl exec -it "$DJANGO_POD" -- python manage.py migrate
+        echo "[INFO] Collecting static files in the Django pod..."
+        kubectl exec -it "$DJANGO_POD" -- python manage.py collectstatic --noinput
+        echo "[INFO] Creating admin user in the Django pod..."
+        kubectl exec -it "$DJANGO_POD" -- python manage.py create_admin
+        echo "[INFO] Opening Django service in browser using minikube..."
+        minikube service django-service
+        # Get the service URL and curl it as the user
+        DJANGO_URL=$(minikube service django-service --url)
+        echo "[INFO] Curling the Django service as the user: $DJANGO_URL"
+        curl "$DJANGO_URL"
+        echo "[INFO] Setup complete! Visit $DJANGO_URL in your browser."
         echo "[INFO] To check status: kubectl get pods, kubectl get svc"
         echo "[INFO] See KUBERNETES.md for access instructions."
     else

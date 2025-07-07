@@ -16,3 +16,5 @@ data:
   DEBUG: "False"                  # Set to "True" for development
   POSTGRES_HOST: "postgres"       # Hostname of the Postgres service (should match the service name)
   POSTGRES_PORT: "5432"           # Default Postgres port 
+  # Add futur 
+  ALLOWED_HOSTS: "192.168.49.2,localhost,127.0.0.1"

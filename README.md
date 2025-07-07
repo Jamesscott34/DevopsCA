@@ -8,7 +8,7 @@
 You can use the provided scripts for setup:
 - `./run_django.sh`: Local Django setup
 - `./run_docker.sh`: Docker Compose setup
-- `./setup.sh`: Interactive setup for both modes
+- `./setup.sh`: Interactive setup for both modes and kubernets installation
 
 ---
 
@@ -85,20 +85,34 @@ GitHub: [github.com/Jamesscott34](https://github.com/Jamesscott34)
 
 ---
 
-## 🚀 Kubernetes Deployment (Quick Guide)
+## 🚀 Kubernetes Deployment
 
-All Kubernetes manifests are in the `k8s/` directory. To deploy:
+- The `setup.sh` script now fully automates Kubernetes onboarding:
+  - Applies all manifests
+  - Waits for the Django pod to be ready
+  - Runs migrations, collects static files, and creates the admin user in the pod
+  - Opens the Django service in your browser (via minikube)
+  - Uses `curl` to test the service URL as your user
+- No manual pod/command steps needed—just follow the prompts!
 
-```sh
-kubectl apply -f k8s/secret.yaml
-kubectl apply -f k8s/configmap.yaml
-kubectl apply -f k8s/postgres-deployment.yaml
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
-```
+See [KUBERNETES.md](KUBERNETES.md) for a complete, step-by-step guide to deploying this app on Kubernetes. This includes preparing secrets, applying manifests, and accessing the app.
 
-- **Never commit real secrets to public repos!**
-- See `WHAT_TO_DO_NEXT.md` for a step-by-step checklist after pushing your Docker image.
+## 🐳 Docker Hub & GitHub Actions Setup
+
+To use CI/CD and automatic Docker image builds, you must:
+
+1. **Create a Docker Hub account** (https://hub.docker.com/)
+2. **Create a Docker repository** (e.g., `yourusername/devops-book-app`)
+3. **Add your Docker Hub credentials to your GitHub repository secrets:**
+   - Go to your repo on GitHub → Settings → Secrets and variables → Actions → New repository secret
+   - Add:
+     - `DOCKER_USERNAME` (your Docker Hub username)
+     - `DOCKER_PASSWORD` (your Docker Hub password or access token)
+4. **Update your workflow and manifests to use your Docker Hub image name.**
+
+**You will be prompted for your Docker Hub username in the setup script.**
+
+See [KUBERNETES.md](KUBERNETES.md) for Kubernetes deployment, and the GitHub Actions workflow for CI/CD details.
 
 ---
 

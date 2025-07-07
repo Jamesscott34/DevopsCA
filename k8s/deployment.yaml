@@ -60,4 +60,9 @@ spec:
           valueFrom:
             configMapKeyRef:
               name: django-config
-              key: POSTGRES_PORT 
+              key: POSTGRES_PORT
+        - name: ALLOWED_HOSTS
+          valueFrom:
+            configMapKeyRef:
+              name: django-config
+              key: ALLOWED_HOSTS 

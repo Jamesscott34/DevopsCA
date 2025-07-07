@@ -9,8 +9,8 @@ Welcome! This guide will help you deploy the Book Catalogue App on Kubernetes.
 
 ## 1. Clone the Repository
 ```sh
-git clone <your-repo-url>
-cd <your-repo-directory>
+git clone https://github.com/Jamesscott34/DevopsCA.git
+cd DevopsCA
 ```
 
 ## 2. Prepare Your Secrets
