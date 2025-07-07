@@ -85,30 +85,20 @@ GitHub: [github.com/Jamesscott34](https://github.com/Jamesscott34)
 
 ---
 
-## ️ What To Do Next
-- [ ] Implement email notification functionality
-- [ ] Add book import/export (CSV, JSON)
-- [ ] Add analytics/dashboard for users (reading stats, most read authors, etc.)
-- [ ] Enhance book cover image support (drag-and-drop, cropping)
-- [ ] Add user profile picture/avatar
-- [ ] Improve mobile responsiveness and accessibility
-- [ ] Add Kubernetes manifests for deployment, service, ingress, and config
-- [ ] Create a Helm chart for easy deployment and configuration
-- [ ] Set up CI/CD pipeline for automated testing, building, and deployment to Kubernetes
-- [ ] Daily or Weekly Email Digest (Celery Scheduled Job): Send users a digest of their reading progress or unread books (celery, django-celery-beat)
-- [ ] Reading Streak Tracker: Track consecutive days a user marks a book as read, display visually (progress bar/flame icon)
-- [ ] Smart Book Recommendations: Recommend books based on keywords in previously read books (NLTK, spaCy, or keyword matching)
-- [ ] Book Stats Graph: Generate graphs like "Books Read Over Time" or "Genre Distribution" (matplotlib, plotly, or Chart.js)
-- [ ] Calendar View for Reading Log: Show which days users read which books (DateRead field, JS calendar or Django template)
-- [ ] Advanced Book Categories/Tags: Let users tag books and filter by tag (ManyToMany, tag filtering)
-- [ ] Advanced Filtering and Sorting: Filter by read status, author, date, etc. (Django ORM + template filtering)
-- [ ] Automated API Tests: Run tests on API endpoints, registration, book creation, etc. (pytest, unittest, or django.test.TestCase)
+## 🚀 Kubernetes Deployment (Quick Guide)
 
----
+All Kubernetes manifests are in the `k8s/` directory. To deploy:
 
-## 🚢 Deploying with Helm & Kubernetes
+```sh
+kubectl apply -f k8s/secret.yaml
+kubectl apply -f k8s/configmap.yaml
+kubectl apply -f k8s/postgres-deployment.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+```
 
-See [HELM_DEPLOYMENT.md](HELM_DEPLOYMENT.md) for full instructions on using the Helm chart in `book-catalogue/` to deploy this app to Kubernetes.
+- **Never commit real secrets to public repos!**
+- See `WHAT_TO_DO_NEXT.md` for a step-by-step checklist after pushing your Docker image.
 
 ---
 
