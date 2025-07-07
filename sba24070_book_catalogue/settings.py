@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure--ubvk@7zf1k9($_-zlxki)1v!t6r74+m!iu0+j!g*fkc1dp@(3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
 
 # Application definition
@@ -161,5 +161,3 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.MultiPartParser',
     ],
 }
-
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost").split(",")
