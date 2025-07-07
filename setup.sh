@@ -1,14 +1,12 @@
 #!/bin/bash
-'''
-setup.sh - Full interactive onboarding for SBA24070 Book Catalogue App
-- Prompts for all Django and DB info
-- Creates .env and k8s/secret.yaml
-- Updates settings.py with DB info
-- Attempts to create Postgres DB/user (if local)
-- Runs migrations, collectstatic, and admin setup
-- Optionally applies Kubernetes manifests
-- Informs user at every step
-'''
+# setup.sh - Full interactive onboarding for SBA24070 Book Catalogue App
+# - Prompts for all Django and DB info
+# - Creates .env and k8s/secret.yaml
+# - Updates settings.py with DB info
+# - Attempts to create Postgres DB/user (if local)
+# - Runs migrations, collectstatic, and admin setup
+# - Applies Kubernetes manifests and post-setup steps
+# - Informs user at every step
 set -e
 
 # Function to update DB settings in settings.py
@@ -102,94 +100,86 @@ create_postgres_db() {
 echo "=========================================="
 echo " SBA24070 Book Catalogue Setup Script"
 echo "=========================================="
-echo "Choose setup mode:"
-echo "1) Local Django (no Docker)"
-echo "2) Docker Compose"
-echo "3) Kubernetes/.env setup only (no app start)"
-read -p "Enter 1, 2, or 3: " mode
 
-if [ "$mode" = "1" ]; then
-    '''
-    Local Django setup
-    '''
-    create_env_and_secret
-    update_db_settings "$POSTGRES_DB" "$POSTGRES_USER" "$POSTGRES_PASSWORD" "localhost" "$POSTGRES_PORT"
-    create_postgres_db
-    if [ ! -d "devops" ]; then
-        echo "[INFO] Creating virtual environment 'devops'..."
-        python3 -m venv devops
-    fi
-    source devops/bin/activate
-    pip install --upgrade pip
-    pip install -r requirements.txt
-    python manage.py makemigrations
-    python manage.py migrate
-    python manage.py collectstatic --noinput
-    python admin_manager.py
-    echo "\n[INFO] App ready! Visit: http://127.0.0.1:8000"
-    echo "[INFO] Admin login: admin / admin"
-    python manage.py runserver
-elif [ "$mode" = "2" ]; then
-    '''
-    Docker Compose setup
-    '''
-    create_env_and_secret
-    update_db_settings "$POSTGRES_DB" "$POSTGRES_USER" "$POSTGRES_PASSWORD" "db" "$POSTGRES_PORT"
-    echo "[INFO] Docker Compose will handle DB creation."
-    docker compose up --build -d
-    docker compose exec web python manage.py migrate
-    docker compose exec web python manage.py collectstatic --noinput
-    docker compose exec web python manage.py create_admin
-    echo "\n[INFO] App ready! Visit: http://localhost:8000"
-    echo "[INFO] Admin login: admin / admin"
-    echo "[INFO] To stop: docker compose down"
-elif [ "$mode" = "3" ]; then
-    '''
-    Only create .env and k8s/secret.yaml for Kubernetes setup
-    '''
-    create_env_and_secret
-    update_db_settings "$POSTGRES_DB" "$POSTGRES_USER" "$POSTGRES_PASSWORD" "postgres" "$POSTGRES_PORT"
-    echo "[INFO] Kubernetes/.env setup complete. See KUBERNETES.md for next steps."
-    read -p "Would you like to apply the Kubernetes manifests now? (y/n): " apply_k8s
-    if [ "$apply_k8s" = "y" ] || [ "$apply_k8s" = "Y" ]; then
-        echo "[INFO] Applying Kubernetes manifests..."
-        kubectl apply -f k8s/secret.yaml
-        kubectl apply -f k8s/configmap.yaml
-        kubectl apply -f k8s/postgres-deployment.yaml
-        kubectl apply -f k8s/deployment.yaml
-        kubectl apply -f k8s/service.yaml
-        echo "[INFO] Kubernetes resources applied."
-        echo "[INFO] Waiting for Django pod to be ready..."
-        # Wait for the Django pod to be running
-        while true; do
-          DJANGO_POD=$(kubectl get pods -l app=django -o jsonpath='{.items[0].metadata.name}')
-          STATUS=$(kubectl get pod "$DJANGO_POD" -o jsonpath='{.status.phase}')
-          if [ "$STATUS" = "Running" ]; then
-            break
-          fi
-          echo "[INFO] Waiting for pod $DJANGO_POD to be Running..."
-          sleep 3
-        done
-        echo "[INFO] Django pod is running: $DJANGO_POD"
-        echo "[INFO] Running migrations in the Django pod..."
-        kubectl exec -it "$DJANGO_POD" -- python manage.py migrate
-        echo "[INFO] Collecting static files in the Django pod..."
-        kubectl exec -it "$DJANGO_POD" -- python manage.py collectstatic --noinput
-        echo "[INFO] Creating admin user in the Django pod..."
-        kubectl exec -it "$DJANGO_POD" -- python manage.py create_admin
-        echo "[INFO] Opening Django service in browser using minikube..."
-        minikube service django-service
-        # Get the service URL and curl it as the user
-        DJANGO_URL=$(minikube service django-service --url)
-        echo "[INFO] Curling the Django service as the user: $DJANGO_URL"
-        curl "$DJANGO_URL"
-        echo "[INFO] Setup complete! Visit $DJANGO_URL in your browser."
-        echo "[INFO] To check status: kubectl get pods, kubectl get svc"
-        echo "[INFO] See KUBERNETES.md for access instructions."
-    else
-        echo "[INFO] Skipping Kubernetes apply. You can do this later with kubectl apply -f k8s/"
-    fi
-else
-    echo "[ERROR] Invalid selection. Exiting."
-    exit 1
-fi 
+# 1. Prompt for all secrets and config
+create_env_and_secret
+
+# 2. Local Django setup
+echo "\n==============================="
+echo " Local Django Setup"
+echo "==============================="
+update_db_settings "$POSTGRES_DB" "$POSTGRES_USER" "$POSTGRES_PASSWORD" "localhost" "$POSTGRES_PORT"
+create_postgres_db
+if [ ! -d "devops" ]; then
+    echo "[INFO] Creating virtual environment 'devops'..."
+    python3 -m venv devops
+fi
+source devops/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+python manage.py makemigrations
+python manage.py migrate
+python manage.py collectstatic --noinput
+python admin_manager.py
+echo "\n[INFO] App ready! Visit: http://127.0.0.1:8000"
+echo "[INFO] Admin login: admin / admin"
+python manage.py runserver &
+
+# 3. Docker Compose setup
+echo "\n==============================="
+echo " Docker Compose Setup"
+echo "==============================="
+update_db_settings "$POSTGRES_DB" "$POSTGRES_USER" "$POSTGRES_PASSWORD" "db" "$POSTGRES_PORT"
+echo "[INFO] Docker Compose will handle DB creation."
+docker compose up --build -d
+docker compose exec web python manage.py migrate
+docker compose exec web python manage.py collectstatic --noinput
+docker compose exec web python manage.py create_admin
+echo "\n[INFO] App ready! Visit: http://localhost:8000"
+echo "[INFO] Admin login: admin / admin"
+echo "[INFO] To stop: docker compose down"
+
+# 4. Kubernetes setup
+echo "\n==============================="
+echo " Kubernetes Setup"
+echo "==============================="
+update_db_settings "$POSTGRES_DB" "$POSTGRES_USER" "$POSTGRES_PASSWORD" "postgres" "$POSTGRES_PORT"
+echo "[INFO] Kubernetes/.env setup complete. See KUBERNETES.md for next steps."
+echo "[INFO] Applying Kubernetes manifests..."
+kubectl apply -f k8s/secret.yaml
+kubectl apply -f k8s/configmap.yaml
+kubectl apply -f k8s/postgres-deployment.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+echo "[INFO] Kubernetes resources applied."
+echo "[INFO] Waiting for Django pod to be ready..."
+# Wait for the Django pod to be running
+while true; do
+  DJANGO_POD=$(kubectl get pods -l app=django -o jsonpath='{.items[0].metadata.name}')
+  STATUS=$(kubectl get pod "$DJANGO_POD" -o jsonpath='{.status.phase}')
+  if [ "$STATUS" = "Running" ]; then
+    break
+  fi
+  echo "[INFO] Waiting for pod $DJANGO_POD to be Running..."
+  sleep 3
+  kubectl get pods
+  kubectl get svc
+  DJANGO_URL=$(minikube service django-service --url)
+  echo "[INFO] Django service URL: $DJANGO_URL"
+done
+echo "[INFO] Django pod is running: $DJANGO_POD"
+echo "[INFO] Running migrations in the Django pod..."
+kubectl exec -it "$DJANGO_POD" -- python manage.py migrate
+echo "[INFO] Collecting static files in the Django pod..."
+kubectl exec -it "$DJANGO_POD" -- python manage.py collectstatic --noinput
+echo "[INFO] Creating admin user in the Django pod..."
+kubectl exec -it "$DJANGO_POD" -- python manage.py create_admin
+echo "[INFO] Opening Django service in browser using minikube..."
+minikube service django-service
+# Get the service URL and curl it as the user
+DJANGO_URL=$(minikube service django-service --url)
+echo "[INFO] Curling the Django service as the user: $DJANGO_URL"
+curl "$DJANGO_URL"
+echo "[INFO] Setup complete! Visit $DJANGO_URL in your browser."
+echo "[INFO] To check status: kubectl get pods, kubectl get svc"
+echo "[INFO] See KUBERNETES.md for access instructions." 
