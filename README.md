@@ -82,6 +82,27 @@ GitHub: [github.com/Jamesscott34](https://github.com/Jamesscott34)
 - [x] Admin can view any user's books from the admin dashboard
 - [x] Admin referral feature: admin can set a referral book for any user, and users can add it to their collection
 - [x] User notes: users can add/edit personal notes in their profile
+- [x] **Kubernetes deployment with full automation (setup.sh)**
+
+---
+
+## 🚧 Planned Features
+- Email notification functionality
+- Book import/export (CSV, JSON)
+- Analytics/dashboard for users (reading stats, most read authors, etc.)
+- Enhanced book cover image support (drag-and-drop, cropping)
+- User profile picture/avatar
+- Improved mobile responsiveness and accessibility
+- Ingress and HTTPS for Kubernetes
+- Advanced tags/categories and filtering
+- Reading streak tracker
+- Smart book recommendations (NLTK, spaCy, or keyword matching)
+- Book stats graphs (matplotlib, plotly, Chart.js)
+- Calendar view for reading log
+- Automated API tests (pytest, unittest, django.test.TestCase)
+- CI/CD pipeline for automated testing, building, and deployment
+- Book analytics, profile pictures, mobile improvements
+- Helm chart improvements and versioning
 
 ---
 
