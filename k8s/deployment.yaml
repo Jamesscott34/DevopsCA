@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: django
-        image: jamesdean89/devops-book-app:latest  # Update if you use a different image
+        image: jamesdeanscott/devops-book-app:latest  # Update if you use a different image
         ports:
         - containerPort: 8000  # Django default
         env:
