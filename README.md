@@ -82,7 +82,7 @@ GitHub: [github.com/Jamesscott34](https://github.com/Jamesscott34)
 - [x] Admin can view any user's books from the admin dashboard
 - [x] Admin referral feature: admin can set a referral book for any user, and users can add it to their collection
 - [x] User notes: users can add/edit personal notes in their profile
-- [x] **Kubernetes deployment with full automation (setup.sh)**
+- [x] Kubernetes deployment with full automation (setup.sh)
 
 ---
 
