@@ -1,3 +1,8 @@
+#
+# Helm Deployment for Book Catalogue App
+#
+# The image repository is set in values.yaml. Change 'jamesdeanscott' to your Docker Hub username if needed.
+#
 apiVersion: apps/v1
 kind: Deployment
 metadata:
