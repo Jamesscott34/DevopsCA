@@ -116,7 +116,7 @@ if [ ! -d "devops" ]; then
 fi
 source devops/bin/activate
 pip install --upgrade pip
-pip install -r requirements.txt
+    pip install -r requirements.txt
 python manage.py makemigrations
 python manage.py migrate
 python manage.py collectstatic --noinput

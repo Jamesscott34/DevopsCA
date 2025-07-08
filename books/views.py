@@ -78,7 +78,7 @@ def home(request):
     search_query = request.GET.get('search', '').strip()
     read_status = request.GET.get('read_status', '')
     tag_id = request.GET.get('tag', '')
-
+    
     books = Book.objects.all()
     if search_query:
         books = books.filter(
@@ -112,13 +112,13 @@ def home(request):
 def add_book(request):
     """
     Handle adding new books to the catalog with improved validation, error handling, and cover image upload support.
-
+    
     This view provides a form for users to manually enter book information, including an optional cover image.
     It handles both GET requests (display form) and POST requests (save book).
     After successful book creation, users are redirected to the home page.
     The view tracks which user added the book for statistics.
     Now handles validation, user-friendly error messages, and file uploads.
-
+    
     Args:
         request: Django HttpRequest object
     Returns:
@@ -149,11 +149,11 @@ def add_book(request):
 def edit_book(request, pk):
     """
     Handle editing existing books in the catalog with improved validation, error handling, and cover image upload support.
-
+    
     This view allows users to modify book information, including updating the cover image. It pre-populates the
     form with existing book data and saves changes when submitted. The view uses the book's primary key to identify
     which book to edit. Now includes robust validation, user-friendly error messages, and file uploads.
-
+    
     Args:
         request: Django HttpRequest object
         pk: Primary key of the book to edit
@@ -173,7 +173,7 @@ def edit_book(request, pk):
                 else:
                     updated_book.save()
                     messages.success(request, 'Book updated successfully!')
-                    return redirect('home')
+                return redirect('home')
             except Exception as e:
                 form.add_error(None, f'An unexpected error occurred: {str(e)}')
         else:
