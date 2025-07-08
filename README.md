@@ -8,9 +8,9 @@
 - See [Quickstart Guide](docs/QUICKSTART.md) for setup instructions for both local and Docker environments.
 
 You can use the provided scripts for setup:
-- `./run_django.sh`: Local Django setup
-- `./run_docker.sh`: Docker Compose setup
-- `./setup.sh`: Interactive setup for both modes and kubernets installation
+- `custom_scripts/run_django.sh`: Local Django setup
+- `custom_scripts/run_docker.sh`: Docker Compose setup
+- `custom_scripts/setup.sh`: Interactive setup for both modes and kubernets installation
 
 ---
 
@@ -46,13 +46,13 @@ You can use the provided scripts for setup:
 
 ## 🛠️ Helper & Management Scripts
 
-- `run_django.sh`: Local dev setup (uses SQLite or local Postgres)
-- `run_docker.sh`: Docker Compose setup (uses Postgres service)
-- `setup.sh`: Full onboarding for all environments (local, Docker, Kubernetes)
-- `host_helper.py`: Interactively set the default DB host in `settings.py` (choose 'localhost' or 'db')
-- `admin_manager.py`: Create, verify, reset, and show stats for the admin user. Usage:
-  - `python admin_manager.py` (full setup)
-  - `python admin_manager.py create|verify|test|stats|reset`
+- `custom_scripts/run_django.sh`: Local dev setup (uses SQLite or local Postgres)
+- `custom_scripts/run_docker.sh`: Docker Compose setup (uses Postgres service)
+- `custom_scripts/setup.sh`: Full onboarding for all environments (local, Docker, Kubernetes)
+- `custom_scripts/host_helper.py`: Interactively set the default DB host in `settings.py` (choose 'localhost' or 'db')
+- `custom_scripts/admin_manager.py`: Create, verify, reset, and show stats for the admin user. Usage:
+  - `python custom_scripts/admin_manager.py` (full setup)
+  - `python custom_scripts/admin_manager.py create|verify|test|stats|reset`
 
 ---
 
@@ -61,7 +61,7 @@ You can use the provided scripts for setup:
 - The app uses environment variables for all secrets and DB config.
 - For **local dev**, DB host should be `localhost`.
 - For **Docker/Kubernetes**, DB host should be `db` (or the service name).
-- Use `host_helper.py` to switch the default in `settings.py`.
+- Use `custom_scripts/host_helper.py` to switch the default in `settings.py`.
 - Always set `POSTGRES_HOST` in your deployment environments for flexibility.
 
 ---
@@ -69,7 +69,7 @@ You can use the provided scripts for setup:
 ## 🧑‍💻 Admin & User Management
 
 - Admin user: `admin` / `admin` (created automatically by scripts)
-- Use `admin_manager.py` to manage admin user and view user stats.
+- Use `custom_scripts/admin_manager.py` to manage admin user and view user stats.
 - Admin dashboard: `/admin-dashboard/`
 - User dashboard: `/home/`
 
@@ -77,9 +77,9 @@ You can use the provided scripts for setup:
 
 ## 🔗 Documentation
 - [Quickstart Guide](docs/QUICKSTART.md)
-- [Kubernetes Guide](KUBERNETES.md)
-- [Helm Deployment](HELM_DEPLOYMENT.md)
-- [API Documentation](API_DOCUMENTATION.md)
+- [Kubernetes Guide](docs/KUBERNETES.md)
+- [Helm Deployment](docs/HELM_DEPLOYMENT.md)
+- [API Documentation](docs/API_DOCUMENTATION.md)
 - [API Example (JavaScript)](static/js/api-example.js)
 
 ---
@@ -88,12 +88,12 @@ You can use the provided scripts for setup:
 
 - **Database connection errors:**
   - Check your DB host in `settings.py` and environment variables.
-  - Use `host_helper.py` to set the correct default.
+  - Use `custom_scripts/host_helper.py` to set the correct default.
   - For Docker/K8s, ensure the Postgres service is running and accessible.
 - **Migrations not applied:**
   - Run the migration commands in the appropriate environment (see above).
 - **Admin login fails:**
-  - Use `admin_manager.py reset` to reset the admin password to `admin`.
+  - Use `custom_scripts/admin_manager.py reset` to reset the admin password to `admin`.
 - **Pods not starting (Kubernetes):**
   - Check pod logs: `kubectl logs <pod-name>`
   - Ensure secrets/configs are set up (see `setup.sh` and `KUBERNETES.md`).
@@ -310,7 +310,7 @@ For issues and questions:
   ```python
   'HOST': os.environ.get('POSTGRES_HOST', 'db'),
   ```
-- You can automate this update by running a helper script (host_helper) that will prompt you to choose the correct default and update your `settings.py` automatically.
+- You can automate this update by running a helper script (custom_scripts/host_helper.py) that will prompt you to choose the correct default and update your `settings.py` automatically.
 
 **Tip:** Always use the environment variable POSTGRES_HOST in your deployment environments for maximum flexibility.
 

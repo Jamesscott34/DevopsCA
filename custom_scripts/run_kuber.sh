@@ -47,11 +47,11 @@ if command -v nuitka >/dev/null 2>&1; then
 fi
 
 # Set DB host to db using host_helper.py if available
-if [ -f host_helper.py ]; then
-  echo "[INFO] Setting DB host to 'db' using host_helper.py..."
-  python3 host_helper.py <<< "2" || FAILED_STEPS+=("host_helper.py")
+if [ -f custom_scripts/host_helper.py ]; then
+  echo "[INFO] Setting DB host to 'db' using custom_scripts/host_helper.py..."
+  python3 custom_scripts/host_helper.py <<< "2" || FAILED_STEPS+=("host_helper.py")
 else
-  echo "[WARN] host_helper.py not found. Falling back to sed."
+  echo "[WARN] custom_scripts/host_helper.py not found. Falling back to sed."
   sed -i "/'HOST':/c\        'HOST': 'db'," sba24070_book_catalogue/settings.py || FAILED_STEPS+=("sed db host")
 fi
 

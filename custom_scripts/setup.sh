@@ -160,7 +160,7 @@ pip install --upgrade pip
 python manage.py makemigrations
 python manage.py migrate
 python manage.py collectstatic --noinput
-python admin_manager.py
+python custom_scripts/admin_manager.py
 echo "\n[INFO] App ready! Visit: http://127.0.0.1:8000"
 echo "[INFO] Admin login: admin / admin"
 python manage.py runserver &

@@ -36,12 +36,12 @@ if [ ! -f sba24070_book_catalogue/settings.py ]; then
   FAILED_STEPS+=("settings.py missing")
 fi
 
-# Set DB host to localhost using host_helper.py if available
-if [ -f host_helper.py ]; then
-  echo "[INFO] Setting DB host to 'localhost' using host_helper.py..."
-  python3 host_helper.py <<< "1" || FAILED_STEPS+=("host_helper.py")
+# Set DB host to localhost using custom_scripts/host_helper.py if available
+if [ -f custom_scripts/host_helper.py ]; then
+  echo "[INFO] Setting DB host to 'localhost' using custom_scripts/host_helper.py..."
+  python3 custom_scripts/host_helper.py <<< "1" || FAILED_STEPS+=("host_helper.py")
 else
-  echo "[WARN] host_helper.py not found. Falling back to sed."
+  echo "[WARN] custom_scripts/host_helper.py not found. Falling back to sed."
   sed -i "/'HOST':/c\        'HOST': 'localhost'," sba24070_book_catalogue/settings.py || FAILED_STEPS+=("sed db host")
 fi
 
@@ -64,7 +64,7 @@ python manage.py migrate || FAILED_STEPS+=("migrate")
 python manage.py collectstatic --noinput || FAILED_STEPS+=("collectstatic")
 
 # Create admin user
-python admin_manager.py || FAILED_STEPS+=("admin_manager.py")
+python custom_scripts/admin_manager.py || FAILED_STEPS+=("admin_manager.py")
 
 echo "\n[INFO] App ready! Visit: http://127.0.0.1:8000"
 echo "[INFO] Admin login: admin / admin"
