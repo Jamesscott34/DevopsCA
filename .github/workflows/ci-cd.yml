@@ -67,7 +67,11 @@ jobs:
 
       - name: Set up Kubeconfig
         run: |
-          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG_B64 }}" | base64 --decode > $HOME/.kube/config
+
+      - name: Test kubectl access
+        run: kubectl get nodes
 
       - name: Deploy to Kubernetes
         run: |
