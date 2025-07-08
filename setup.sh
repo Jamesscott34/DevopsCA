@@ -9,6 +9,29 @@
 # - Informs user at every step
 set -e
 
+# Tool checks (fail fast if missing)
+command -v python3 >/dev/null 2>&1 || { echo >&2 "[ERROR] Python 3 is not installed. Aborting."; exit 1; }
+command -v pip >/dev/null 2>&1 || { echo >&2 "[ERROR] pip is not installed. Aborting."; exit 1; }
+command -v sed >/dev/null 2>&1 || { echo >&2 "[ERROR] sed is not installed. Aborting."; exit 1; }
+command -v docker >/dev/null 2>&1 || { echo >&2 "[ERROR] Docker is not installed. Aborting."; exit 1; }
+command -v kubectl >/dev/null 2>&1 || { echo >&2 "[ERROR] kubectl is not installed. Aborting."; exit 1; }
+command -v minikube >/dev/null 2>&1 || { echo >&2 "[ERROR] minikube is not installed. Aborting."; exit 1; }
+# Check for docker compose (plugin or legacy)
+if ! docker compose version >/dev/null 2>&1 && ! command -v docker-compose >/dev/null 2>&1; then
+  echo >&2 "[ERROR] Docker Compose is not installed or not available as a plugin. Aborting."
+  exit 1
+fi
+# psql is optional, only needed for local Postgres DB creation
+if ! command -v psql >/dev/null 2>&1; then
+  echo "[WARN] psql not found. Local Postgres DB/user creation will be skipped."
+fi
+
+# Check settings.py exists
+if [ ! -f sba24070_book_catalogue/settings.py ]; then
+  echo "[ERROR] sba24070_book_catalogue/settings.py not found. Aborting."
+  exit 1
+fi
+
 # Function to update DB settings in settings.py
 update_db_settings() {
     local db_name="$1"
@@ -182,4 +205,9 @@ echo "[INFO] Curling the Django service as the user: $DJANGO_URL"
 curl "$DJANGO_URL"
 echo "[INFO] Setup complete! Visit $DJANGO_URL in your browser."
 echo "[INFO] To check status: kubectl get pods, kubectl get svc"
-echo "[INFO] See KUBERNETES.md for access instructions." 
+echo "[INFO] See KUBERNETES.md for access instructions."
+
+# At the end, print a summary and next steps
+echo "\n[INFO] Setup complete!"
+echo "[INFO] Local: http://127.0.0.1:8000 | Docker: http://localhost:8000 | Kubernetes: see minikube service output."
+echo "[INFO] For troubleshooting and next steps, see README.md and KUBERNETES.md." 
