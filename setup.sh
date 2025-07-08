@@ -7,20 +7,37 @@
 # - Runs migrations, collectstatic, and admin setup
 # - Applies Kubernetes manifests and post-setup steps
 # - Informs user at every step
-set -e
 
-# Tool checks (fail fast if missing)
-command -v python3 >/dev/null 2>&1 || { echo >&2 "[ERROR] Python 3 is not installed. Aborting."; exit 1; }
-command -v pip >/dev/null 2>&1 || { echo >&2 "[ERROR] pip is not installed. Aborting."; exit 1; }
-command -v sed >/dev/null 2>&1 || { echo >&2 "[ERROR] sed is not installed. Aborting."; exit 1; }
-command -v docker >/dev/null 2>&1 || { echo >&2 "[ERROR] Docker is not installed. Aborting."; exit 1; }
-command -v kubectl >/dev/null 2>&1 || { echo >&2 "[ERROR] kubectl is not installed. Aborting."; exit 1; }
-command -v minikube >/dev/null 2>&1 || { echo >&2 "[ERROR] minikube is not installed. Aborting."; exit 1; }
-# Check for docker compose (plugin or legacy)
-if ! docker compose version >/dev/null 2>&1 && ! command -v docker-compose >/dev/null 2>&1; then
-  echo >&2 "[ERROR] Docker Compose is not installed or not available as a plugin. Aborting."
-  exit 1
-fi
+# Remove 'set -e' for custom error handling
+FAILED_STEPS=()
+
+# Tool check and install helper
+check_and_install() {
+  local tool="$1"
+  local pkg="$2"
+  if ! command -v "$tool" >/dev/null 2>&1; then
+    read -p "[PROMPT] $tool is not installed. Install it now with sudo apt install $pkg? [y/n]: " install_tool
+    if [[ "$install_tool" =~ ^[Yy]$ ]]; then
+      sudo apt-get update && sudo apt-get install -y "$pkg"
+      if ! command -v "$tool" >/dev/null 2>&1; then
+        echo "[ERROR] $tool installation failed."
+        FAILED_STEPS+=("$tool install failed")
+      fi
+    else
+      echo "[ERROR] $tool is required. Skipping $tool-dependent steps."
+      FAILED_STEPS+=("$tool declined")
+    fi
+  fi
+}
+
+# Tool checks (with install prompt)
+check_and_install python3 python3
+check_and_install pip python3-pip
+check_and_install sed sed
+check_and_install docker docker.io
+check_and_install kubectl kubectl
+check_and_install minikube minikube
+
 # psql is optional, only needed for local Postgres DB creation
 if ! command -v psql >/dev/null 2>&1; then
   echo "[WARN] psql not found. Local Postgres DB/user creation will be skipped."
@@ -28,8 +45,8 @@ fi
 
 # Check settings.py exists
 if [ ! -f sba24070_book_catalogue/settings.py ]; then
-  echo "[ERROR] sba24070_book_catalogue/settings.py not found. Aborting."
-  exit 1
+  echo "[ERROR] sba24070_book_catalogue/settings.py not found."
+  FAILED_STEPS+=("settings.py missing")
 fi
 
 # Function to update DB settings in settings.py
@@ -208,6 +225,16 @@ echo "[INFO] To check status: kubectl get pods, kubectl get svc"
 echo "[INFO] See KUBERNETES.md for access instructions."
 
 # At the end, print a summary and next steps
+if [ ${#FAILED_STEPS[@]} -ne 0 ]; then
+  echo "\n[SUMMARY] The following steps failed or were skipped:"
+  for step in "${FAILED_STEPS[@]}"; do
+    echo "  - $step"
+  done
+  echo "[INFO] Please review the errors above and resolve as needed."
+else
+  echo "\n[INFO] All steps completed (or skipped with user permission)."
+fi
+
 echo "\n[INFO] Setup complete!"
 echo "[INFO] Local: http://127.0.0.1:8000 | Docker: http://localhost:8000 | Kubernetes: see minikube service output."
 echo "[INFO] For troubleshooting and next steps, see README.md and KUBERNETES.md." 
