@@ -1,5 +1,7 @@
 # 📚 SBA24070 Book Catalogue App
 
+**Welcome!** This app is a full-featured Django book catalogue with flexible deployment: local, Docker, Kubernetes, and Helm. This README will guide you from zero to production, including troubleshooting and automation scripts.
+
 **Database Flexibility Note:**
 - By default, the app uses SQLite, which requires no setup—just clone and run.
 - You can switch to PostgreSQL (or another supported DB) by updating `settings.py` (or your `.env` for Docker) and running migrations.
@@ -12,10 +14,119 @@ You can use the provided scripts for setup:
 
 ---
 
-## 📄 Documentation & Examples
+## 🚦 Quick Start
+
+### 1. Local Development (SQLite, no setup required)
+```sh
+./run_django.sh
+```
+- Installs dependencies, runs migrations, creates admin, and starts the server.
+- Visit: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+- Admin login: `admin` / `admin`
+
+### 2. Docker Compose (Postgres, for local containers)
+```sh
+./run_docker.sh
+```
+- Builds and starts containers, runs migrations, collects static, creates admin.
+- Visit: [http://localhost:8000](http://localhost:8000)
+- Admin login: `admin` / `admin`
+
+### 3. Kubernetes (Minikube or any cluster)
+```sh
+./setup.sh
+```
+- Fully interactive: prompts for secrets, creates .env and k8s secrets, applies manifests, waits for pods, runs migrations, creates admin, opens browser.
+- See [KUBERNETES.md](KUBERNETES.md) for advanced/manual steps.
+
+### 4. Helm Chart
+- See [HELM_DEPLOYMENT.md](HELM_DEPLOYMENT.md) for Helm-based deployment and customization.
+
+---
+
+## 🛠️ Helper & Management Scripts
+
+- `run_django.sh`: Local dev setup (uses SQLite or local Postgres)
+- `run_docker.sh`: Docker Compose setup (uses Postgres service)
+- `setup.sh`: Full onboarding for all environments (local, Docker, Kubernetes)
+- `host_helper.py`: Interactively set the default DB host in `settings.py` (choose 'localhost' or 'db')
+- `admin_manager.py`: Create, verify, reset, and show stats for the admin user. Usage:
+  - `python admin_manager.py` (full setup)
+  - `python admin_manager.py create|verify|test|stats|reset`
+
+---
+
+## 🗄️ Environment Variables & Database Host
+
+- The app uses environment variables for all secrets and DB config.
+- For **local dev**, DB host should be `localhost`.
+- For **Docker/Kubernetes**, DB host should be `db` (or the service name).
+- Use `host_helper.py` to switch the default in `settings.py`.
+- Always set `POSTGRES_HOST` in your deployment environments for flexibility.
+
+---
+
+## 🧑‍💻 Admin & User Management
+
+- Admin user: `admin` / `admin` (created automatically by scripts)
+- Use `admin_manager.py` to manage admin user and view user stats.
+- Admin dashboard: `/admin-dashboard/`
+- User dashboard: `/home/`
+
+---
+
+## 🔗 Documentation
 - [Quickstart Guide](docs/QUICKSTART.md)
+- [Kubernetes Guide](KUBERNETES.md)
+- [Helm Deployment](HELM_DEPLOYMENT.md)
 - [API Documentation](API_DOCUMENTATION.md)
 - [API Example (JavaScript)](static/js/api-example.js)
+
+---
+
+## 🐞 Troubleshooting & FAQ
+
+- **Database connection errors:**
+  - Check your DB host in `settings.py` and environment variables.
+  - Use `host_helper.py` to set the correct default.
+  - For Docker/K8s, ensure the Postgres service is running and accessible.
+- **Migrations not applied:**
+  - Run the migration commands in the appropriate environment (see above).
+- **Admin login fails:**
+  - Use `admin_manager.py reset` to reset the admin password to `admin`.
+- **Pods not starting (Kubernetes):**
+  - Check pod logs: `kubectl logs <pod-name>`
+  - Ensure secrets/configs are set up (see `setup.sh` and `KUBERNETES.md`).
+- **Resetting the environment:**
+  - Local: Remove `devops/`, `db.sqlite3`, and re-run `run_django.sh`.
+  - Docker: `docker compose down -v` to remove containers and volumes.
+  - Kubernetes: `kubectl delete -f k8s/` to remove all resources.
+
+---
+
+## 🧹 Reset/Clean Instructions
+
+- **Local:**
+  ```sh
+  rm -rf devops/ db.sqlite3
+  ./run_django.sh
+  ```
+- **Docker:**
+  ```sh
+  docker compose down -v
+  ./run_docker.sh
+  ```
+- **Kubernetes:**
+  ```sh
+  kubectl delete -f k8s/
+  ./setup.sh
+  ```
+
+---
+
+## 📝 Contributing
+- Fork the repo, create a branch, and submit a PR.
+- Please update documentation for any new features or changes.
 
 ---
 
@@ -142,16 +253,6 @@ A complete REST API is available for integration with JavaScript frontends, mobi
 
 ---
 
-## 👤 Author & License
-**James Scott**  
-Student ID: SBA24070  
-Email: jamesdeanscott19@gmail.com  
-GitHub: [github.com/Jamesscott34](https://github.com/Jamesscott34)
-
-This project is part of the SBA24070 coursework and is for educational purposes.
-
-=======
-
 ## 📋 Notification System Support
 
 For issues and questions:
@@ -195,5 +296,22 @@ For issues and questions:
      ```sh
      kubectl exec -it <pod-name> -- python manage.py createsuperuser
      ```
+
+---
+
+## 🗄️ Switching Database Host for Local vs Docker/Kubernetes
+
+- By default, Django uses the environment variable POSTGRES_HOST for the database host, defaulting to 'db'.
+- For **local development** (when running `python manage.py runserver`), you should set the default to 'localhost' in your `settings.py`:
+  ```python
+  'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
+  ```
+- For **Docker, Docker Compose, or Kubernetes**, set the default to 'db':
+  ```python
+  'HOST': os.environ.get('POSTGRES_HOST', 'db'),
+  ```
+- You can automate this update by running a helper script (host_helper) that will prompt you to choose the correct default and update your `settings.py` automatically.
+
+**Tip:** Always use the environment variable POSTGRES_HOST in your deployment environments for maximum flexibility.
 
 ---
