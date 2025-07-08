@@ -94,7 +94,7 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRES_DB', 'sba24070'),
         'USER': os.environ.get('POSTGRES_USER', 'sba24070_user'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'your_secure_password'),
-        'HOST': os.environ.get('POSTGRES_HOST', 'db'),
+        'HOST': os.environ.get('POSTGRES_HOST', 'db'), #change to localhost to run django locally
         'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }
