@@ -1,70 +1,96 @@
 # SBA24070 Book Catalogue App – Quickstart
 
-**Database Flexibility Note:**
-- You do **not** have to use the database provided by default.
-- By default, the app uses SQLite, which requires no setup—just clone and run.
-- You can switch to PostgreSQL (or another supported DB) by updating `settings.py` (or your `.env` for Docker) and running migrations.
-- See below for setup instructions for both local and Docker environments.
+This guide will help you get started with the Book Catalogue App in any environment: local, Docker, or Kubernetes. For full details, see [README.md](../README.md).
 
-## Setup (Recommended)
+---
 
-1. Clone the repository and enter the project directory.
-2. Run the setup script:
-   ```sh
-   ./setup.sh
-   ```
-3. The script will:
-   - Install dependencies
-   - Run migrations
-   - Collect static files
-   - Create the admin user
-   - Start the server
-4. Open your browser and go to: [http://127.0.0.1:8000](http://127.0.0.1:8000)
-5. Log in as admin:
-   - Username: `admin`
-   - Password: `admin`
+## 🚦 Quick Start Options
 
-## Manual Setup
+### 1. Local Development (SQLite, no setup required)
+```sh
+./run_django.sh
+```
+- Installs dependencies, runs migrations, creates admin, and starts the server.
+- Visit: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+- Admin login: `admin` / `admin`
 
-1. Install dependencies:
-   ```sh
-   pip install -r requirements.txt
-   ```
-2. Run migrations:
-   ```sh
-   python manage.py makemigrations
-   python manage.py migrate
-   ```
-3. Collect static files:
-   ```sh
-   python manage.py collectstatic --noinput
-   ```
-4. Create the admin user:
-   ```sh
-   python manage.py create_admin
-   ```
-5. Start the server:
-   ```sh
-   python manage.py runserver
-   ```
-6. Visit: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+### 2. Docker Compose (Postgres, for local containers)
+```sh
+./run_docker.sh
+```
+- Builds and starts containers, runs migrations, collects static, creates admin.
+- Visit: [http://localhost:8000](http://localhost:8000)
+- Admin login: `admin` / `admin`
 
-## Docker Setup
+### 3. Kubernetes (Minikube or any cluster)
+```sh
+./setup.sh
+```
+- Fully interactive: prompts for secrets, creates .env and k8s secrets, applies manifests, waits for pods, runs migrations, creates admin, opens browser.
+- See [KUBERNETES.md](../KUBERNETES.md) for advanced/manual steps.
 
-1. Build and start the containers:
-   ```sh
-   docker compose up --build
-   ```
-2. Run migrations and collect static files:
-   ```sh
-   docker compose exec web python manage.py migrate
-   docker compose exec web python manage.py collectstatic --noinput
-   docker compose exec web python manage.py create_admin
-   ```
-3. Visit: [http://localhost:8000](http://localhost:8000)
-   - Log in as admin: `admin` / `admin`
+---
 
-## Admin Login
+## 🛠️ Helper Scripts
+- `run_django.sh`: Local dev setup (uses SQLite or local Postgres)
+- `run_docker.sh`: Docker Compose setup (uses Postgres service)
+- `setup.sh`: Full onboarding for all environments (local, Docker, Kubernetes)
+- `host_helper.py`: Interactively set the default DB host in `settings.py` (choose 'localhost' or 'db')
+- `admin_manager.py`: Create, verify, reset, and show stats for the admin user. Usage:
+  - `python admin_manager.py` (full setup)
+  - `python admin_manager.py create|verify|test|stats|reset`
 
-- The admin user (`admin`/`admin`) can log in via the main login page at `/login/`.
-- The admin dashboard is accessible after login. 
+---
+
+## 🗄️ Environment Variables & Database Host
+- The app uses environment variables for all secrets and DB config.
+- For **local dev**, DB host should be `localhost`.
+- For **Docker/Kubernetes**, DB host should be `db` (or the service name).
+- Use `host_helper.py` to switch the default in `settings.py`.
+- Always set `POSTGRES_HOST` in your deployment environments for flexibility.
+
+---
+
+## 🐞 Troubleshooting & FAQ
+- **Database connection errors:**
+  - Check your DB host in `settings.py` and environment variables.
+  - Use `host_helper.py` to set the correct default.
+  - For Docker/K8s, ensure the Postgres service is running and accessible.
+- **Migrations not applied:**
+  - Run the migration commands in the appropriate environment (see above).
+- **Admin login fails:**
+  - Use `admin_manager.py reset` to reset the admin password to `admin`.
+- **Pods not starting (Kubernetes):**
+  - Check pod logs: `kubectl logs <pod-name>`
+  - Ensure secrets/configs are set up (see `setup.sh` and `KUBERNETES.md`).
+- **Resetting the environment:**
+  - Local: Remove `devops/`, `db.sqlite3`, and re-run `run_django.sh`.
+  - Docker: `docker compose down -v` to remove containers and volumes.
+  - Kubernetes: `kubectl delete -f k8s/` to remove all resources.
+
+---
+
+## 🧹 Reset/Clean Instructions
+- **Local:**
+  ```sh
+  rm -rf devops/ db.sqlite3
+  ./run_django.sh
+  ```
+- **Docker:**
+  ```sh
+  docker compose down -v
+  ./run_docker.sh
+  ```
+- **Kubernetes:**
+  ```sh
+  kubectl delete -f k8s/
+  ./setup.sh
+  ```
+
+---
+
+## 🔗 More Documentation
+- [README.md](../README.md) (full onboarding, troubleshooting, and advanced usage)
+- [KUBERNETES.md](../KUBERNETES.md) (Kubernetes deployment)
+- [HELM_DEPLOYMENT.md](../HELM_DEPLOYMENT.md) (Helm deployment)
+- [API_DOCUMENTATION.md](../API_DOCUMENTATION.md) (API usage) 
