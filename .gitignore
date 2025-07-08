@@ -21,3 +21,4 @@ k8s/secret.yaml
 # Ignore Kubernetes generated files (optional)
 k8s/*.bak
 k8s/*.tmp
+.env.production

@@ -1,9 +1,8 @@
 #!/bin/bash
-'''
-run_django.sh - Local Django setup for SBA24070 Book Catalogue App
-- Sets DB host to 'localhost' in settings.py
-- Installs requirements, runs migrations, collects static, creates admin, and starts the Django server
-'''
+#run_django.sh - Local Django setup for SBA24070 Book Catalogue App
+# Sets DB host to 'localhost' in settings.py
+# Installs requirements, runs migrations, collects static, creates admin, and starts the Django server
+
 set -e
 
 # Set DB host to localhost

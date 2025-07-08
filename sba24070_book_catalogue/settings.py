@@ -12,9 +12,13 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+
+
+
 try:
     from dotenv import load_dotenv
-    load_dotenv()
+    env_file = '.env.production' if os.getenv('ENV', 'development') == 'production' else '.env'
+    load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / env_file)
 except ImportError:
     pass
 
@@ -84,19 +88,16 @@ WSGI_APPLICATION = 'sba24070_book_catalogue.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get('POSTGRES_DB', 'sba24070'),
         'USER': os.environ.get('POSTGRES_USER', 'sba24070_user'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'your_secure_password'),
-        'HOST': os.environ.get('POSTGRES_HOST', 'db'), 
+        'HOST': os.environ.get('POSTGRES_HOST', 'db'),
         'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }
-
 
 
 # Password validation
