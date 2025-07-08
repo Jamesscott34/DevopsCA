@@ -2,22 +2,42 @@
 
 This document provides comprehensive documentation for the Book Catalog REST API, including all endpoints, authentication, and usage examples.
 
-## 🚀 Base URL
+---
 
-```
-http://127.0.0.1:8000/api/
-```
+## 📖 Overview & Quickstart
+- **Base URL:**
+  ```
+  http://127.0.0.1:8000/api/
+  ```
+- **Authentication:** Session-based (login to get a session cookie)
+- **Admin endpoints:** Only accessible by admin users
+- **See also:**
+  - [README.md](README.md) (setup, environment, admin management)
+  - [docs/QUICKSTART.md](docs/QUICKSTART.md) (onboarding)
+  - [KUBERNETES.md](KUBERNETES.md) (Kubernetes deployment)
+  - [HELM_DEPLOYMENT.md](HELM_DEPLOYMENT.md) (Helm deployment)
+
+---
+
+## 🚦 API Quickstart
+1. Register or login via `/api/auth/register/` or `/api/auth/login/`
+2. Use the session cookie for all further requests
+3. Access book/user endpoints as needed
+4. For admin actions, login as `admin` (see setup scripts)
+
+---
 
 ## 🔐 Authentication
 
 The API uses session-based authentication. Users must first authenticate through the login endpoint to receive a session cookie.
 
 ### Authentication Flow
-
 1. **Register** (optional): Create a new user account
 2. **Login**: Authenticate and receive session cookie
 3. **Use API**: Include session cookie in subsequent requests
 4. **Logout**: Clear session when done
+
+---
 
 ## 📋 API Endpoints
 
@@ -352,252 +372,31 @@ GET /api/statistics/
 }
 ```
 
-## 🔧 Usage Examples
+---
 
-### JavaScript/Fetch API
+## 🐞 Troubleshooting & FAQ
+- **401 Unauthorized:**
+  - Make sure you are logged in and sending the session cookie with requests
+- **403 Forbidden:**
+  - You are trying to access an admin-only endpoint as a regular user
+- **500 Server Error:**
+  - Check your environment variables and database connection
+- **How do I get an admin user?**
+  - Use the setup scripts (`run_django.sh`, `run_docker.sh`, `setup.sh`) or `admin_manager.py` to create/reset the admin user
+- **How do I test the API?**
+  - Use `curl`, Postman, or the provided JavaScript example ([static/js/api-example.js](static/js/api-example.js))
+- **Where do I find my API base URL?**
+  - Local: `http://127.0.0.1:8000/api/`
+  - Docker: `http://localhost:8000/api/`
+  - Kubernetes: Use the NodePort or Ingress URL
 
-#### Login and Get Books
-```javascript
-// Login
-const loginResponse = await fetch('http://127.0.0.1:8000/api/auth/login/', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-        username: 'admin',
-        password: 'admin'
-    }),
-    credentials: 'include' // Important for session cookies
-});
+---
 
-const loginData = await loginResponse.json();
-console.log('Login successful:', loginData);
-
-// Get books (session cookie will be automatically included)
-const booksResponse = await fetch('http://127.0.0.1:8000/api/books/', {
-    credentials: 'include'
-});
-
-const booksData = await booksResponse.json();
-console.log('Books:', booksData);
-```
-
-#### Create a New Book
-```javascript
-const newBook = await fetch('http://127.0.0.1:8000/api/books/', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-        title: 'The Hobbit',
-        author: 'J.R.R. Tolkien',
-        description: 'A fantasy novel about a hobbit\'s journey.',
-        published_date: '1937-09-21',
-        isbn: '978-0547928241',
-        is_read: false
-    }),
-    credentials: 'include'
-});
-
-const bookData = await newBook.json();
-console.log('Book created:', bookData);
-```
-
-#### Toggle Book Read Status
-```javascript
-const toggleResponse = await fetch('http://127.0.0.1:8000/api/books/1/toggle_read/', {
-    method: 'POST',
-    credentials: 'include'
-});
-
-const toggleData = await toggleResponse.json();
-console.log('Book updated:', toggleData);
-```
-
-### Python/Requests
-
-#### Login and Get Books
-```python
-import requests
-
-# Login
-login_data = {
-    'username': 'admin',
-    'password': 'admin'
-}
-
-session = requests.Session()
-login_response = session.post('http://127.0.0.1:8000/api/auth/login/', json=login_data)
-print('Login response:', login_response.json())
-
-# Get books
-books_response = session.get('http://127.0.0.1:8000/api/books/')
-books_data = books_response.json()
-print('Books:', books_data)
-```
-
-#### Create a New Book
-```python
-new_book_data = {
-    'title': '1984',
-    'author': 'George Orwell',
-    'description': 'A dystopian novel about totalitarianism.',
-    'published_date': '1949-06-08',
-    'isbn': '978-0451524935',
-    'is_read': False
-}
-
-book_response = session.post('http://127.0.0.1:8000/api/books/', json=new_book_data)
-print('Book created:', book_response.json())
-```
-
-## 🛡️ Security Features
-
-### Authentication & Authorization
-- **Session-based authentication** for secure user sessions
-- **Role-based access control** (admin vs regular users)
-- **Password hashing** for secure password storage
-- **CSRF protection** for form submissions
-
-### Data Validation
-- **Input validation** on all endpoints
-- **Password confirmation** for user registration
-- **Email uniqueness** validation
-- **Book attribution** to prevent unauthorized access
-
-### API Security
-- **Rate limiting** (configurable)
-- **Request size limits** to prevent abuse
-- **JSON parsing** with error handling
-- **Secure headers** and CORS configuration
-
-## 📝 Error Handling
-
-### Common Error Responses
-
-#### 400 Bad Request
-```json
-{
-    "error": "Invalid data provided",
-    "details": {
-        "field_name": ["Error message"]
-    }
-}
-```
-
-#### 401 Unauthorized
-```json
-{
-    "error": "Authentication required"
-}
-```
-
-#### 403 Forbidden
-```json
-{
-    "error": "Admin access required"
-}
-```
-
-#### 404 Not Found
-```json
-{
-    "error": "Resource not found"
-}
-```
-
-#### 500 Internal Server Error
-```json
-{
-    "error": "Internal server error"
-}
-```
-
-## 🔄 Pagination
-
-All list endpoints support pagination with the following response format:
-
-```json
-{
-    "count": 100,
-    "next": "http://127.0.0.1:8000/api/books/?page=2",
-    "previous": null,
-    "results": [...]
-}
-```
-
-**Query Parameters:**
-- `page`: Page number (default: 1)
-- `page_size`: Items per page (default: 20, max: 100)
-
-## 🔍 Filtering & Searching
-
-### Book Filtering
-- `is_read=true/false`: Filter by read status
-- `search=keyword`: Search in title, author, or description
-
-### Example
-```http
-GET /api/books/?is_read=false&search=fantasy
-```
-
-## 📊 Response Format
-
-All API responses follow a consistent JSON format:
-
-### Success Response
-```json
-{
-    "data": {...},
-    "message": "Operation successful"
-}
-```
-
-### Error Response
-```json
-{
-    "error": "Error message",
-    "details": {...}
-}
-```
-
-## 🚀 Getting Started
-
-1. **Start the Django server:**
-   ```bash
-   python manage.py runserver
-   ```
-
-2. **Access the API root:**
-   ```
-   http://127.0.0.1:8000/api/
-   ```
-
-3. **Use the browsable API:**
-   - Visit any endpoint in your browser
-   - Interactive documentation and testing interface
-   - Form-based data entry for testing
-
-4. **Test with curl:**
-   ```bash
-   # Login
-   curl -X POST http://127.0.0.1:8000/api/auth/login/ \
-        -H "Content-Type: application/json" \
-        -d '{"username":"admin","password":"admin"}' \
-        -c cookies.txt
-
-   # Get books
-   curl http://127.0.0.1:8000/api/books/ -b cookies.txt
-   ```
-
-## 📚 Additional Resources
-
-- **Django REST Framework Documentation**: https://www.django-rest-framework.org/
-- **API Testing Tools**: Postman, Insomnia, or curl
-- **JavaScript Fetch API**: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
-- **Python Requests Library**: https://requests.readthedocs.io/
+## 🔗 More Documentation
+- [README.md](README.md)
+- [docs/QUICKSTART.md](docs/QUICKSTART.md)
+- [KUBERNETES.md](KUBERNETES.md)
+- [HELM_DEPLOYMENT.md](HELM_DEPLOYMENT.md)
 
 ---
 
