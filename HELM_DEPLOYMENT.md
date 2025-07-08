@@ -1,6 +1,6 @@
 # 🚢 Helm Deployment Guide for SBA24070 Book Catalogue App
 
-This guide explains how to deploy the Book Catalogue App to Kubernetes using the provided Helm chart in the `book-catalogue/` directory.
+This guide explains how to deploy the Book Catalogue App to Kubernetes using the provided Helm chart in the `book-catalogue/` directory. Helm makes it easy to install, upgrade, and manage your deployment.
 
 ---
 
@@ -8,6 +8,7 @@ This guide explains how to deploy the Book Catalogue App to Kubernetes using the
 - A running Kubernetes cluster (local: minikube/kind, or cloud: GKE, EKS, AKS, etc.)
 - [Helm 3+](https://helm.sh/) installed on your machine
 - Docker image for the app (build and push to a registry if customizing)
+- Kubernetes secrets and configs prepared (see [KUBERNETES.md](KUBERNETES.md) or use `setup.sh`)
 
 ---
 
@@ -53,15 +54,6 @@ See all available options in [`book-catalogue/values.yaml`](./book-catalogue/val
 
 ---
 
-## Chart Directory Structure
-- `Chart.yaml` — Chart metadata
-- `values.yaml` — Default configuration values
-- `templates/` — Kubernetes resource templates (Deployment, Service, Ingress, etc.)
-- `charts/` — (Optional) Subcharts/dependencies
-- `.helmignore` — Files to ignore when packaging the chart
-
----
-
 ## Example: Custom Values File
 
 Create a file called `my-values.yaml`:
@@ -83,11 +75,33 @@ helm install my-book-app ./book-catalogue -f my-values.yaml
 
 ---
 
-## Notes
-- Make sure your database (e.g., PostgreSQL) is accessible from the cluster, or deploy it as part of your stack.
-- For production, set up persistent storage and secrets for sensitive data.
-- You can use Helm's upgrade and rollback features for safe deployments.
+## Automation & Integration
+- You can use `setup.sh` to prepare secrets/configs before deploying with Helm.
+- Helm can be used as an alternative to manual `kubectl apply` or as part of your CI/CD pipeline.
+- For advanced automation, see [KUBERNETES.md](KUBERNETES.md) and [README.md](README.md).
 
 ---
 
-For more details, see the [Helm documentation](https://helm.sh/docs/). 
+## Troubleshooting & FAQ
+- **Pods not starting:**
+  - Check pod logs: `kubectl logs <pod-name>`
+  - Ensure secrets/configs are correct and applied
+- **Database connection errors:**
+  - Make sure Postgres is running and accessible
+  - Check DB host in your values/configs (should be `db` or `postgres`)
+- **Admin login fails:**
+  - Use `kubectl exec -it <django-pod> -- python admin_manager.py reset` to reset admin password
+- **Resetting/cleaning:**
+  - Uninstall the release: `helm uninstall my-book-app`
+  - Remove persistent volumes if needed
+
+---
+
+## See Also
+- [README.md](README.md) for full onboarding and troubleshooting
+- [KUBERNETES.md](KUBERNETES.md) for manual/automated Kubernetes deployment
+- [API_DOCUMENTATION.md](API_DOCUMENTATION.md) for API usage
+
+---
+
+**Tip:** Helm is ideal for production and repeatable deployments. For first-time users, try `setup.sh` or manual steps first, then use Helm for upgrades and scaling! 
