@@ -160,3 +160,40 @@ For issues and questions:
 3. Check Django documentation for framework-specific issues
 
 ---
+
+## 🏁 After Setup: Running Your App on Minikube
+
+1. **Start Minikube:**
+   ```sh
+   minikube start
+   ```
+
+2. **Find the Django Service URL:**
+   ```sh
+   minikube service django-service
+   ```
+   This will open your Django app in your browser. If not, note the URL and port (e.g., `http://<minikube-ip>:<nodeport>`).
+
+3. **Run Django Management Commands in the Pod:**
+   First, get the name of your Django pod:
+   ```sh
+   kubectl get pods
+   ```
+   (Look for a pod name starting with `django-deployment-`)
+
+   Then run the following commands (replace `<pod-name>` with your actual pod name):
+
+   - **Migrate the database:**
+     ```sh
+     kubectl exec -it <pod-name> -- python manage.py migrate
+     ```
+   - **Collect static files:**
+     ```sh
+     kubectl exec -it <pod-name> -- python manage.py collectstatic --noinput
+     ```
+   - **Create admin user:**
+     ```sh
+     kubectl exec -it <pod-name> -- python manage.py createsuperuser
+     ```
+
+---

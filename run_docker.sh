@@ -1,9 +1,9 @@
 #!/bin/bash
-'''
-run_docker.sh - Docker setup for SBA24070 Book Catalogue App
-- Sets DB host to 'db' in settings.py
-- Builds and starts Docker containers, runs migrations, collects static, creates admin
-'''
+
+#run_docker.sh - Docker setup for SBA24070 Book Catalogue App
+#Sets DB host to 'db' in settings.py
+#Builds and starts Docker containers, runs migrations, collects static, creates admin
+
 set -e
 
 # Set DB host to db
