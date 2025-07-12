@@ -417,12 +417,20 @@ class AdminReferralForm(forms.ModelForm):
     """
     Form for editing the admin_referral field for a user (admin only).
     """
+    admin_referral = forms.ModelChoiceField(
+        queryset=Book.objects.all().order_by('title'),
+        required=False,
+        label='Referral Book',
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        help_text='Select a book to refer to this user.'
+    )
     class Meta:
         model = User
         fields = ['admin_referral']
-        widgets = {
-            'admin_referral': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter admin referral or notes (optional)'}),
-        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['admin_referral'].queryset = Book.objects.all().order_by('title')
 
 class AdminSetReferralForm(forms.ModelForm):
     """
