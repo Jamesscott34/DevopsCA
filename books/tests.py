@@ -55,3 +55,29 @@ class BookModelTest(TestCase):
                 published_date="2023-01-02",
                 isbn="js1111111111"
             )
+
+    def test_required_fields(self):
+        """
+        Test that missing required fields raise an error.
+
+        This test attempts to create a Book without a title and without an author,
+        expecting a ValueError or IntegrityError.
+        """
+        from django.db import IntegrityError
+
+        with self.assertRaises(IntegrityError):
+            Book.objects.create(
+                title=None,
+                author="Author",
+                description="Missing title.",
+                published_date="2023-01-01",
+                isbn="js2222222222"
+            )
+        with self.assertRaises(IntegrityError):
+            Book.objects.create(
+                title="Title",
+                author=None,
+                description="Missing author.",
+                published_date="2023-01-01",
+                isbn="js3333333333"
+            )
