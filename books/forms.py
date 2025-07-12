@@ -50,6 +50,12 @@ class BookForm(forms.ModelForm):
             'is_read': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
+    def clean_isbn(self):
+        isbn = self.cleaned_data.get('isbn')
+        if not isbn or str(isbn).strip().lower() == 'none':
+            return None
+        return isbn
+
 class UserRegistrationForm(forms.ModelForm):
     """
     Form for user registration and account creation.
