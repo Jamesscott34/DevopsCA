@@ -244,3 +244,217 @@ Ran 9 tests in 0.426s
 
 OK
 Destroying test database for alias 'default' ('test_sba24070')...
+Test run at: 2025-07-12 20:02:05
+
+Found 9 test(s).
+Creating test database for alias 'default' ('test_sba24070')...
+Operations to perform:
+  Synchronize unmigrated apps: messages, rest_framework, staticfiles
+  Apply all migrations: admin, auth, authtoken, books, contenttypes, sessions
+Running pre-migrate handlers for application admin
+Running pre-migrate handlers for application auth
+Running pre-migrate handlers for application contenttypes
+Running pre-migrate handlers for application sessions
+Running pre-migrate handlers for application books
+Running pre-migrate handlers for application authtoken
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK (0.011s)
+  Applying auth.0001_initial... OK (0.031s)
+  Applying admin.0001_initial... OK (0.009s)
+  Applying admin.0002_logentry_remove_auto_add... OK (0.005s)
+  Applying admin.0003_logentry_add_action_flag_choices... OK (0.005s)
+  Applying contenttypes.0002_remove_content_type_name... OK (0.010s)
+  Applying auth.0002_alter_permission_name_max_length... OK (0.009s)
+  Applying auth.0003_alter_user_email_max_length... OK (0.005s)
+  Applying auth.0004_alter_user_username_opts... OK (0.005s)
+  Applying auth.0005_alter_user_last_login_null... OK (0.007s)
+  Applying auth.0006_require_contenttypes_0002... OK (0.001s)
+  Applying auth.0007_alter_validators_add_error_messages... OK (0.005s)
+  Applying auth.0008_alter_user_username_max_length... OK (0.008s)
+  Applying auth.0009_alter_user_last_name_max_length... OK (0.005s)
+  Applying auth.0010_alter_group_name_max_length... OK (0.006s)
+  Applying auth.0011_update_proxy_permissions... OK (0.006s)
+  Applying auth.0012_alter_user_first_name_max_length... OK (0.008s)
+  Applying authtoken.0001_initial... OK (0.008s)
+  Applying authtoken.0002_auto_20160226_1747... OK (0.014s)
+  Applying authtoken.0003_tokenproxy... OK (0.001s)
+  Applying authtoken.0004_alter_tokenproxy_options... OK (0.003s)
+  Applying books.0001_initial... OK (0.004s)
+  Applying books.0002_alter_book_isbn... OK (0.003s)
+  Applying books.0003_user... OK (0.006s)
+  Applying books.0004_notification... OK (0.008s)
+  Applying books.0005_book_added_by_book_view_count... OK (0.009s)
+  Applying books.0006_book_cover_image... OK (0.004s)
+  Applying books.0007_tag_book_tags... OK (0.013s)
+  Applying books.0008_user_admin_referral... OK (0.004s)
+  Applying books.0009_user_user_notes_alter_user_admin_referral... OK (0.012s)
+  Applying sessions.0001_initial... OK (0.005s)
+Running post-migrate handlers for application admin
+Adding content type 'admin | logentry'
+Adding permission 'Permission object (1)'
+Adding permission 'Permission object (2)'
+Adding permission 'Permission object (3)'
+Adding permission 'Permission object (4)'
+Running post-migrate handlers for application auth
+Adding content type 'auth | permission'
+Adding content type 'auth | group'
+Adding content type 'auth | user'
+Adding permission 'Permission object (5)'
+Adding permission 'Permission object (6)'
+Adding permission 'Permission object (7)'
+Adding permission 'Permission object (8)'
+Adding permission 'Permission object (9)'
+Adding permission 'Permission object (10)'
+Adding permission 'Permission object (11)'
+Adding permission 'Permission object (12)'
+Adding permission 'Permission object (13)'
+Adding permission 'Permission object (14)'
+Adding permission 'Permission object (15)'
+Adding permission 'Permission object (16)'
+Running post-migrate handlers for application contenttypes
+Adding content type 'contenttypes | contenttype'
+Adding permission 'Permission object (17)'
+Adding permission 'Permission object (18)'
+Adding permission 'Permission object (19)'
+Adding permission 'Permission object (20)'
+Running post-migrate handlers for application sessions
+Adding content type 'sessions | session'
+Adding permission 'Permission object (21)'
+Adding permission 'Permission object (22)'
+Adding permission 'Permission object (23)'
+Adding permission 'Permission object (24)'
+Running post-migrate handlers for application books
+Adding content type 'books | book'
+Adding content type 'books | user'
+Adding content type 'books | notification'
+Adding content type 'books | tag'
+Adding permission 'Permission object (25)'
+Adding permission 'Permission object (26)'
+Adding permission 'Permission object (27)'
+Adding permission 'Permission object (28)'
+Adding permission 'Permission object (29)'
+Adding permission 'Permission object (30)'
+Adding permission 'Permission object (31)'
+Adding permission 'Permission object (32)'
+Adding permission 'Permission object (33)'
+Adding permission 'Permission object (34)'
+Adding permission 'Permission object (35)'
+Adding permission 'Permission object (36)'
+Adding permission 'Permission object (37)'
+Adding permission 'Permission object (38)'
+Adding permission 'Permission object (39)'
+Adding permission 'Permission object (40)'
+Running post-migrate handlers for application authtoken
+Adding content type 'authtoken | token'
+Adding content type 'authtoken | tokenproxy'
+Adding permission 'Permission object (41)'
+Adding permission 'Permission object (42)'
+Adding permission 'Permission object (43)'
+Adding permission 'Permission object (44)'
+Adding permission 'Permission object (45)'
+Adding permission 'Permission object (46)'
+Adding permission 'Permission object (47)'
+Adding permission 'Permission object (48)'
+System check identified no issues (0 silenced).
+test_assign_tags_to_book (books.tests.BookModelTest.test_assign_tags_to_book)
+Test that tags can be assigned to a book and retrieved. ... ok
+test_book_str_representation (books.tests.BookModelTest.test_book_str_representation)
+Test the string representation of a Book. ... ok
+test_create_and_retrieve_book (books.tests.BookModelTest.test_create_and_retrieve_book)
+Test that a Book can be created and retrieved from the database. ... ok
+test_get_most_read_and_most_viewed (books.tests.BookModelTest.test_get_most_read_and_most_viewed)
+Test the get_most_read and get_most_viewed class methods. ... ok
+test_increment_view_count (books.tests.BookModelTest.test_increment_view_count)
+Test that the increment_view_count method increases the view count. ... ok
+test_required_fields (books.tests.BookModelTest.test_required_fields)
+Test that missing required fields raise an error. ... ok
+test_unique_isbn_constraint (books.tests.BookModelTest.test_unique_isbn_constraint)
+Test that the Book model enforces unique ISBN values. ... ok
+test_notification_creation_and_mark_as_read (books.tests.UserModelTest.test_notification_creation_and_mark_as_read)
+Test creating a notification for a user and marking it as read. ... ok
+test_user_authentication (books.tests.UserModelTest.test_user_authentication)
+Test that a user can be authenticated with the correct password. ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.495s
+
+OK
+Destroying test database for alias 'default' ('test_sba24070')...
+
+✅ All tests completed successfully!
+✅ All tests completed successfully!
+Test run at: 2025-07-12 21:02:39
+
+STDOUT:
+Found 9 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: messages, rest_framework, staticfiles
+  Apply all migrations: admin, auth, authtoken, books, contenttypes, sessions
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying authtoken.0001_initial... OK
+  Applying authtoken.0002_auto_20160226_1747... OK
+  Applying authtoken.0003_tokenproxy... OK
+  Applying authtoken.0004_alter_tokenproxy_options... OK
+  Applying books.0001_initial... OK
+  Applying books.0002_alter_book_isbn... OK
+  Applying books.0003_user... OK
+  Applying books.0004_notification... OK
+  Applying books.0005_book_added_by_book_view_count... OK
+  Applying books.0006_book_cover_image... OK
+  Applying books.0007_tag_book_tags... OK
+  Applying books.0008_user_admin_referral... OK
+  Applying books.0009_user_user_notes_alter_user_admin_referral... OK
+  Applying sessions.0001_initial... OK
+System check identified no issues (0 silenced).
+
+STDERR:
+Creating test database for alias 'default' ('test_sba24070')...
+test_assign_tags_to_book (books.tests.BookModelTest.test_assign_tags_to_book)
+Test that tags can be assigned to a book and retrieved. ... ok
+test_book_str_representation (books.tests.BookModelTest.test_book_str_representation)
+Test the string representation of a Book. ... ok
+test_create_and_retrieve_book (books.tests.BookModelTest.test_create_and_retrieve_book)
+Test that a Book can be created and retrieved from the database. ... ok
+test_get_most_read_and_most_viewed (books.tests.BookModelTest.test_get_most_read_and_most_viewed)
+Test the get_most_read and get_most_viewed class methods. ... ok
+test_increment_view_count (books.tests.BookModelTest.test_increment_view_count)
+Test that the increment_view_count method increases the view count. ... ok
+test_required_fields (books.tests.BookModelTest.test_required_fields)
+Test that missing required fields raise an error. ... ok
+test_unique_isbn_constraint (books.tests.BookModelTest.test_unique_isbn_constraint)
+Test that the Book model enforces unique ISBN values. ... ok
+test_notification_creation_and_mark_as_read (books.tests.UserModelTest.test_notification_creation_and_mark_as_read)
+Test creating a notification for a user and marking it as read. ... ok
+test_user_authentication (books.tests.UserModelTest.test_user_authentication)
+Test that a user can be authenticated with the correct password. ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.489s
+
+OK
+Destroying test database for alias 'default' ('test_sba24070')...
+
+✅ All tests completed successfully!
