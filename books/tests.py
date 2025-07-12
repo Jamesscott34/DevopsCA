@@ -3,6 +3,7 @@ from .models import Book
 from datetime import datetime
 from django.contrib.auth.hashers import check_password
 from .models import User
+from .models import Tag, Notification
 
 # Create your tests here.
 
@@ -154,6 +155,41 @@ class BookModelTest(TestCase):
         self.assertEqual(most_viewed[1], b2)
         self.assertEqual(most_viewed[2], b1)
 
+    def test_assign_tags_to_book(self):
+        """
+        Test that tags can be assigned to a book and retrieved.
+
+        This test creates tags, assigns them to a book, and verifies the assignment.
+        """
+        tag1 = Tag.objects.create(name="Fiction")
+        tag2 = Tag.objects.create(name="Science")
+        book = Book.objects.create(
+            title="Tagged Book",
+            author="Tag Author",
+            description="Book with tags.",
+            published_date=datetime.strptime("04-01-2023", "%d-%m-%Y").date(),
+            isbn="js6666666666"
+        )
+        book.tags.add(tag1, tag2)
+        self.assertEqual(book.tags.count(), 2)
+        self.assertIn(tag1, book.tags.all())
+        self.assertIn(tag2, book.tags.all())
+
+    def test_book_str_representation(self):
+        """
+        Test the string representation of a Book.
+
+        This test creates a book and checks that its string representation is its title.
+        """
+        book = Book.objects.create(
+            title="String Book",
+            author="String Author",
+            description="Book for __str__ test.",
+            published_date=datetime.strptime("05-01-2023", "%d-%m-%Y").date(),
+            isbn="js7777777777"
+        )
+        self.assertEqual(str(book), "String Book")
+
 class UserModelTest(TestCase):
     """
     Test suite for the User model in the Book Catalog application.
@@ -174,3 +210,25 @@ class UserModelTest(TestCase):
         )
         self.assertNotEqual(user.password, raw_password)  # Should be hashed
         self.assertTrue(check_password(raw_password, user.password))
+
+    def test_notification_creation_and_mark_as_read(self):
+        """
+        Test creating a notification for a user and marking it as read.
+
+        This test creates a user and a notification, then marks it as read and checks the status.
+        """
+        user = User.objects.create(
+            username="notifuser",
+            email="notifuser@example.com",
+            password="notifpass"
+        )
+        notification = Notification.objects.create(
+            user=user,
+            title="Test Notification",
+            message="This is a test notification.",
+            notification_type="general"
+        )
+        self.assertFalse(notification.is_read)
+        notification.mark_as_read()
+        notification.refresh_from_db()
+        self.assertTrue(notification.is_read)
