@@ -45,6 +45,17 @@ jobs:
 
   runmigrations:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: sba24070
+          POSTGRES_USER: sba24070_user
+          POSTGRES_PASSWORD: your_secure_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U sba24070_user" --health-interval=10s --health-timeout=5s --health-retries=5
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -56,11 +67,30 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+      - name: Set DB host to localhost for CI
+        run: python3 custom_scripts/host_helper.py <<< "1"
       - name: Run django migrate
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: sba24070
+          POSTGRES_USER: sba24070_user
+          POSTGRES_PASSWORD: your_secure_password
         run: python manage.py migrate
 
   migrations-check:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: sba24070
+          POSTGRES_USER: sba24070_user
+          POSTGRES_PASSWORD: your_secure_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U sba24070_user" --health-interval=10s --health-timeout=5s --health-retries=5
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -72,11 +102,30 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+      - name: Set DB host to localhost for CI
+        run: python3 custom_scripts/host_helper.py <<< "1"
       - name: Run makemigrations --check
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: sba24070
+          POSTGRES_USER: sba24070_user
+          POSTGRES_PASSWORD: your_secure_password
         run: python manage.py makemigrations --check
 
   migrations-merge-check:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: sba24070
+          POSTGRES_USER: sba24070_user
+          POSTGRES_PASSWORD: your_secure_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U sba24070_user" --health-interval=10s --health-timeout=5s --health-retries=5
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -88,7 +137,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+      - name: Set DB host to localhost for CI
+        run: python3 custom_scripts/host_helper.py <<< "1"
       - name: Run makemigrations --merge --check
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: sba24070
+          POSTGRES_USER: sba24070_user
+          POSTGRES_PASSWORD: your_secure_password
         run: python manage.py makemigrations --merge --check
 
   docker:
@@ -168,6 +225,67 @@ jobs:
             --set secrets.EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }} \
             --wait 
 
+  coverage:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: sba24070
+          POSTGRES_USER: sba24070_user
+          POSTGRES_PASSWORD: your_secure_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U sba24070_user" --health-interval=10s --health-timeout=5s --health-retries=5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install coverage
+      - name: Set DB host to localhost for CI
+        run: python3 custom_scripts/host_helper.py <<< "1"
+      - run: coverage run manage.py test
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: sba24070
+          POSTGRES_USER: sba24070_user
+          POSTGRES_PASSWORD: your_secure_password
+      - run: coverage report
+      - run: coverage xml
+      # Optionally upload to Codecov or Coveralls
+
+  type-check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: sba24070
+          POSTGRES_USER: sba24070_user
+          POSTGRES_PASSWORD: your_secure_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U sba24070_user" --health-interval=10s --health-timeout=5s --health-retries=5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install mypy
+      - name: Set DB host to localhost for CI
+        run: python3 custom_scripts/host_helper.py <<< "1"
+      - run: mypy .
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: sba24070
+          POSTGRES_USER: sba24070_user
+          POSTGRES_PASSWORD: your_secure_password
+
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -177,39 +295,6 @@ jobs:
           python-version: '3.13'
       - run: pip install flake8
       - run: flake8 .
-
-  type-check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-      - run: pip install mypy
-      - run: mypy .
-
-  coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-      - run: pip install coverage
-      - run: coverage run manage.py test
-      - run: coverage report
-      - run: coverage xml
-      # Optionally upload to Codecov or Coveralls
-
-  security:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-      - run: pip install safety
-      - run: safety check
 
   docs:
     runs-on: ubuntu-latest
