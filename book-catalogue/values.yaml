@@ -128,17 +128,18 @@ django:
   # Use '*' for dev/testing; set specific hosts/IPs for production
 
 env:
-  ENV: production
-  DEBUG: "False"
-  SECRET_KEY: your-prod-secret-key
-  ALLOWED_HOSTS: 127.0.0.1,localhost
-  POSTGRES_DB: sba24070
-  POSTGRES_USER: sba24070_user
-  POSTGRES_PASSWORD: your_secure_password
-  POSTGRES_HOST: db
-  POSTGRES_PORT: "5432"
-  EMAIL_HOST: ""
-  EMAIL_PORT: "587"
-  EMAIL_HOST_USER: ""
-  EMAIL_HOST_PASSWORD: ""
-  EMAIL_USE_TLS: "True"
+  DJANGO_SETTINGS_MODULE: sba24070_book_catalogue.settings  # Django settings module
+  DEBUG: "False"  # Set to "True" for development
+  ALLOWED_HOSTS: 127.0.0.1,localhost  # Comma-separated list of allowed hosts
+  POSTGRES_HOST: db  # Database host
+  POSTGRES_PORT: "5432"  # Database port
+  POSTGRES_DB: sba24070  # Database name
+  # Add more non-sensitive environment variables as needed
+
+secrets:
+  SECRET_KEY: your-prod-secret-key  # Django secret key (base64 encoded by Helm)
+  POSTGRES_USER: sba24070_user      # Database user (base64 encoded by Helm)
+  POSTGRES_PASSWORD: your_secure_password  # Database password (base64 encoded by Helm)
+  EMAIL_HOST_USER: ""              # Email host user (base64 encoded by Helm)
+  EMAIL_HOST_PASSWORD: ""          # Email host password (base64 encoded by Helm)
+  # Add more secrets as needed
