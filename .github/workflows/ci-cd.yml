@@ -114,3 +114,37 @@ jobs:
         run: |
           kubectl set image deployment/django-deployment django=${{ secrets.DOCKER_USERNAME }}/devops-book-app:latest
           kubectl rollout status deployment/django-deployment 
+
+  helm-deploy:
+    needs: docker
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest'
+      - name: Set up Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG_B64 }}" | base64 --decode > $HOME/.kube/config
+      - name: Test kubectl access
+        run: kubectl get nodes
+      - name: Helm upgrade/install
+        run: |
+          helm upgrade --install book-catalogue ./book-catalogue \
+            --namespace default \
+            --set image.repository=${{ secrets.DOCKER_USERNAME }}/devops-book-app \
+            --set image.tag=latest \
+            --set secrets.SECRET_KEY=${{ secrets.SECRET_KEY }} \
+            --set secrets.POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
+            --set secrets.POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+            --set secrets.EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }} \
+            --set secrets.EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }} \
+            --wait 
