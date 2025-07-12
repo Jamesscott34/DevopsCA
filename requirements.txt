@@ -13,7 +13,6 @@ urllib3==2.2.3
 Pillow
 django-stubs
 djangorestframework-stubs
-types-python-dotenv
 types-requests
 coverage
 mypy
