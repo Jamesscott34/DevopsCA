@@ -22,3 +22,9 @@ k8s/secret.yaml
 k8s/*.bak
 k8s/*.tmp
 .env.production
+
+# CI/CD output and log files
+kubectl_get_nodes.txt
+helm_upgrade.txt
+flake8.txt
+mkdocs.txt
