@@ -28,3 +28,26 @@ class BookModelTest(TestCase):
         retrieved = Book.objects.get(isbn="1234567890123")
         self.assertEqual(retrieved.title, "Test Book")
         self.assertEqual(retrieved.author, "Test Author")
+
+    def test_unique_isbn_constraint(self):
+        """
+        Test that the Book model enforces unique ISBN values.
+
+        This test creates a Book with a specific ISBN, then attempts to create
+        another Book with the same ISBN. It should raise an IntegrityError.
+        """
+        from django.db import IntegrityError
+
+        Book.objects.create(
+            title="Book One",
+            author="Author One",
+            published_date="2023-01-01",
+            isbn="1111111111111"
+        )
+        with self.assertRaises(IntegrityError):
+            Book.objects.create(
+                title="Book Two",
+                author="Author Two",
+                published_date="2023-01-02",
+                isbn="1111111111111"
+            )
