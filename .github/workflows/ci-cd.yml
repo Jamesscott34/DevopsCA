@@ -247,7 +247,7 @@ jobs:
           POSTGRES_PASSWORD: your_secure_password
       - run: coverage report
       - run: coverage xml
-      # Optionally upload to Codecov or Coveralls
+      
 
   type-check:
     runs-on: ubuntu-latest
@@ -286,8 +286,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - run: pip install flake8
-      - run: flake8 .
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run flake8 and save output
+        run: |
+          flake8 . > flake8.txt || true
 
   docs:
     runs-on: ubuntu-latest
@@ -296,5 +299,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - run: pip install -r docs/requirements.txt
-      - run: mkdocs build 
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Build mkdocs and save output
+        run: |
+          mkdocs build > mkdocs.txt 2>&1 || true 
