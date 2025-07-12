@@ -1,5 +1,6 @@
 from django.test import TestCase
 from .models import Book
+from datetime import datetime
 
 # Create your tests here.
 
@@ -23,7 +24,7 @@ class BookModelTest(TestCase):
             title="Test Book",
             author="Test Author",
             description="A test book for unit testing.",
-            published_date="2023-01-01",
+            published_date=datetime.strptime("01-01-2023", "%d-%m-%Y").date(),
             isbn="js1234567890"
         )
         retrieved = Book.objects.get(isbn="js1234567890")
@@ -44,7 +45,7 @@ class BookModelTest(TestCase):
             title="Book One",
             author="Author One",
             description="First book with unique ISBN.",
-            published_date="2023-01-01",
+            published_date=datetime.strptime("01-01-2023", "%d-%m-%Y").date(),
             isbn="js1111111111"
         )
         with self.assertRaises(IntegrityError):
@@ -52,7 +53,7 @@ class BookModelTest(TestCase):
                 title="Book Two",
                 author="Author Two",
                 description="Second book with duplicate ISBN.",
-                published_date="2023-01-02",
+                published_date=datetime.strptime("02-01-2023", "%d-%m-%Y").date(),
                 isbn="js1111111111"
             )
 
@@ -70,7 +71,7 @@ class BookModelTest(TestCase):
                 title=None,
                 author="Author",
                 description="Missing title.",
-                published_date="2023-01-01",
+                published_date=datetime.strptime("01-01-2023", "%d-%m-%Y").date(),
                 isbn="js2222222222"
             )
         with self.assertRaises(IntegrityError):
@@ -78,7 +79,7 @@ class BookModelTest(TestCase):
                 title="Title",
                 author=None,
                 description="Missing author.",
-                published_date="2023-01-01",
+                published_date=datetime.strptime("01-01-2023", "%d-%m-%Y").date(),
                 isbn="js3333333333"
             )
 
@@ -93,7 +94,7 @@ class BookModelTest(TestCase):
             title="View Count Book",
             author="View Author",
             description="Testing view count increment.",
-            published_date="2023-01-01",
+            published_date=datetime.strptime("01-01-2023", "%d-%m-%Y").date(),
             isbn="js4444444444"
         )
         self.assertEqual(book.view_count, 0)
@@ -116,7 +117,7 @@ class BookModelTest(TestCase):
             title="Book 1",
             author="Author 1",
             description="Book 1 description.",
-            published_date="2023-01-01",
+            published_date=datetime.strptime("01-01-2023", "%d-%m-%Y").date(),
             isbn="js5555555551",
             is_read=True,
             view_count=5
@@ -125,7 +126,7 @@ class BookModelTest(TestCase):
             title="Book 2",
             author="Author 2",
             description="Book 2 description.",
-            published_date="2023-01-02",
+            published_date=datetime.strptime("02-01-2023", "%d-%m-%Y").date(),
             isbn="js5555555552",
             is_read=True,
             view_count=10
@@ -134,7 +135,7 @@ class BookModelTest(TestCase):
             title="Book 3",
             author="Author 3",
             description="Book 3 description.",
-            published_date="2023-01-03",
+            published_date=datetime.strptime("03-01-2023", "%d-%m-%Y").date(),
             isbn="js5555555553",
             is_read=False,
             view_count=20
