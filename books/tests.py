@@ -103,3 +103,50 @@ class BookModelTest(TestCase):
         book.increment_view_count()
         book.refresh_from_db()
         self.assertEqual(book.view_count, 2)
+
+    def test_get_most_read_and_most_viewed(self):
+        """
+        Test the get_most_read and get_most_viewed class methods.
+
+        This test creates several books with varying read and view counts,
+        then checks that the methods return the correct books in order.
+        """
+        # Create books with different read and view counts
+        b1 = Book.objects.create(
+            title="Book 1",
+            author="Author 1",
+            description="Book 1 description.",
+            published_date="2023-01-01",
+            isbn="js5555555551",
+            is_read=True,
+            view_count=5
+        )
+        b2 = Book.objects.create(
+            title="Book 2",
+            author="Author 2",
+            description="Book 2 description.",
+            published_date="2023-01-02",
+            isbn="js5555555552",
+            is_read=True,
+            view_count=10
+        )
+        b3 = Book.objects.create(
+            title="Book 3",
+            author="Author 3",
+            description="Book 3 description.",
+            published_date="2023-01-03",
+            isbn="js5555555553",
+            is_read=False,
+            view_count=20
+        )
+
+        most_read = list(Book.get_most_read())
+        most_viewed = list(Book.get_most_viewed())
+
+        self.assertEqual(most_read[0], b2)
+        self.assertEqual(most_read[1], b1)
+        self.assertNotIn(b3, most_read)  # b3 is not marked as read
+
+        self.assertEqual(most_viewed[0], b3)
+        self.assertEqual(most_viewed[1], b2)
+        self.assertEqual(most_viewed[2], b1)
