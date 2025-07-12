@@ -80,20 +80,82 @@
                 
                 <!-- Book Recommendation Field -->
                 <!-- Optional book selection for recommendations -->
-                <div class="form-group">
-                    <label for="{{ form.book_recommendation.id_for_label }}" class="form-label">
+                <div class="form-group position-relative">
+                    <label for="book-search" class="form-label">
                         <i class="fas fa-book"></i> Book Recommendation (Optional)
                     </label>
-                    {{ form.book_recommendation }}
-                    <!-- Display book_recommendation field errors if any -->
-                    {% if form.book_recommendation.errors %}
-                        <div class="text-danger">
-                            {% for error in form.book_recommendation.errors %}
-                                <small>{{ error }}</small>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
+                    <input type="text" id="book-search" class="form-control" placeholder="Type to search books..." autocomplete="off">
+                    <input type="hidden" name="book_recommendation" id="book_recommendation_id">
+                    <div id="book-suggestions" class="list-group position-absolute w-100" style="z-index: 1000;"></div>
+                    <small class="form-text text-muted">Search local and Open Library books. Select to recommend.</small>
                 </div>
+                <script>
+// --- Live search for local and Open Library books ---
+const localBooks = [
+    {% for book in books %}{id: '{{ book.id }}', title: '{{ book.title|escapejs }}', author: '{{ book.author|escapejs }}', source: 'local'}{% if not forloop.last %},{% endif %}{% endfor %}
+];
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+const bookSearch = document.getElementById('book-search');
+const suggestions = document.getElementById('book-suggestions');
+const hiddenInput = document.getElementById('book_recommendation_id');
+bookSearch.addEventListener('input', debounce(async function() {
+    const query = this.value.trim();
+    suggestions.innerHTML = '';
+    if (!query) return;
+    // Local books
+    const localMatches = localBooks.filter(b => b.title.toLowerCase().includes(query.toLowerCase()) || b.author.toLowerCase().includes(query.toLowerCase()));
+    localMatches.forEach(book => {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'list-group-item list-group-item-action';
+        item.textContent = `${book.title} by ${book.author} (Local)`;
+        item.onclick = () => {
+            bookSearch.value = `${book.title} by ${book.author}`;
+            hiddenInput.value = book.id;
+            suggestions.innerHTML = '';
+        };
+        suggestions.appendChild(item);
+    });
+    // Open Library
+    const resp = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=5`);
+    if (resp.ok) {
+        const data = await resp.json();
+        (data.docs || []).forEach(book => {
+            const title = book.title || 'No Title';
+            const author = (book.author_name && book.author_name[0]) || 'Unknown';
+            const olid = book.key ? book.key.replace('/works/', '') : '';
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'list-group-item list-group-item-action';
+            item.textContent = `${title} by ${author} (Open Library)`;
+            item.onclick = () => {
+                bookSearch.value = `${title} by ${author}`;
+                hiddenInput.value = `ol:${olid}`;
+                suggestions.innerHTML = '';
+            };
+            suggestions.appendChild(item);
+        });
+    }
+}, 300));
+// On form submit, require a selection
+const form = document.querySelector('form');
+form.addEventListener('submit', function(e) {
+    if (!hiddenInput.value) {
+        e.preventDefault();
+        suggestions.innerHTML = '';
+        const err = document.createElement('div');
+        err.className = 'text-danger small';
+        err.textContent = 'Please select a book from the suggestions.';
+        suggestions.appendChild(err);
+    }
+});
+</script>
                 
                 <!-- Target Users Field -->
                 <!-- Dropdown for selecting which users to target -->
