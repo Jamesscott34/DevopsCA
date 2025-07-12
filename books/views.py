@@ -131,6 +131,9 @@ def add_book(request):
             try:
                 book = form.save(commit=False)
                 book.added_by = current_user
+                # Auto-generate ISBN if blank
+                if not book.isbn:
+                    book.isbn = generate_js_isbn()
                 # Check for duplicate ISBN if provided
                 if book.isbn and Book.objects.filter(isbn=book.isbn).exists():
                     form.add_error('isbn', 'A book with this ISBN already exists.')
