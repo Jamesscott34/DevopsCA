@@ -187,8 +187,22 @@ def edit_book(request, pk):
 
 def delete_book_by_isbn(request, isbn):
     """
-    Delete a book from the catalog using its ISBN. If not found, try by title and author.
+    Delete a book from the catalog using its ISBN. If not found, or if ISBN is 'None' or 'noisbn', try by title and author.
     """
+    if isbn in [None, '', 'None', 'noisbn']:
+        # Try by title and author if provided
+        title = request.GET.get('title') or request.POST.get('title')
+        author = request.GET.get('author') or request.POST.get('author')
+        if title and author:
+            try:
+                book = Book.objects.get(title=title, author=author)
+                book.delete()
+                messages.success(request, f'Book "{title}" by {author} deleted (no valid ISBN).')
+            except Book.DoesNotExist:
+                messages.error(request, 'No book found with the given title and author.')
+        else:
+            messages.error(request, 'No book found: missing ISBN, title, or author.')
+        return redirect('home')
     try:
         book = Book.objects.get(isbn=isbn)
         book.delete()
