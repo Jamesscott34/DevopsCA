@@ -1,9 +1,9 @@
 # 📚 SBA24070 Book Catalogue App
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/Jamesscott34/DevopsCA)
-[![Docker](https://img.shields.io/badge/docker-ready-blue)](https://hub.docker.com/r/jamesdeanscott/devops-book-app)
-[![Kubernetes](https://img.shields.io/badge/kubernetes-ready-orange)](https://kubernetes.io/)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+![Build Status]](https://github.com/Jamesscott34/DevopsCA)
+![Docker](https://hub.docker.com/r/jamesdeanscott/devops-book-app)
+![Kubernetes](https://kubernetes.io/)
+![License](LICENSE)
 
 **Welcome!** This is a full-featured Django book catalogue with flexible deployment options: **Local Development**, **Docker Compose**, **Kubernetes (Minikube)**, and **Helm**. Choose your preferred environment and get started in minutes!
 
@@ -17,6 +17,132 @@
 | **Helm**         | See [Helm Guide](docs/HELM_DEPLOYMENT.md) | minikube/cloud IP        | Postgres | 5 min      |
 
 **Default Admin:** `admin` / `admin` (created automatically)
+
+---
+
+## ✨ Features
+
+### 📚 Book Management
+- **Complete CRUD Operations**: Create, read, update, and delete books with full validation
+- **ISBN Auto-Population**: Automatically generates ISBNs if left blank during book creation
+- **Smart Deletion**: Supports deletion by title and author when ISBN is missing or invalid
+- **Cover Image Support**: Upload and display book cover images
+- **Tag System**: Organize books with custom tags for better categorization
+- **Reading Progress Tracking**: Track your reading progress for each book
+- **View Count Analytics**: Monitor which books are most popular
+
+### 🔍 Open Library Integration
+- **Live Search**: Real-time search through Open Library's vast database
+- **One-Click Import**: Import book details directly from Open Library API
+- **Automatic Data Population**: Fills in title, author, description, and cover image
+- **ISBN Validation**: Validates ISBNs against Open Library database
+- **Book Recommendations**: Get personalized book recommendations based on your library
+
+### 👥 User Management
+- **Custom User Model**: Extended user model with additional fields
+- **User Registration & Authentication**: Secure login/logout system
+- **Profile Management**: Users can update their profiles and preferences
+- **User Notes**: Personal notes system for each user
+- **Admin Referral System**: Admins can assign referral books to users
+
+### 🔔 Notification System
+- **Real-time Notifications**: Instant notifications for book assignments
+- **Read/Unread Status**: Track notification read status
+- **Book Recommendations**: Receive notifications for new book suggestions
+- **Admin Notifications**: Admins get notified of user activities
+
+### 🛠️ Admin Dashboard
+- **Comprehensive Analytics**: User statistics and book analytics
+- **User Management**: View, edit, and delete user accounts
+- **Book Management**: Manage all books across all users
+- **Referral Assignment**: Assign books to users through admin interface
+- **Notification Management**: Send and manage system notifications
+- **User Notes Management**: View and manage user notes
+
+### 🔌 REST API
+- **Full CRUD Endpoints**: Complete API for all book operations
+- **Session Authentication**: Secure API access with session-based auth
+- **JSON Response Format**: Clean, consistent API responses
+- **Error Handling**: Comprehensive error responses and validation
+- **API Documentation**: Complete API reference and examples
+
+### 🐳 Multi-Environment Deployment
+- **Local Development**: SQLite database for quick development
+- **Docker Compose**: Containerized deployment with PostgreSQL
+- **Kubernetes**: Production-ready deployment with Minikube
+- **Helm Charts**: Advanced Kubernetes deployment with Helm
+- **Environment Configuration**: Automatic environment detection and setup
+
+### 🔧 Developer Tools
+- **Custom Scripts**: Automated setup and management scripts
+- **Admin Management**: Automated admin user creation and management
+- **Database Host Helper**: Automatic database host configuration
+- **Test Suite**: Comprehensive test coverage for all features
+- **Build Status Monitoring**: Real-time build status tracking
+
+---
+
+## 🚧 Upcoming Features
+
+### 📱 Enhanced User Experience
+- **Mobile-Responsive Design**: Improved mobile interface and PWA support
+- **Dark/Light Theme**: User-selectable theme preferences
+- **Advanced Search**: Full-text search with filters and sorting
+- **Reading Lists**: Create and share custom reading lists
+- **Book Reviews & Ratings**: User review and rating system
+
+### 🔗 Social Features
+- **User Profiles**: Public user profiles with reading history
+- **Book Clubs**: Create and join book clubs
+- **Social Sharing**: Share books and reading progress on social media
+- **Friend System**: Add friends and see their reading activity
+- **Book Recommendations**: AI-powered personalized recommendations
+
+### 📊 Advanced Analytics
+- **Reading Statistics**: Detailed reading progress and time tracking
+- **Genre Analytics**: Analyze reading preferences by genre
+- **Reading Goals**: Set and track reading goals
+- **Export Features**: Export reading lists and statistics
+- **Dashboard Widgets**: Customizable admin dashboard widgets
+
+### 🔐 Enhanced Security
+- **OAuth Integration**: Google, Facebook, and GitHub login
+- **Two-Factor Authentication**: Enhanced account security
+- **API Rate Limiting**: Protect API endpoints from abuse
+- **Audit Logging**: Track all user actions for security
+- **Data Encryption**: Encrypt sensitive user data
+- **Email Verification**: Email-based account verification system
+- **Password Reset**: Email-based password reset functionality
+
+### 📧 Email System
+- **Email Notifications**: Email alerts for book assignments and recommendations
+- **Email Digest**: Weekly/monthly email summaries of reading activity
+- **Email Preferences**: User-configurable email notification settings
+- **Welcome Emails**: Automated welcome emails for new users
+- **Book Recommendation Emails**: Personalized book suggestion emails
+- **Reading Progress Emails**: Periodic updates on reading progress
+- **Admin Email Alerts**: Email notifications for admin activities
+
+### 🚀 Performance & Scalability
+- **Caching System**: Redis-based caching for improved performance
+- **CDN Integration**: Content delivery network for static files
+- **Database Optimization**: Query optimization and indexing
+- **Background Tasks**: Celery integration for async tasks
+- **Microservices Architecture**: Break down into microservices
+
+### 📚 Content Enhancement
+- **Multiple Book Sources**: Integration with Amazon, Goodreads APIs
+- **E-book Support**: Upload and read e-books (PDF, EPUB)
+- **Audiobook Integration**: Support for audiobook tracking
+- **Book Series Management**: Track book series and reading order
+- **Library Import**: Import books from external library systems
+
+### 🤖 AI & Machine Learning
+- **Smart Recommendations**: ML-powered book recommendations
+- **Reading Time Estimation**: Predict reading time based on book length
+- **Genre Classification**: Automatic genre classification
+- **Content Summarization**: AI-generated book summaries
+- **Sentiment Analysis**: Analyze user reviews and feedback
 
 ---
 
