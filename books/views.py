@@ -736,7 +736,21 @@ def send_notification(request, user_id=None):
             return redirect('admin_dashboard')
     
     if request.method == 'POST':
-        form = NotificationForm(request.POST)
+        # --- PATCH: support Open Library book selection ---
+        post_data = request.POST.copy()
+        book_val = post_data.get('book_recommendation', '')
+        book_instance = None
+        if book_val:
+            if book_val.startswith('ol:'):
+                olid = book_val[3:]
+                book_instance = import_openlibrary_book(olid)
+            else:
+                try:
+                    book_instance = Book.objects.get(id=book_val)
+                except Book.DoesNotExist:
+                    book_instance = None
+            post_data['book_recommendation'] = book_instance.id if book_instance else ''
+        form = NotificationForm(post_data)
         if form.is_valid():
             notification_data = form.cleaned_data
             send_email = notification_data.pop('send_email', False)
@@ -814,7 +828,21 @@ def send_bulk_notification(request):
         return redirect('login_user')
     
     if request.method == 'POST':
-        form = BulkNotificationForm(request.POST)
+        # --- PATCH: support Open Library book selection ---
+        post_data = request.POST.copy()
+        book_val = post_data.get('book_recommendation', '')
+        book_instance = None
+        if book_val:
+            if book_val.startswith('ol:'):
+                olid = book_val[3:]
+                book_instance = import_openlibrary_book(olid)
+            else:
+                try:
+                    book_instance = Book.objects.get(id=book_val)
+                except Book.DoesNotExist:
+                    book_instance = None
+            post_data['book_recommendation'] = book_instance.id if book_instance else ''
+        form = BulkNotificationForm(post_data)
         if form.is_valid():
             notification_data = form.cleaned_data
             send_email = notification_data.pop('send_email', False)
@@ -1111,15 +1139,31 @@ def admin_set_referral(request, user_id):
 
     user = get_object_or_404(User, id=user_id)
     if request.method == 'POST':
-        form = AdminSetReferralForm(request.POST, instance=user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, f"Referral book set for user '{user.username}'.")
-            return redirect('admin_dashboard')
-    else:
-        form = AdminSetReferralForm(instance=user)
+        admin_referral_val = request.POST.get('admin_referral', '')
+        if admin_referral_val.startswith('ol:'):
+            olid = admin_referral_val[3:]
+            book = import_openlibrary_book(olid)
+            if book:
+                user.admin_referral = book
+                user.save()
+                messages.success(request, f"Referral book set to imported Open Library book '{book.title}'.")
+                return redirect('admin_dashboard')
+            else:
+                messages.error(request, 'Failed to fetch book from Open Library.')
+                return redirect('admin_set_referral', user_id=user.id)
+        else:
+            try:
+                book = Book.objects.get(id=admin_referral_val)
+                user.admin_referral = book
+                user.save()
+                messages.success(request, f"Referral book set to '{book.title}'.")
+                return redirect('admin_dashboard')
+            except Book.DoesNotExist:
+                messages.error(request, 'Selected book not found.')
+                return redirect('admin_set_referral', user_id=user.id)
+    # GET
     return render(request, 'books/admin_set_referral.html', {
-        'form': form,
+        'form': AdminSetReferralForm(instance=user),
         'target_user': user,
         'current_user': current_user,
     })
