@@ -187,21 +187,25 @@ def edit_book(request, pk):
 
 def delete_book_by_isbn(request, isbn):
     """
-    Delete a book from the catalog using its ISBN.
-    
-    This view removes a book from the database based on its ISBN number.
-    It's used in the book table's delete action buttons. After deletion,
-    users are redirected to the home page.
-    
-    Args:
-        request: Django HttpRequest object
-        isbn: ISBN of the book to delete
-        
-    Returns:
-        Redirect to home page
+    Delete a book from the catalog using its ISBN. If not found, try by title and author.
     """
-    book = get_object_or_404(Book, isbn=isbn)
-    book.delete()
+    try:
+        book = Book.objects.get(isbn=isbn)
+        book.delete()
+        messages.success(request, f'Book with ISBN {isbn} deleted.')
+    except Book.DoesNotExist:
+        # Try by title and author if provided
+        title = request.GET.get('title') or request.POST.get('title')
+        author = request.GET.get('author') or request.POST.get('author')
+        if title and author:
+            try:
+                book = Book.objects.get(title=title, author=author)
+                book.delete()
+                messages.success(request, f'Book "{title}" by {author} deleted (no valid ISBN).')
+            except Book.DoesNotExist:
+                messages.error(request, 'No book found with the given ISBN, title, and author.')
+        else:
+            messages.error(request, 'No book found with the given ISBN, and no title/author provided.')
     return redirect('home')
 
 def toggle_read_status(request, pk):
