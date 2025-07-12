@@ -1,1 +1,39 @@
- 
+{% extends 'books/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h4><i class="fas fa-user-edit"></i> Edit Admin Referral for {{ target_user.username }}</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.non_field_errors }}
+                        <div class="mb-3">
+                            {{ form.admin_referral.label_tag }}
+                            {{ form.admin_referral }}
+                            {% if form.admin_referral.help_text %}
+                                <small class="form-text text-muted">{{ form.admin_referral.help_text }}</small>
+                            {% endif %}
+                            {% for error in form.admin_referral.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Save
+                            </button>
+                            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
