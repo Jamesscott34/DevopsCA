@@ -81,3 +81,25 @@ class BookModelTest(TestCase):
                 published_date="2023-01-01",
                 isbn="js3333333333"
             )
+
+    def test_increment_view_count(self):
+        """
+        Test that the increment_view_count method increases the view count.
+
+        This test creates a Book, calls increment_view_count, and checks that
+        the view_count field is incremented as expected.
+        """
+        book = Book.objects.create(
+            title="View Count Book",
+            author="View Author",
+            description="Testing view count increment.",
+            published_date="2023-01-01",
+            isbn="js4444444444"
+        )
+        self.assertEqual(book.view_count, 0)
+        book.increment_view_count()
+        book.refresh_from_db()
+        self.assertEqual(book.view_count, 1)
+        book.increment_view_count()
+        book.refresh_from_db()
+        self.assertEqual(book.view_count, 2)
