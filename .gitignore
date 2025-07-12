@@ -28,3 +28,6 @@ kubectl_get_nodes.txt
 helm_upgrade.txt
 flake8.txt
 mkdocs.txt
+
+# mypy type checking cache
+.mypy_cache/
