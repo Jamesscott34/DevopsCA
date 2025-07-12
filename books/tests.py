@@ -1,6 +1,8 @@
 from django.test import TestCase
 from .models import Book
 from datetime import datetime
+from django.contrib.auth.hashers import check_password
+from .models import User
 
 # Create your tests here.
 
@@ -151,3 +153,24 @@ class BookModelTest(TestCase):
         self.assertEqual(most_viewed[0], b3)
         self.assertEqual(most_viewed[1], b2)
         self.assertEqual(most_viewed[2], b1)
+
+class UserModelTest(TestCase):
+    """
+    Test suite for the User model in the Book Catalog application.
+    """
+
+    def test_user_authentication(self):
+        """
+        Test that a user can be authenticated with the correct password.
+
+        This test creates a user, checks that the password is hashed,
+        and verifies authentication using Django's check_password.
+        """
+        raw_password = "mysecretpassword"
+        user = User.objects.create(
+            username="testuser",
+            email="testuser@example.com",
+            password=raw_password
+        )
+        self.assertNotEqual(user.password, raw_password)  # Should be hashed
+        self.assertTrue(check_password(raw_password, user.password))
