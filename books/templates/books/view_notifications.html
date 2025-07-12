@@ -80,7 +80,7 @@
                                 <!-- Shows creation date and action buttons -->
                                 <div class="d-flex align-items-center">
                                     <small class="text-muted me-3">
-                                        <i class="fas fa-clock"></i> {{ notification.created_at|date:"M d, Y H:i" }}
+                                        <i class="fas fa-clock"></i> {{ notification.created_at|date:"d-m-Y H:i" }}
                                     </small>
                                     
                                     <!-- Mark as Read Button -->
@@ -121,7 +121,7 @@
                                                 <strong>{{ notification.book_recommendation.title }}</strong><br>
                                                 <em>by {{ notification.book_recommendation.author }}</em><br>
                                                 <small class="text-muted">
-                                                    Published: {{ notification.book_recommendation.published_date|date:"Y" }}
+                                                    Published: {{ notification.book_recommendation.published_date|date:"d-m-Y" }}
                                                     {% if notification.book_recommendation.isbn %}
                                                         | ISBN: {{ notification.book_recommendation.isbn }}
                                                     {% endif %}

@@ -115,7 +115,7 @@
                         <p><strong>Current Email:</strong> {{ target_user.email }}</p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Account Created:</strong> {{ target_user.created_at|date:"M d, Y" }}</p>
+                        <p><strong>Account Created:</strong> {{ target_user.created_at|date:"d-m-Y" }}</p>
                         <p><strong>User Type:</strong> 
                             {% if target_user.username == 'admin' %}
                                 <span class="badge bg-warning text-dark">Administrator</span>

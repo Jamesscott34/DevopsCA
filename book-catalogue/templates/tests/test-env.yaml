@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include \"book-catalogue.fullname\" . }}-test-env"
+  labels:
+    {{- include "book-catalogue.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: test-env
+      image: busybox
+      command: ['sh', '-c', 'env | grep DJANGO_SETTINGS_MODULE && env | grep POSTGRES_DB']
+  restartPolicy: Never 

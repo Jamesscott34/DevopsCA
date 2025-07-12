@@ -81,7 +81,7 @@
                             <label for="{{ form.published_date.id_for_label }}" class="form-label">
                                 <i class="fas fa-calendar"></i> Publication Date *
                             </label>
-                            {{ form.published_date }}
+                            {{ form.published_date.as_widget(attrs={'placeholder': 'DD-MM-YYYY'}) }}
                             <!-- Display published_date field errors if any -->
                             {% if form.published_date.errors %}
                                 <div class="text-danger">

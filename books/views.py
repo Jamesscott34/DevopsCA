@@ -356,9 +356,9 @@ def save_open_library_book(request):
         # Convert "1976" → "1976-01-01"
         try:
             if raw_date and len(raw_date) == 4:
-                published_date = datetime.strptime(raw_date + "-01-01", "%Y-%m-%d").date()
+                published_date = datetime.strptime("01-01-" + raw_date, "%d-%m-%Y").date()
             else:
-                published_date = datetime.strptime(raw_date, "%Y-%m-%d").date()
+                published_date = datetime.strptime(raw_date, "%d-%m-%Y").date()
         except Exception:
             published_date = None  # optional: fallback or raise
 
