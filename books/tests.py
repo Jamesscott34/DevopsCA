@@ -42,7 +42,7 @@ class BookModelTest(TestCase):
         This test creates a Book with a specific ISBN, then attempts to create
         another Book with the same ISBN. It should raise an IntegrityError.
         """
-        from django.db import IntegrityError
+        from django.db import IntegrityError, transaction
 
         Book.objects.create(
             title="Book One",
@@ -52,39 +52,40 @@ class BookModelTest(TestCase):
             isbn="js1111111111"
         )
         with self.assertRaises(IntegrityError):
-            Book.objects.create(
-                title="Book Two",
-                author="Author Two",
-                description="Second book with duplicate ISBN.",
-                published_date=datetime.strptime("02-01-2023", "%d-%m-%Y").date(),
-                isbn="js1111111111"
-            )
+            with transaction.atomic():
+                Book.objects.create(
+                    title="Book Two",
+                    author="Author Two",
+                    description="Second book with duplicate ISBN.",
+                    published_date=datetime.strptime("02-01-2023", "%d-%m-%Y").date(),
+                    isbn="js1111111111"
+                )
 
     def test_required_fields(self):
         """
         Test that missing required fields raise an error.
-
-        This test attempts to create a Book without a title and without an author,
-        expecting a ValueError or IntegrityError.
         """
-        from django.db import IntegrityError
-
+        from django.db import IntegrityError, transaction
+        # Missing title
         with self.assertRaises(IntegrityError):
-            Book.objects.create(
-                title=None,
-                author="Author",
-                description="Missing title.",
-                published_date=datetime.strptime("01-01-2023", "%d-%m-%Y").date(),
-                isbn="js2222222222"
-            )
+            with transaction.atomic():
+                Book.objects.create(
+                    title=None,
+                    author="Author",
+                    description="Missing title.",
+                    published_date=datetime.strptime("01-01-2023", "%d-%m-%Y").date(),
+                    isbn="js2222222222"
+                )
+        # Missing author
         with self.assertRaises(IntegrityError):
-            Book.objects.create(
-                title="Title",
-                author=None,
-                description="Missing author.",
-                published_date=datetime.strptime("01-01-2023", "%d-%m-%Y").date(),
-                isbn="js3333333333"
-            )
+            with transaction.atomic():
+                Book.objects.create(
+                    title="Title",
+                    author=None,
+                    description="Missing author.",
+                    published_date=datetime.strptime("01-01-2023", "%d-%m-%Y").date(),
+                    isbn="js3333333333"
+                )
 
     def test_increment_view_count(self):
         """
