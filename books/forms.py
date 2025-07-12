@@ -398,6 +398,10 @@ class BulkNotificationForm(forms.Form):
         help_text='Extra content to include in email notifications'
     )
     
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['book_recommendation'].queryset = Book.objects.all().order_by('title')
+
     def clean(self):
         """Validate that specific users are selected when targeting specific users."""
         cleaned_data = super().clean()
@@ -425,7 +429,7 @@ class AdminSetReferralForm(forms.ModelForm):
     Form for admin to set a referral book for a user.
     """
     admin_referral = forms.ModelChoiceField(
-        queryset=Book.objects.all().order_by('title'),
+        queryset=Book.objects.none(),  # Will be set in __init__
         required=False,
         label='Referral Book',
         widget=forms.Select(attrs={'class': 'form-control'}),
@@ -434,4 +438,8 @@ class AdminSetReferralForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['admin_referral']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['admin_referral'].queryset = Book.objects.all().order_by('title')
 
