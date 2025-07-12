@@ -104,11 +104,19 @@
                                 </a>
                                 
                                 <!-- Delete Book Button - Removes book from catalog -->
+                                {% if book.isbn %}
                                 <a href="{% url 'delete_book_by_isbn' book.isbn %}" 
                                    class="btn btn-danger btn-sm"
                                    onclick="return confirm('Are you sure you want to delete this book?')">
                                     <i class="fas fa-trash"></i> Delete
                                 </a>
+                                {% else %}
+                                <a href="{% url 'delete_book_by_isbn' 'noisbn' %}?title={{ book.title|urlencode }}&author={{ book.author|urlencode }}" 
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Are you sure you want to delete this book?')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}
