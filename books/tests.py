@@ -22,12 +22,14 @@ class BookModelTest(TestCase):
         book = Book.objects.create(
             title="Test Book",
             author="Test Author",
+            description="A test book for unit testing.",
             published_date="2023-01-01",
-            isbn="1234567890123"
+            isbn="js1234567890"
         )
-        retrieved = Book.objects.get(isbn="1234567890123")
+        retrieved = Book.objects.get(isbn="js1234567890")
         self.assertEqual(retrieved.title, "Test Book")
         self.assertEqual(retrieved.author, "Test Author")
+        self.assertEqual(retrieved.description, "A test book for unit testing.")
 
     def test_unique_isbn_constraint(self):
         """
@@ -41,13 +43,15 @@ class BookModelTest(TestCase):
         Book.objects.create(
             title="Book One",
             author="Author One",
+            description="First book with unique ISBN.",
             published_date="2023-01-01",
-            isbn="1111111111111"
+            isbn="js1111111111"
         )
         with self.assertRaises(IntegrityError):
             Book.objects.create(
                 title="Book Two",
                 author="Author Two",
+                description="Second book with duplicate ISBN.",
                 published_date="2023-01-02",
-                isbn="1111111111111"
+                isbn="js1111111111"
             )
