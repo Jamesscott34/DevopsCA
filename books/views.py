@@ -1017,18 +1017,69 @@ def edit_admin_referral(request, user_id):
         return redirect('login_user')
 
     user = get_object_or_404(User, id=user_id)
+    books = Book.objects.all().order_by('title')
     if request.method == 'POST':
-        form = AdminReferralForm(request.POST, instance=user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, f"Admin referral info updated for user '{user.username}'.")
-            return redirect('admin_dashboard')
-    else:
-        form = AdminReferralForm(instance=user)
+        admin_referral_val = request.POST.get('admin_referral', '')
+        if admin_referral_val.startswith('ol:'):
+            olid = admin_referral_val[3:]
+            # Fetch from Open Library
+            ol_url = f'https://openlibrary.org/works/{olid}.json'
+            resp = requests.get(ol_url)
+            if resp.ok:
+                data = resp.json()
+                title = data.get('title', 'No Title')
+                authors = data.get('authors', [])
+                author_name = 'Unknown'
+                if authors:
+                    # Fetch author name from author key
+                    author_key = authors[0].get('author', {}).get('key')
+                    if author_key:
+                        author_resp = requests.get(f'https://openlibrary.org{author_key}.json')
+                        if author_resp.ok:
+                            author_name = author_resp.json().get('name', 'Unknown')
+                # Published date is not always available
+                published_date = None
+                if 'created' in data and 'value' in data['created']:
+                    try:
+                        published_date = data['created']['value'][:10]
+                    except Exception:
+                        published_date = None
+                # Generate a unique ISBN for Open Library imports
+                isbn = f'OL{olid}'
+                # Check if already imported
+                book, created = Book.objects.get_or_create(
+                    isbn=isbn,
+                    defaults={
+                        'title': title,
+                        'author': author_name,
+                        'published_date': published_date or '2000-01-01',
+                        'description': data.get('description', {}).get('value', '') if isinstance(data.get('description'), dict) else data.get('description', ''),
+                    }
+                )
+                user.admin_referral = book
+                user.save()
+                messages.success(request, f"Admin referral set to imported Open Library book '{book.title}'.")
+                return redirect('admin_dashboard')
+            else:
+                messages.error(request, 'Failed to fetch book from Open Library.')
+                return redirect('edit_admin_referral', user_id=user.id)
+        else:
+            # Local book
+            try:
+                book = Book.objects.get(id=admin_referral_val)
+                user.admin_referral = book
+                user.save()
+                messages.success(request, f"Admin referral set to '{book.title}'.")
+                return redirect('admin_dashboard')
+            except Book.DoesNotExist:
+                messages.error(request, 'Selected book not found.')
+                return redirect('edit_admin_referral', user_id=user.id)
+    # GET
     return render(request, 'books/edit_admin_referral.html', {
-        'form': form,
+        'form': AdminReferralForm(instance=user),
         'target_user': user,
         'current_user': current_user,
+        'books': books,
     })
 
 def admin_view_user_books(request, user_id):
