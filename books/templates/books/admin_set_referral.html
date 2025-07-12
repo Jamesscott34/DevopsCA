@@ -16,11 +16,10 @@
         <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary ms-2">Cancel</a>
     </form>
 </div>
+<script id="local-books-data" type="application/json">{{ books|json_script:"local-books-data" }}</script>
 <script>
 // --- Live search for local and Open Library books ---
-const localBooks = [
-    {% for book in books %}{id: '{{ book.id }}', title: '{{ book.title|escapejs }}', author: '{{ book.author|escapejs }}', source: 'local'}{% if not forloop.last %},{% endif %}{% endfor %}
-];
+const localBooks = JSON.parse(document.getElementById('local-books-data').textContent);
 function debounce(func, wait) {
     let timeout;
     return function(...args) {
