@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     # my custom app
     'books',
     'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -152,6 +153,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -175,3 +177,9 @@ EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+
+# Session and CSRF cookie settings for Kubernetes/API compatibility
+SESSION_COOKIE_SAMESITE = 'Lax'  # or 'None' if you need cross-origin
+SESSION_COOKIE_SECURE = False    # True only if using HTTPS
+CSRF_COOKIE_SAMESITE = 'Lax'     # or 'None' if you need cross-origin
+CSRF_COOKIE_SECURE = False       # True only if using HTTPS

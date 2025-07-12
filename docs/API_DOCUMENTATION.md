@@ -48,6 +48,18 @@ The API uses session-based authentication. Users must first authenticate through
 POST /api/auth/register/
 ```
 
+**cURL Example:**
+```sh
+curl -X POST http://127.0.0.1:8000/api/auth/register/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "newuser",
+    "email": "user@example.com",
+    "password": "securepassword",
+    "confirm_password": "securepassword"
+  }'
+```
+
 **Request Body:**
 ```json
 {
@@ -74,6 +86,16 @@ POST /api/auth/register/
 #### Login
 ```http
 POST /api/auth/login/
+```
+
+**cURL Example:**
+```sh
+curl -X POST http://127.0.0.1:8000/api/auth/login/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "admin",
+    "password": "admin"
+  }'
 ```
 
 **Request Body:**
@@ -103,6 +125,12 @@ POST /api/auth/login/
 POST /api/auth/logout/
 ```
 
+**cURL Example:**
+```sh
+curl -X POST http://127.0.0.1:8000/api/auth/logout/ \
+  -b cookies.txt
+```
+
 **Response:**
 ```json
 {
@@ -113,6 +141,18 @@ POST /api/auth/logout/
 #### Change Password
 ```http
 POST /api/auth/change_password/
+```
+
+**cURL Example:**
+```sh
+curl -X POST http://127.0.0.1:8000/api/auth/change_password/ \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{
+    "current_password": "oldpassword",
+    "new_password": "newpassword",
+    "confirm_new_password": "newpassword"
+  }'
 ```
 
 **Request Body:**
@@ -136,6 +176,11 @@ POST /api/auth/change_password/
 #### Get All Books
 ```http
 GET /api/books/
+```
+
+**cURL Example:**
+```sh
+curl http://127.0.0.1:8000/api/books/ -b cookies.txt
 ```
 
 **Query Parameters:**
@@ -173,9 +218,29 @@ GET /api/books/
 GET /api/books/{id}/
 ```
 
+**cURL Example:**
+```sh
+curl http://127.0.0.1:8000/api/books/1/ -b cookies.txt
+```
+
 #### Create Book
 ```http
 POST /api/books/
+```
+
+**cURL Example:**
+```sh
+curl -X POST http://127.0.0.1:8000/api/books/ \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{
+    "title": "New Book Title",
+    "author": "Author Name",
+    "description": "Book description",
+    "published_date": "2024-01-15",
+    "isbn": "978-1234567890",
+    "is_read": false
+  }'
 ```
 
 **Request Body:**
@@ -196,9 +261,39 @@ PUT /api/books/{id}/
 PATCH /api/books/{id}/
 ```
 
+**cURL Example (PUT):**
+```sh
+curl -X PUT http://127.0.0.1:8000/api/books/1/ \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{
+    "title": "Updated Title",
+    "author": "Updated Author",
+    "description": "Updated description",
+    "published_date": "2024-01-15",
+    "isbn": "978-1234567890",
+    "is_read": true
+  }'
+```
+
+**cURL Example (PATCH):**
+```sh
+curl -X PATCH http://127.0.0.1:8000/api/books/1/ \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{
+    "is_read": true
+  }'
+```
+
 #### Delete Book
 ```http
 DELETE /api/books/{id}/
+```
+
+**cURL Example:**
+```sh
+curl -X DELETE http://127.0.0.1:8000/api/books/1/ -b cookies.txt
 ```
 
 #### Toggle Read Status
@@ -206,9 +301,19 @@ DELETE /api/books/{id}/
 POST /api/books/{id}/toggle_read/
 ```
 
+**cURL Example:**
+```sh
+curl -X POST http://127.0.0.1:8000/api/books/1/toggle_read/ -b cookies.txt
+```
+
 #### Get Read Books
 ```http
 GET /api/books/read_books/
+```
+
+**cURL Example:**
+```sh
+curl http://127.0.0.1:8000/api/books/read_books/ -b cookies.txt
 ```
 
 #### Get Unread Books
@@ -216,9 +321,19 @@ GET /api/books/read_books/
 GET /api/books/unread_books/
 ```
 
+**cURL Example:**
+```sh
+curl http://127.0.0.1:8000/api/books/unread_books/ -b cookies.txt
+```
+
 #### Get Book Statistics
 ```http
 GET /api/books/statistics/
+```
+
+**cURL Example:**
+```sh
+curl http://127.0.0.1:8000/api/books/statistics/ -b cookies.txt
 ```
 
 **Response:**
@@ -232,6 +347,37 @@ GET /api/books/statistics/
     "most_read_books": [...],
     "most_viewed_books": [...]
 }
+```
+
+#### Get All Books (All Users)
+```http
+GET /api/books/all/
+```
+**Description:** Returns all books in the database, regardless of user. Any authenticated user can access this endpoint.
+
+**cURL Example:**
+```sh
+curl http://127.0.0.1:8000/api/books/all/ -b cookies.txt
+```
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "title": "The Great Gatsby",
+    "author": "F. Scott Fitzgerald",
+    "description": "A story of the Jazz Age...",
+    "published_date": "1925-04-10",
+    "isbn": "978-0743273565",
+    "is_read": false,
+    "view_count": 5,
+    "added_by": 1,
+    "added_by_username": "admin",
+    "is_read_display": "Unread",
+    "created_at": "2024-01-15T10:30:00Z"
+  }
+]
 ```
 
 ### 👥 User Endpoints (Admin Only)
@@ -276,6 +422,49 @@ GET /api/users/statistics/
     "admin_users": 1,
     "regular_users": 4,
     "users": [...]
+}
+```
+
+#### Get/Update Own Profile (Authenticated User)
+```http
+GET /api/users/me/
+PUT /api/users/me/
+PATCH /api/users/me/
+```
+**Description:** Retrieve or update your own user profile. Any authenticated user can access this endpoint to view or update their own information.
+
+**cURL Example (GET):**
+```sh
+curl http://127.0.0.1:8000/api/users/me/ -b cookies.txt
+```
+
+**GET Response:**
+```json
+{
+  "id": 2,
+  "username": "regularuser",
+  "email": "user@example.com",
+  "created_at": "2024-01-15T10:30:00Z"
+}
+```
+
+**cURL Example (PATCH):**
+```sh
+curl -X PATCH http://127.0.0.1:8000/api/users/me/ \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{
+    "email": "newemail@example.com"
+  }'
+```
+
+**PATCH Response:**
+```json
+{
+  "id": 2,
+  "username": "regularuser",
+  "email": "newemail@example.com",
+  "created_at": "2024-01-15T10:30:00Z"
 }
 ```
 

@@ -3,7 +3,7 @@
 **Welcome!** This app is a full-featured Django book catalogue with flexible deployment: local, Docker, Kubernetes, and Helm. This README will guide you from zero to production, including troubleshooting and automation scripts.
 
 **Database Flexibility Note:**
-- By default, the app uses SQLite, which requires no setup—just clone and run.
+- By default, the app uses SQLite, which requires no setup just clone and run.
 - You can switch to PostgreSQL (or another supported DB) by updating `settings.py` (or your `.env` for Docker) and running migrations.
 - See [Quickstart Guide](docs/QUICKSTART.md) for setup instructions for both local and Docker environments.
 
@@ -51,8 +51,8 @@ You can use the provided scripts for setup:
 - `custom_scripts/setup.sh`: Full onboarding for all environments (local, Docker, Kubernetes)
 - `custom_scripts/host_helper.py`: Interactively set the default DB host in `settings.py` (choose 'localhost' or 'db')
 - `custom_scripts/admin_manager.py`: Create, verify, reset, and show stats for the admin user. Usage:
-  - `python custom_scripts/admin_manager.py` (full setup)
-  - `python custom_scripts/admin_manager.py create|verify|test|stats|reset`
+- `python custom_scripts/admin_manager.py` (full setup)
+- `python custom_scripts/admin_manager.py create|verify|test|stats|reset`
 
 ---
 

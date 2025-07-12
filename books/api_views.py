@@ -70,6 +70,21 @@ class BookViewSet(viewsets.ModelViewSet):
         """
         serializer.save(added_by=self.request.user)
     
+    def update(self, request, *args, **kwargs):
+        if request.user.username != 'admin':
+            return Response({'error': 'Only admin can update books.'}, status=status.HTTP_403_FORBIDDEN)
+        return super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        if request.user.username != 'admin':
+            return Response({'error': 'Only admin can partially update books.'}, status=status.HTTP_403_FORBIDDEN)
+        return super().partial_update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        if request.user.username != 'admin':
+            return Response({'error': 'Only admin can delete books.'}, status=status.HTTP_403_FORBIDDEN)
+        return super().destroy(request, *args, **kwargs)
+    
     @action(detail=True, methods=['post'])
     def toggle_read(self, request, pk=None):
         """
@@ -115,6 +130,12 @@ class BookViewSet(viewsets.ModelViewSet):
             List of unread books
         """
         queryset = self.get_queryset().filter(is_read=False)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'], url_path='all')
+    def all(self, request):
+        queryset = Book.objects.all().order_by('-created_at')
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
     
@@ -185,6 +206,19 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer: User serializer instance
         """
         serializer.save()
+    
+    @action(detail=False, methods=['get', 'put', 'patch'], url_path='me')
+    def me(self, request):
+        user = request.user
+        if request.method == 'GET':
+            serializer = self.get_serializer(user)
+            return Response(serializer.data)
+        elif request.method in ['PUT', 'PATCH']:
+            serializer = self.get_serializer(user, data=request.data, partial=(request.method=='PATCH'))
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @action(detail=False, methods=['get'])
     def statistics(self, request):
