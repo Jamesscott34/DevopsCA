@@ -12,3 +12,12 @@ sqlparse==0.5.3
 urllib3==2.2.3
 Pillow
 python-dotenv
+django-stubs
+djangorestframework-stubs
+types-python-dotenv
+types-requests
+coverage
+mypy
+flake8
+mkdocs
+mkdocs-material
