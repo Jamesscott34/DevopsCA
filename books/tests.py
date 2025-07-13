@@ -1,9 +1,13 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from .models import Book
 from datetime import datetime
 from django.contrib.auth.hashers import check_password
 from .models import User
 from .models import Tag, Notification
+from django.core import mail
+from django.conf import settings
+import os
+import unittest
 
 # Create your tests here.
 
@@ -233,3 +237,42 @@ class UserModelTest(TestCase):
         notification.mark_as_read()
         notification.refresh_from_db()
         self.assertTrue(notification.is_read)
+
+class EmailBackendTest(TestCase):
+    @override_settings(EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend')
+    def test_send_real_email(self):
+        """
+        Sends a real email using the SMTP backend and environment credentials.
+        Logs the result to pytest.txt for confirmation.
+        WARNING: This will send a real email every time the test runs.
+        """
+        subject = "Test Email"
+        message = "This is a real test email from the test suite."
+        from_email = settings.DEFAULT_FROM_EMAIL
+        recipient_list = [settings.DEFAULT_FROM_EMAIL]
+        log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'pytest.txt')
+        try:
+            sent = mail.send_mail(subject, message, from_email, recipient_list)
+            with open(log_path, 'a') as f:
+                if sent == 1:
+                    f.write("\n[EMAIL TEST] ✅ Email sent successfully to {}.\n".format(from_email))
+                else:
+                    f.write("\n[EMAIL TEST] ❌ Email was not sent.\n")
+            self.assertEqual(sent, 1, "Email was not sent successfully.")
+        except Exception as e:
+            with open(log_path, 'a') as f:
+                f.write(f"\n[EMAIL TEST] ❌ Email sending failed: {e}\n")
+            self.fail(f"Email sending failed: {e}")
+
+class EnvVarTest(TestCase):
+    def test_email_env_vars_present(self):
+        """
+        Ensure EMAIL_HOST_USER and EMAIL_HOST_PASSWORD are loaded from the environment and not empty.
+        If not, print a warning and skip the test (do not fail CI/CD).
+        """
+        user = os.environ.get('EMAIL_HOST_USER')
+        password = os.environ.get('EMAIL_HOST_PASSWORD')
+        if not user or not password:
+            print('WARNING: EMAIL_HOST_USER or EMAIL_HOST_PASSWORD is not set in environment. Email tests will be skipped.')
+            raise unittest.SkipTest('Email environment variables not set.')
+        # If present, test passes
