@@ -25,9 +25,9 @@
             <!-- Login Form -->
             <!-- Django form for user authentication with CSRF protection -->
             <form method="post">
-                {% csrf_token %}
+                <!-- {% csrf_token %} -->
                 <!-- DEBUG: Show CSRF token value for curl testing (remove in production) -->
-                <div class="alert alert-warning mb-2"><strong>CSRF token:</strong> {{ csrf_token }}</div>
+                <!-- <div class="alert alert-warning mb-2"><strong>CSRF token:</strong> {{ csrf_token }}</div> -->
                 
                 <!-- Username Input Field -->
                 <!-- Text input for user's username with validation -->
