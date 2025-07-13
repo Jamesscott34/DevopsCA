@@ -517,14 +517,3 @@ class SystemStatisticsView(APIView):
         
         serializer = SystemStatisticsSerializer(data)
         return Response(serializer.data)
-
-@api_view(['POST'])
-@permission_classes([IsAdminUser])
-def api_send_email(request):
-    to_email = request.data.get('to_email') or request.POST.get('to_email')
-    subject = request.data.get('subject') or request.POST.get('subject')
-    message = request.data.get('message') or request.POST.get('message')
-    if not (to_email and subject and message):
-        return Response({'error': 'Missing required fields.'}, status=400)
-    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [to_email])
-    return Response({'status': 'Email sent', 'to': to_email, 'subject': subject})

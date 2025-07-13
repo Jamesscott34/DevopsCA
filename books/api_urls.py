@@ -10,7 +10,7 @@ from rest_framework.routers import DefaultRouter
 from django.urls import path
 from .api_views import (
     BookViewSet, UserViewSet, NotificationViewSet, AuthViewSet,
-    SystemStatisticsView, api_send_email
+    SystemStatisticsView
 )
 
 # Create router for ViewSets
@@ -24,5 +24,5 @@ router.register(r'auth', AuthViewSet, basename='auth')
 urlpatterns = [
     # System statistics endpoint
     path('statistics/', SystemStatisticsView.as_view(), name='api-statistics'),
-    path('send-email/', api_send_email, name='api_send_email'),
+    # Removed send-email endpoint
 ] + router.urls

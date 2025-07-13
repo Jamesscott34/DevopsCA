@@ -290,8 +290,8 @@
                                     <td>
                                         <div class="btn-group" role="group">
                                             {% if user.username != 'admin' %}
-                                                <!-- Send Notification Button - For non-admin users only -->
-                                                <a href="{% url 'send_notification_user' user.id %}" 
+                                                <!-- Send Email Button - For non-admin users only -->
+                                                <a href="{% url 'send_email_user' user.id %}" 
                                                    class="btn btn-info btn-sm"
                                                    title="Send email to {{ user.username }}">
                                                     <i class="fas fa-envelope"></i> Send Email
@@ -534,6 +534,50 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Management Section -->
+    <h2 class="mb-4 mt-5"><i class="fas fa-envelope"></i> Email Management</h2>
+    <div class="card">
+        <div class="card-header">
+            <h5><i class="fas fa-envelope"></i> Send Emails</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card bg-info text-white">
+                        <div class="card-body text-center">
+                            <i class="fas fa-user fa-2x mb-2"></i>
+                            <h6>Individual Emails</h6>
+                            <p class="mb-2">Send a custom email to a specific user</p>
+                            <a href="{% url 'send_email' %}" class="btn btn-light btn-sm">
+                                <i class="fas fa-paper-plane"></i> Send Individual
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-success text-white">
+                        <div class="card-body text-center">
+                            <i class="fas fa-users fa-2x mb-2"></i>
+                            <h6>Bulk Emails</h6>
+                            <p class="mb-2">Send the same email to multiple users at once</p>
+                            <a href="{% url 'send_bulk_email' %}" class="btn btn-light btn-sm">
+                                <i class="fas fa-broadcast-tower"></i> Send Bulk
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-info">
+                <h6><i class="fas fa-lightbulb"></i> Email Best Practices</h6>
+                <ul class="mb-0">
+                    <li>Use clear subjects and concise messages</li>
+                    <li>Target specific users for personalized emails</li>
+                    <li>Use bulk emails for announcements</li>
+                </ul>
             </div>
         </div>
     </div>
