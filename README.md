@@ -1,6 +1,6 @@
 # 📚 SBA24070 Book Catalogue App
 
-[![Build Status](https://github.com/Jamesscott34/DevopsCA/workflows/CI/badge.svg)](https://github.com/Jamesscott34/DevopsCA/actions)
+[![CI/CD Pipeline](https://github.com/Jamesscott34/DevopsCA/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Jamesscott34/DevopsCA/actions/workflows/ci-cd.yml)
 [![Docker Pulls](https://img.shields.io/docker/pulls/jamesdeanscott/devops-book-app.svg)](https://hub.docker.com/r/jamesdeanscott/devops-book-app)
 [![Kubernetes](https://img.shields.io/badge/kubernetes-ready-blue?logo=kubernetes)](https://kubernetes.io/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
