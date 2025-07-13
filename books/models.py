@@ -48,6 +48,10 @@ class User(models.Model):
         """Return the username as the string representation of the user."""
         return self.username
 
+    @property
+    def is_authenticated(self):
+        return True
+
 class Tag(models.Model):
     """
     Model for book tags/categories.
@@ -95,6 +99,7 @@ class Book(models.Model):
         help_text='Optional cover image for the book.'
     )
     tags = models.ManyToManyField(Tag, blank=True, related_name='books', help_text='Tags/categories for this book.')
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         """Return the book title as the string representation."""
