@@ -1306,5 +1306,12 @@ def api_send_email(request):
         message = request.POST.get('message')
     if not (to_email and subject and message):
         return JsonResponse({'error': 'Missing required fields.'}, status=400)
+    admin_user = request.user.username
     send_custom_email(to_email, subject, message)
-    return JsonResponse({'success': True, 'message': 'Email sent.'})
+    return JsonResponse({
+        'success': True,
+        'message': 'Email sent.',
+        'sent_by': admin_user,
+        'recipient': to_email,
+        'subject': subject
+    })
