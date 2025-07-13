@@ -457,3 +457,52 @@ class AdminSetReferralForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['admin_referral'].queryset = Book.objects.all().order_by('title')
 
+
+class EmailForm(forms.Form):
+    """
+    Form for sending an email to a single user.
+    """
+    subject = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter email subject'})
+    )
+    message = forms.CharField(
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Enter email message'})
+    )
+    additional_content = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Additional content (optional)'})
+    )
+
+class BulkEmailForm(forms.Form):
+    """
+    Form for sending emails to multiple users at once.
+    """
+    subject = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter email subject'})
+    )
+    message = forms.CharField(
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Enter email message'})
+    )
+    additional_content = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Additional content (optional)'})
+    )
+    TARGET_CHOICES = [
+        ('all', 'All Users'),
+        ('regular', 'Regular Users Only'),
+        ('specific', 'Specific Users'),
+    ]
+    target_users = forms.ChoiceField(
+        choices=TARGET_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        help_text='Choose which users to send the email to'
+    )
+    specific_users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.exclude(username='admin').order_by('username'),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+        help_text='Select specific users (admin cannot send emails to themselves)'
+    )
+
