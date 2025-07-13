@@ -1,9 +1,9 @@
 # 📚 SBA24070 Book Catalogue App
 
-![Build Status]](https://github.com/Jamesscott34/DevopsCA)
-![Docker](https://hub.docker.com/r/jamesdeanscott/devops-book-app)
-![Kubernetes](https://kubernetes.io/)
-![License](LICENSE)
+[![Build Status](https://github.com/Jamesscott34/DevopsCA/workflows/CI/badge.svg)](https://github.com/Jamesscott34/DevopsCA/actions)
+[![Docker Pulls](https://img.shields.io/docker/pulls/jamesdeanscott/devops-book-app.svg)](https://hub.docker.com/r/jamesdeanscott/devops-book-app)
+[![Kubernetes](https://img.shields.io/badge/kubernetes-ready-blue?logo=kubernetes)](https://kubernetes.io/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 **Welcome!** This is a full-featured Django book catalogue with flexible deployment options: **Local Development**, **Docker Compose**, **Kubernetes (Minikube)**, and **Helm**. Choose your preferred environment and get started in minutes!
 
@@ -354,7 +354,7 @@ curl -X POST http://127.0.0.1:8000/api/auth/login/ \
 
 # Get books
 curl http://127.0.0.1:8000/api/books/ -b cookies.txt
-```
+  ```
 
 ---
 

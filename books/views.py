@@ -1108,21 +1108,18 @@ def edit_admin_referral(request, user_id):
                 user.admin_referral = book
                 user.save()
                 messages.success(request, f"Admin referral set to imported Open Library book '{book.title}'.")
-                return redirect('admin_dashboard')
-            else:
-                messages.error(request, 'Failed to fetch book from Open Library.')
-                return redirect('edit_admin_referral', user_id=user.id)
-        else:
-            # Local book
-            try:
-                book = Book.objects.get(id=admin_referral_val)
-                user.admin_referral = book
-                user.save()
-                messages.success(request, f"Admin referral set to '{book.title}'.")
-                return redirect('admin_dashboard')
-            except Book.DoesNotExist:
-                messages.error(request, 'Selected book not found.')
-                return redirect('edit_admin_referral', user_id=user.id)
+            return redirect('admin_dashboard')
+    else:
+        # Local book
+        try:
+            book = Book.objects.get(id=admin_referral_val)
+            user.admin_referral = book
+            user.save()
+            messages.success(request, f"Admin referral set to '{book.title}'.")
+            return redirect('admin_dashboard')
+        except Book.DoesNotExist:
+            messages.error(request, 'Selected book not found.')
+            return redirect('edit_admin_referral', user_id=user.id)
     # GET
     return render(request, 'books/edit_admin_referral.html', {
         'form': AdminReferralForm(instance=user),
@@ -1168,20 +1165,17 @@ def admin_set_referral(request, user_id):
                 user.admin_referral = book
                 user.save()
                 messages.success(request, f"Referral book set to imported Open Library book '{book.title}'.")
-                return redirect('admin_dashboard')
-            else:
-                messages.error(request, 'Failed to fetch book from Open Library.')
-                return redirect('admin_set_referral', user_id=user.id)
-        else:
-            try:
-                book = Book.objects.get(id=admin_referral_val)
-                user.admin_referral = book
-                user.save()
-                messages.success(request, f"Referral book set to '{book.title}'.")
-                return redirect('admin_dashboard')
-            except Book.DoesNotExist:
-                messages.error(request, 'Selected book not found.')
-                return redirect('admin_set_referral', user_id=user.id)
+            return redirect('admin_dashboard')
+    else:
+        try:
+            book = Book.objects.get(id=admin_referral_val)
+            user.admin_referral = book
+            user.save()
+            messages.success(request, f"Referral book set to '{book.title}'.")
+            return redirect('admin_dashboard')
+        except Book.DoesNotExist:
+            messages.error(request, 'Selected book not found.')
+            return redirect('admin_set_referral', user_id=user.id)
     # GET
     return render(request, 'books/admin_set_referral.html', {
         'form': AdminSetReferralForm(instance=user),

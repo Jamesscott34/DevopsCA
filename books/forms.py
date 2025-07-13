@@ -407,7 +407,7 @@ class BulkNotificationForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['book_recommendation'].queryset = Book.objects.all().order_by('title')
-
+    
     def clean(self):
         """Validate that specific users are selected when targeting specific users."""
         cleaned_data = super().clean()
