@@ -8,3 +8,11 @@ def send_welcome_email(user):
     recipient_list = [user.email]
     send_mail(subject, message, from_email, recipient_list)
 
+# NOTE: For production, never hardcode credentials. Use environment variables or Django's settings with secrets management.
+
+def send_custom_email(to_email, subject, message):
+    """
+    Send a custom email to the specified recipient.
+    """
+    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [to_email])
+
