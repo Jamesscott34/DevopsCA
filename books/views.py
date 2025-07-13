@@ -21,6 +21,10 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 import os
 
+from .forms import EmailForm, BulkEmailForm
+from django.core.mail import send_mail
+from django.conf import settings
+
 def import_openlibrary_book(olid):
     """
     Fetches book data from Open Library by OLID and creates/returns a Book instance.
@@ -1269,3 +1273,71 @@ def admin_set_referral(request, user_id):
         'target_user': user,
         'current_user': current_user,
     })
+
+@csrf_exempt
+def send_email(request, user_id=None):
+    current_user = get_current_user(request)
+    if not current_user or not current_user.is_admin:
+        messages.error(request, 'You do not have permission to send emails.')
+        return redirect('admin_dashboard')
+    target_user = None
+    if user_id:
+        target_user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            subject = form.cleaned_data['subject']
+            message = form.cleaned_data['message']
+            additional_content = form.cleaned_data.get('additional_content', '')
+            full_message = message
+            if additional_content:
+                full_message += f"\n\n{additional_content}"
+            recipient = target_user.email if target_user else None
+            if recipient:
+                send_mail(subject, full_message, settings.DEFAULT_FROM_EMAIL, [recipient])
+                messages.success(request, f'Email sent to {target_user.username}!')
+                return redirect('admin_dashboard')
+            else:
+                messages.error(request, 'No recipient specified.')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = EmailForm()
+    return render(request, 'books/send_email.html', {'form': form, 'current_user': current_user, 'target_user': target_user})
+
+@csrf_exempt
+def send_bulk_email(request):
+    current_user = get_current_user(request)
+    if not current_user or not current_user.is_admin:
+        messages.error(request, 'You do not have permission to send emails.')
+        return redirect('admin_dashboard')
+    if request.method == 'POST':
+        form = BulkEmailForm(request.POST)
+        if form.is_valid():
+            subject = form.cleaned_data['subject']
+            message = form.cleaned_data['message']
+            additional_content = form.cleaned_data.get('additional_content', '')
+            target_users = form.cleaned_data['target_users']
+            specific_users = form.cleaned_data['specific_users']
+            full_message = message
+            if additional_content:
+                full_message += f"\n\n{additional_content}"
+            if target_users == 'all':
+                recipients = list(User.objects.exclude(email='').values_list('email', flat=True))
+            elif target_users == 'regular':
+                recipients = list(User.objects.filter(is_admin=False).exclude(email='').values_list('email', flat=True))
+            elif target_users == 'specific':
+                recipients = list(specific_users.values_list('email', flat=True))
+            else:
+                recipients = []
+            if recipients:
+                send_mail(subject, full_message, settings.DEFAULT_FROM_EMAIL, recipients)
+                messages.success(request, f'Email sent to {len(recipients)} users!')
+                return redirect('admin_dashboard')
+            else:
+                messages.error(request, 'No recipients found.')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = BulkEmailForm()
+    return render(request, 'books/send_bulk_email.html', {'form': form, 'current_user': current_user})
