@@ -21,6 +21,45 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 import os
 
+def import_openlibrary_book(olid):
+    """
+    Fetches book data from Open Library by OLID and creates/returns a Book instance.
+    """
+    import requests
+    from .models import Book
+    ol_url = f'https://openlibrary.org/works/{olid}.json'
+    resp = requests.get(ol_url)
+    if not resp.ok:
+        return None
+    data = resp.json()
+    title = data.get('title', 'No Title')
+    authors = data.get('authors', [])
+    author_name = 'Unknown'
+    if authors:
+        author_key = authors[0].get('author', {}).get('key')
+        if author_key:
+            author_resp = requests.get(f'https://openlibrary.org{author_key}.json')
+            if author_resp.ok:
+                author_name = author_resp.json().get('name', 'Unknown')
+    published_date = None
+    if 'created' in data and 'value' in data['created']:
+        try:
+            published_date = data['created']['value'][:10]
+        except Exception:
+            published_date = None
+    isbn = f'OL{olid}'
+    description = data.get('description', {}).get('value', '') if isinstance(data.get('description'), dict) else data.get('description', '')
+    book, created = Book.objects.get_or_create(
+        isbn=isbn,
+        defaults={
+            'title': title,
+            'author': author_name,
+            'published_date': published_date or '2000-01-01',
+            'description': description,
+        }
+    )
+    return book
+
 def get_current_user(request):
     """
     Helper function to retrieve the currently logged-in user from session.
@@ -400,6 +439,7 @@ def save_open_library_book(request):
     Returns:
         Redirect to home page after saving
     """
+    current_user = get_current_user(request)
     if request.method == "POST":
         title = request.POST.get("title")
         author = request.POST.get("author")
@@ -435,7 +475,7 @@ def save_open_library_book(request):
         # --- Append confirmation to cookies.txt ---
         try:
             with open('cookies.txt', 'a') as f:
-                f.write(f"\n---\n{datetime.now().strftime('%d %b %Y %H:%M:%S')}\nBook uploaded for user: {request.session.get('user_id', 'unknown')}\nTitle: {title}\nISBN: {isbn}\n---\n")
+                f.write(f"\n---\n{datetime.now().strftime('%d %b %Y %H:%M:%S')}\nBook imported from Open Library for user: {current_user.username if current_user else 'unknown'}\nTitle: {title}\nISBN: {isbn if isbn else 'auto-generated'}\n---\n")
         except Exception as log_exc:
             pass
         return redirect("home")

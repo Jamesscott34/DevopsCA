@@ -37,6 +37,14 @@ The API uses session-based authentication. Users must first authenticate through
 3. **Use API**: Include session cookie in subsequent requests
 4. **Logout**: Clear session when done
 
+**Login and Save Session Cookie (for curl):**
+```sh
+curl -X POST http://127.0.0.1:8000/login/ \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=admin&password=admin" \
+  -c cookies.txt
+```
+
 ---
 
 ## 📋 API Endpoints
@@ -560,6 +568,72 @@ GET /api/statistics/
     "unread_notifications": 3
 }
 ```
+
+---
+
+## 🌐 HTML Endpoint Usage (with curl)
+
+### Add a Book (HTML Form Endpoint)
+```sh
+curl -b cookies.txt -X POST http://127.0.0.1:8000/add/ \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "title=My Book&author=Jane Doe&published_date=2024-06-01&isbn=JS12345&description=Added via curl"
+```
+- Omit `isbn` to auto-generate a JS-prefixed ISBN.
+
+### Delete a Book (HTML Form Endpoint)
+```sh
+curl -b cookies.txt -X POST http://127.0.0.1:8000/delete/JS12345/
+```
+
+### View All Books (HTML Page)
+```sh
+curl -b cookies.txt http://127.0.0.1:8000/home/
+```
+
+---
+
+## 🔍 Open Library Integration
+
+### Search Open Library (via Website)
+- Visit: `http://127.0.0.1:8000/open-library/`
+- Or, search via curl (returns HTML):
+```sh
+curl -b cookies.txt "http://127.0.0.1:8000/open-library/?query=dune"
+```
+
+### Import Book from Open Library (via curl)
+```sh
+curl -b cookies.txt -X POST http://127.0.0.1:8000/open-library/save/ \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "title=Little men&author=Louisa May Alcott&published_date=1885&isbn=&description=Imported from Open Library"
+```
+- If `isbn` is blank, a JS-prefixed ISBN will be auto-generated.
+
+---
+
+## 🛡️ Admin, Notification, and Referral Endpoints
+
+### Send Notification (Admin Only)
+```sh
+curl -b cookies.txt -X POST http://127.0.0.1:8000/send-notification/ \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "title=Read this!&message=Check out this book&notification_type=recommendation&user_id=2"
+```
+
+### Set Admin Referral (Admin Only)
+```sh
+curl -b cookies.txt -X POST http://127.0.0.1:8000/admin-dashboard/set-referral/2/ \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "admin_referral=ol:OL1234567M"
+```
+
+---
+
+## 📝 Notes
+- All curl commands require a valid session cookie (`-b cookies.txt`).
+- For API endpoints, use JSON (`-H "Content-Type: application/json"`). For HTML endpoints, use form data (`-H "Content-Type: application/x-www-form-urlencoded"`).
+- Admin endpoints require you to be logged in as the admin user.
 
 ---
 
