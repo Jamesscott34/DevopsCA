@@ -8,6 +8,7 @@ Each URL pattern maps to a specific view function that handles the request.
 
 from django.urls import path
 from . import views
+from .views import send_email_view
 
 # URL patterns for the Book Catalog application
 urlpatterns = [
@@ -54,4 +55,8 @@ urlpatterns = [
     # Open Library integration
     path('open-library/', views.open_library_search, name='open_library_search'),  # Search Open Library
     path('open-library/save/', views.save_open_library_book, name='save_open_library_book'),  # Save book from Open Library
+]
+
+urlpatterns += [
+    path('admin/send-email/', send_email_view, name='send_email'),
 ]
