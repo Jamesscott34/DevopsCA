@@ -40,6 +40,11 @@ urlpatterns = [
     path('send-notification/<int:user_id>/', views.send_notification, name='send_notification_user'),  # Send notification to specific user
     path('send-bulk-notification/', views.send_bulk_notification, name='send_bulk_notification'),  # Send bulk notification (admin)
     
+    # Email management (admin)
+    path('send-email/', views.send_email, name='send_email'),  # Send email (admin)
+    path('send-email/<int:user_id>/', views.send_email, name='send_email_user'),  # Send email to specific user
+    path('send-bulk-email/', views.send_bulk_email, name='send_bulk_email'),  # Send bulk email (admin)
+    
     # Book management
     path('home/', views.home, name='home'),  # Home page with book catalog (moved from root)
     path('add/', views.add_book, name='add_book'),  # Add new book
