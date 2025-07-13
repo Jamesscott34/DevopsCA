@@ -19,6 +19,7 @@ from datetime import datetime
 import random
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
+import os
 
 def get_current_user(request):
     """
@@ -109,6 +110,7 @@ def home(request):
         'selected_tag': tag_id,
     })
 
+@csrf_exempt
 def add_book(request):
     """
     Handle adding new books to the catalog with improved validation, error handling, and cover image upload support.
@@ -140,6 +142,12 @@ def add_book(request):
                 else:
                     book.save()
                     messages.success(request, 'Book added successfully!')
+                    # --- Append confirmation to cookies.txt ---
+                    try:
+                        with open('cookies.txt', 'a') as f:
+                            f.write(f"\n---\n{datetime.now().strftime('%d %b %Y %H:%M:%S')}\nBook uploaded for user: {current_user.username if current_user else 'unknown'}\nTitle: {book.title}\nISBN: {book.isbn}\n---\n")
+                    except Exception as log_exc:
+                        pass
                     return redirect('home')
             except Exception as e:
                 form.add_error(None, f'An unexpected error occurred: {str(e)}')
@@ -149,6 +157,7 @@ def add_book(request):
         form = BookForm()
     return render(request, 'books/add_book.html', {'form': form, 'current_user': current_user})
 
+@csrf_exempt
 def edit_book(request, pk):
     """
     Handle editing existing books in the catalog with improved validation, error handling, and cover image upload support.
@@ -185,10 +194,12 @@ def edit_book(request, pk):
         form = BookForm(instance=book)
     return render(request, 'books/edit_book.html', {'form': form, 'current_user': current_user})
 
+@csrf_exempt
 def delete_book_by_isbn(request, isbn):
     """
     Delete a book from the catalog using its ISBN. If not found, or if ISBN is 'None' or 'noisbn', try by title and author.
     """
+    current_user = get_current_user(request)
     if isbn in [None, '', 'None', 'noisbn']:
         # Try by title and author if provided
         title = request.GET.get('title') or request.POST.get('title')
@@ -198,6 +209,12 @@ def delete_book_by_isbn(request, isbn):
                 book = Book.objects.get(title=title, author=author)
                 book.delete()
                 messages.success(request, f'Book "{title}" by {author} deleted (no valid ISBN).')
+                # --- Append confirmation to cookies.txt ---
+                try:
+                    with open('cookies.txt', 'a') as f:
+                        f.write(f"\n---\n{datetime.now().strftime('%d %b %Y %H:%M:%S')}\nBook deleted for user: {current_user.username if current_user else 'unknown'}\nTitle: {title}\nISBN: {getattr(book, 'isbn', 'unknown')}\n---\n")
+                except Exception as log_exc:
+                    pass
             except Book.DoesNotExist:
                 messages.error(request, 'No book found with the given title and author.')
         else:
@@ -205,8 +222,16 @@ def delete_book_by_isbn(request, isbn):
         return redirect('home')
     try:
         book = Book.objects.get(isbn=isbn)
+        title = book.title
+        author = book.author
         book.delete()
         messages.success(request, f'Book with ISBN {isbn} deleted.')
+        # --- Append confirmation to cookies.txt ---
+        try:
+            with open('cookies.txt', 'a') as f:
+                f.write(f"\n---\n{datetime.now().strftime('%d %b %Y %H:%M:%S')}\nBook deleted for user: {current_user.username if current_user else 'unknown'}\nTitle: {title}\nISBN: {isbn}\n---\n")
+        except Exception as log_exc:
+            pass
     except Book.DoesNotExist:
         # Try by title and author if provided
         title = request.GET.get('title') or request.POST.get('title')
@@ -216,6 +241,12 @@ def delete_book_by_isbn(request, isbn):
                 book = Book.objects.get(title=title, author=author)
                 book.delete()
                 messages.success(request, f'Book "{title}" by {author} deleted (no valid ISBN).')
+                # --- Append confirmation to cookies.txt ---
+                try:
+                    with open('cookies.txt', 'a') as f:
+                        f.write(f"\n---\n{datetime.now().strftime('%d %b %Y %H:%M:%S')}\nBook deleted for user: {current_user.username if current_user else 'unknown'}\nTitle: {title}\nISBN: {getattr(book, 'isbn', 'unknown')}\n---\n")
+                except Exception as log_exc:
+                    pass
             except Book.DoesNotExist:
                 messages.error(request, 'No book found with the given ISBN, title, and author.')
         else:
@@ -354,6 +385,7 @@ def toggle_read(request, book_id):
     book.save()
     return redirect('home')
 
+@csrf_exempt
 def save_open_library_book(request):
     """
     Save a book from Open Library search results to the local catalog.
@@ -400,6 +432,12 @@ def save_open_library_book(request):
             isbn=isbn,
             description=request.POST.get("description", ""),  # optional
         )
+        # --- Append confirmation to cookies.txt ---
+        try:
+            with open('cookies.txt', 'a') as f:
+                f.write(f"\n---\n{datetime.now().strftime('%d %b %Y %H:%M:%S')}\nBook uploaded for user: {request.session.get('user_id', 'unknown')}\nTitle: {title}\nISBN: {isbn}\n---\n")
+        except Exception as log_exc:
+            pass
         return redirect("home")
 
 def generate_js_isbn():
@@ -443,6 +481,7 @@ def register_user(request):
     
     return render(request, 'books/register_user.html', {'form': form, 'current_user': current_user})
 
+@csrf_exempt
 def login_user(request):
     """
     Handle user authentication and login.
@@ -627,6 +666,7 @@ def delete_user(request, user_id):
     
     return redirect('admin_dashboard')
 
+@csrf_exempt
 def change_password(request):
     """
     Handle password change for a user.
@@ -658,6 +698,7 @@ def change_password(request):
     
     return render(request, 'books/change_password.html', {'form': form, 'current_user': current_user})
 
+@csrf_exempt
 def edit_profile(request):
     """
     Handle profile editing for a user.
@@ -691,6 +732,7 @@ def edit_profile(request):
     
     return render(request, 'books/edit_profile.html', {'form': form, 'current_user': current_user})
 
+@csrf_exempt
 def delete_profile(request):
     """
     Handle profile deletion for a user.
@@ -723,6 +765,7 @@ def delete_profile(request):
     
     return render(request, 'books/delete_profile.html', {'current_user': current_user})
 
+@csrf_exempt
 def send_notification(request, user_id=None):
     """
     Handle sending notifications to users (admin only).
@@ -829,6 +872,7 @@ def send_notification(request, user_id=None):
         'target_user': target_user
     })
 
+@csrf_exempt
 def send_bulk_notification(request):
     """
     Handle sending bulk notifications to multiple users (admin only).
@@ -1008,6 +1052,7 @@ def mark_all_notifications_read(request):
     messages.success(request, f'{count} notification(s) marked as read.')
     return redirect('view_notifications')
 
+@csrf_exempt
 def change_user_email(request, user_id):
     """
     Handle changing a user's email address (admin only).
@@ -1056,6 +1101,7 @@ def change_user_email(request, user_id):
         'target_user': target_user
     })
 
+@csrf_exempt
 def edit_admin_referral(request, user_id):
     """
     Allow admin to edit the admin_referral field for a user.
@@ -1146,6 +1192,7 @@ def admin_view_user_books(request, user_id):
         'current_user': current_user,
     })
 
+@csrf_exempt
 def admin_set_referral(request, user_id):
     """
     Admin-only view to set a referral book for a user.
