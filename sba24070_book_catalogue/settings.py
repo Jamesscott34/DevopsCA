@@ -186,3 +186,6 @@ SESSION_COOKIE_SAMESITE = 'Lax'  # or 'None' if you need cross-origin
 SESSION_COOKIE_SECURE = False    # True only if using HTTPS
 CSRF_COOKIE_SAMESITE = 'Lax'     # or 'None' if you need cross-origin
 CSRF_COOKIE_SECURE = False       # True only if using HTTPS
+
+
+LOGIN_URL = '/login/'

@@ -20,6 +20,10 @@ import random
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 import os
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .email_utils import send_custom_email
+from django.views.decorators.http import require_POST
+import json
 
 from .forms import EmailForm, BulkEmailForm
 from django.core.mail import send_mail

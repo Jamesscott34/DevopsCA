@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from books.views import api_send_email
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,4 +28,8 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+urlpatterns += [
+    path('api/send-email/', api_send_email, name='api_send_email'),
+]
 
