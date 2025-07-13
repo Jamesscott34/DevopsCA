@@ -152,7 +152,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Django REST Framework Configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
+        'books.drf_auth.CustomSessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
@@ -186,3 +186,6 @@ SESSION_COOKIE_SAMESITE = 'Lax'  # or 'None' if you need cross-origin
 SESSION_COOKIE_SECURE = False    # True only if using HTTPS
 CSRF_COOKIE_SAMESITE = 'Lax'     # or 'None' if you need cross-origin
 CSRF_COOKIE_SECURE = False       # True only if using HTTPS
+
+
+LOGIN_URL = '/login/'
