@@ -55,14 +55,24 @@ jobs:
         run: pip install -r requirements.txt
       - name: Set DB host to localhost for CI
         run: python3 custom_scripts/host_helper.py <<< "1"
-      - name: Run Django tests
+      - name: Run Django tests individually
         env:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
           POSTGRES_DB: sba24070
           POSTGRES_USER: sba24070_user
           POSTGRES_PASSWORD: your_secure_password
-        run: python manage.py test
+        run: |
+          python manage.py test books.tests.BookModelTest.test_create_and_retrieve_book
+          python manage.py test books.tests.BookModelTest.test_unique_isbn_constraint
+          python manage.py test books.tests.BookModelTest.test_required_fields
+          python manage.py test books.tests.BookModelTest.test_increment_view_count
+          python manage.py test books.tests.BookModelTest.test_get_most_read_and_most_viewed
+          python manage.py test books.tests.BookModelTest.test_assign_tags_to_book
+          python manage.py test books.tests.BookModelTest.test_book_str_representation
+          python manage.py test books.tests.UserModelTest.test_user_authentication
+          python manage.py test books.tests.UserModelTest.test_notification_creation_and_mark_as_read
+          python manage.py test books.tests.EmailBackendTest.test_send_real_email
 
   runmigrations:
     needs: install-dependencies
