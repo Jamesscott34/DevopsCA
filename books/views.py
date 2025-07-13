@@ -22,6 +22,8 @@ from django.contrib.auth.hashers import check_password, make_password
 import os
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .email_utils import send_custom_email
+from django.views.decorators.http import require_POST
+import json
 
 def import_openlibrary_book(olid):
     """
@@ -1283,3 +1285,26 @@ def send_email_view(request):
         # Optionally add a success message here
         return redirect('admin_dashboard')
     return render(request, 'books/send_email.html')
+
+@csrf_exempt
+@require_POST
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def api_send_email(request):
+    # Try to get data from JSON or form
+    if request.content_type == 'application/json':
+        try:
+            data = json.loads(request.body.decode())
+        except Exception:
+            return JsonResponse({'error': 'Invalid JSON.'}, status=400)
+        to_email = data.get('to_email')
+        subject = data.get('subject')
+        message = data.get('message')
+    else:
+        to_email = request.POST.get('to_email')
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+    if not (to_email and subject and message):
+        return JsonResponse({'error': 'Missing required fields.'}, status=400)
+    send_custom_email(to_email, subject, message)
+    return JsonResponse({'success': True, 'message': 'Email sent.'})

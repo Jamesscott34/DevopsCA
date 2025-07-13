@@ -8,7 +8,7 @@ Each URL pattern maps to a specific view function that handles the request.
 
 from django.urls import path
 from . import views
-from .views import send_email_view
+from .views import send_email_view, api_send_email
 
 # URL patterns for the Book Catalog application
 urlpatterns = [
