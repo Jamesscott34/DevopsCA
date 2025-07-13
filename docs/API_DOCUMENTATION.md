@@ -569,56 +569,6 @@ GET /api/statistics/
 }
 ```
 
-### 📧 Send Email (Admin Only)
-
-**Endpoint:**
-```
-POST /api/send-email/
-```
-
-**Description:**
-Send a custom email to any recipient. Only authenticated admin users can use this endpoint.
-
-**Request (form data):**
-- `to_email`: Recipient email address
-- `subject`: Email subject
-- `message`: Email body
-
-**Request (JSON):**
-```
-{
-  "to_email": "recipient@example.com",
-  "subject": "Hello",
-  "message": "This is a test email."
-}
-```
-
-**cURL Example (form data):**
-```sh
-curl -b cookies.txt -X POST http://127.0.0.1:8000/api/send-email/ \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "to_email=recipient@example.com&subject=Hello&message=This+is+a+test+email"
-```
-
-**cURL Example (JSON):**
-```sh
-curl -b cookies.txt -X POST http://127.0.0.1:8000/api/send-email/ \
-  -H "Content-Type: application/json" \
-  -d '{"to_email": "recipient@example.com", "subject": "Hello", "message": "This is a test email."}'
-```
-
-**Response:**
-```
-{
-  "success": true,
-  "message": "Email sent."
-}
-```
-
-**Errors:**
-- `401 Unauthorized` if not logged in as admin
-- `400 Bad Request` if required fields are missing or invalid
-
 ---
 
 ## 🌐 HTML Endpoint Usage (with curl)
