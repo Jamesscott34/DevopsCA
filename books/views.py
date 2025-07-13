@@ -20,6 +20,8 @@ import random
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 import os
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .email_utils import send_custom_email
 
 def import_openlibrary_book(olid):
     """
@@ -1269,3 +1271,15 @@ def admin_set_referral(request, user_id):
         'target_user': user,
         'current_user': current_user,
     })
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def send_email_view(request):
+    if request.method == 'POST':
+        to_email = request.POST.get('to_email')
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+        send_custom_email(to_email, subject, message)
+        # Optionally add a success message here
+        return redirect('admin_dashboard')
+    return render(request, 'books/send_email.html')
