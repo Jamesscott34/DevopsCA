@@ -80,7 +80,13 @@ jobs:
           python manage.py test books.tests.BookModelTest.test_book_str_representation
           python manage.py test books.tests.UserModelTest.test_user_authentication
           python manage.py test books.tests.UserModelTest.test_notification_creation_and_mark_as_read
-          python manage.py test books.tests.EmailBackendTest.test_send_real_email
+          # Only run EmailBackendTest if EnvVarTest passes (not skipped)
+          python manage.py test books.tests.EnvVarTest > envvar.log
+          if ! grep -q 'skipped=1' envvar.log; then
+            python manage.py test books.tests.EmailBackendTest.test_send_real_email
+          else
+            echo 'Skipping EmailBackendTest: Email env vars not set.'
+          fi
 
   runmigrations:
     needs: install-dependencies

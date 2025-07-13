@@ -241,11 +241,11 @@ class UserModelTest(TestCase):
 class EmailBackendTest(TestCase):
     @override_settings(EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend')
     def test_send_real_email(self):
-        """
-        Sends a real email using the SMTP backend and environment credentials.
-        Logs the result to pytest.txt for confirmation.
-        WARNING: This will send a real email every time the test runs.
-        """
+        user = os.environ.get('EMAIL_HOST_USER')
+        password = os.environ.get('EMAIL_HOST_PASSWORD')
+        if not user or not password:
+            print('WARNING: Email env vars not set. Skipping real email test.')
+            raise unittest.SkipTest('Email environment variables not set.')
         subject = "Test Email"
         message = "This is a real test email from the test suite."
         from_email = settings.DEFAULT_FROM_EMAIL

@@ -123,6 +123,18 @@
 - **Reading Progress Emails**: Periodic updates on reading progress
 - **Admin Email Alerts**: Email notifications for admin activities
 
+> **Note:**
+> To enable email features, you must either:
+> - (Not recommended) Hardcode your email credentials in `settings.py`, **or**
+> - Add your email credentials to your `.env` file (recommended). For Gmail, you must generate an [App Password](https://support.google.com/accounts/answer/185833) and use it as your `EMAIL_HOST_PASSWORD`.
+> - Example `.env` entries:
+>   ```
+>   EMAIL_HOST_USER=your_email@gmail.com
+>   EMAIL_HOST_PASSWORD=your_app_password
+>   DEFAULT_FROM_EMAIL=your_email@gmail.com
+>   ```
+> - Without these, email features and tests will be skipped or fail.
+
 ### 🚀 Performance & Scalability
 - **Caching System**: Redis-based caching for improved performance
 - **CDN Integration**: Content delivery network for static files
