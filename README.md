@@ -222,7 +222,8 @@ kubectl apply -f k8s/service.yaml
 
 # Run migrations
 kubectl exec -it <django-pod> -- python manage.py migrate
-kubectl exec -it <django-pod> -- python manage.py createsuperuser
+kubectl exec -it <django-pod> -- python manage.py collectstatic --noinput
+kubectl exec -it <django-pod> -- python manage.py create_admin
 ```
 
 ### 🚢 Helm Deployment
